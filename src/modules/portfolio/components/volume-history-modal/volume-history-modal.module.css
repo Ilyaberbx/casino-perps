@@ -1,0 +1,86 @@
+/* Fill the modal body as a flex column: the table area scrolls, the footnote
+ * stays pinned below it. The shared `.body` is deliberately not a scroll
+ * container (see modal.module.css) — each modal owns its own inner scroller.
+ *
+ * The height MUST be definite, not `height: 100%` or a pure `flex: 1` chain:
+ * the shared `.dialog` has only `max-height` (no definite height), so a
+ * percentage/flex height resolves to the content basis and the inner scroll
+ * never bounds — the same trap market-selection-window's `.windowBody`
+ * documents. We subtract from the viewport: backdrop padding (24×2 = 48),
+ * body padding (20×2 = 40), and the Modal header (~56) → 144px. The 720px
+ * ceiling keeps the modal from sprawling on very tall displays. */
+.content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: min(calc(100vh - 144px), 720px);
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+}
+
+/* Keep column headers visible while the long history scrolls. The background
+ * is opaque so scrolled rows don't bleed through the sticky row. */
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--surface);
+}
+
+.table th,
+.table td {
+  padding: 8px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th:first-child,
+.table td:first-child {
+  text-align: left;
+}
+
+.table th {
+  color: var(--textMuted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+}
+
+.totalRow {
+  font-weight: 700;
+  color: var(--text);
+  background-color: var(--surface-strong, var(--surface));
+}
+
+.totalRow td {
+  border-bottom: none;
+  border-top: 1px solid var(--border-strong, var(--border));
+}
+
+.footnote {
+  margin: 16px 0 0;
+  color: var(--textMuted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Mobile: the Modal becomes a full-screen sheet (dialog → 100dvh, no backdrop
+ * padding — see modal.module.css). Fill it: only body padding (40) + header
+ * (~56) come off the viewport. */
+@media (max-width: 1023.98px) {
+  .content {
+    height: calc(100dvh - 96px);
+  }
+}

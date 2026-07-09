@@ -1,0 +1,90 @@
+/* AI marker system: the mascot glyph, the surviving AI identity mark (the loud
+   "AI zone" frame + badge layer was retired). Compositor-cheap; the only
+   animation is the mascot's GIF layer, with a prefers-reduced-motion fallback at
+   the bottom of this file. */
+
+/* ---- AiMascot ---------------------------------------------------------- */
+
+/* Static SVG floor — paints in currentColor so it swaps by contrast. The
+   wrapper/consumer sets the color; default is the primary ink. The pixel-extrude
+   drop-shadow gives the mascot a raised "sticker" read (ADR-0050 amendment). */
+.mascot {
+  display: inline-block;
+  color: var(--text);
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35));
+}
+
+/* White theme: the near-black primary ink reads as a black mascot. Paint it the
+   deep-teal accent instead so the brand sprite stays legible on light surfaces
+   (covers the static SVG and the reduced-motion fallback below). */
+:global([data-theme='white']) .mascot,
+:global([data-theme='white']) .mascotFallback {
+  color: var(--accent);
+}
+
+/* Animated wrapper stacks the GIF over the static floor; display toggles pick
+   the visible layer (one is always in flow, so the box never shifts). */
+.mascotAnimated {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 0;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35));
+}
+
+.mascotGif {
+  display: block;
+}
+
+/* The dark-contrast (white) GIF shows on dark; the light-contrast (black) GIF
+   shows on the white theme. Default theme is dark, so light starts hidden. */
+.mascotGifLight {
+  display: none;
+}
+
+:global([data-theme='white']) .mascotGifDark {
+  display: none;
+}
+
+/* Teal-recolor mask layer: an --accent box clipped to the animated sprite via
+   the GIF's alpha. Hidden by default; the white theme shows it in place of the
+   raster black GIF so the mascot reads deep-teal, not black. */
+.mascotGifMaskLight {
+  display: none;
+  background-color: var(--accent);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+:global([data-theme='white']) .mascotGifLight {
+  display: none;
+}
+
+:global([data-theme='white']) .mascotGifMaskLight {
+  display: block;
+}
+
+/* Static fallback only surfaces under reduced motion (a GIF can't be paused). */
+.mascotFallback {
+  display: none;
+}
+
+/* ---- Reduced motion ---------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .mascotGif {
+    display: none;
+  }
+  :global([data-theme='white']) .mascotGifLight,
+  :global([data-theme='white']) .mascotGifMaskLight {
+    display: none;
+  }
+  .mascotFallback {
+    display: block;
+  }
+}

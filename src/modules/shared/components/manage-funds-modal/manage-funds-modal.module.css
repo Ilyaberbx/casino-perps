@@ -1,0 +1,166 @@
+/* Two-column shell: left nav rail + right active-form pane (settings-modal
+ * style). The shared Modal already caps width at 720px desktop / full-screen on
+ * mobile, where the rail flips to a top scroll strip via `.navMobile`. */
+.layout {
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+}
+
+@media (max-width: 1023.98px) {
+  .layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* Desktop: fix the body height so switching tabs never resizes the modal — a
+   taller tab scrolls inside the pane. Mobile is full-screen (pane fills/scrolls). */
+@media (min-width: 1024px) {
+  .layout {
+    height: min(72vh, 460px);
+  }
+}
+
+/* ─── Left nav rail ─────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 0 168px;
+  min-width: 0;
+}
+
+/* Mobile: horizontal scroll strip. Hidden scrollbar keeps the chrome clean;
+ * the row scrolls when the five tabs overflow the viewport width. */
+.navMobile {
+  flex-direction: row;
+  flex: 0 0 auto;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.navMobile::-webkit-scrollbar {
+  display: none;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--textMutedStrong);
+  background: none;
+  border: var(--border-pixel) solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-glow) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart);
+}
+
+.navMobile .navItem {
+  width: auto;
+}
+
+.navItem:hover:not(.navItemActive) {
+  color: var(--text);
+  background-color: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: var(--glow-halo-soft);
+}
+
+.navItem:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-accent-sm);
+}
+
+/* Active item is the only cyan-accented element in the rail — now a raised,
+   glowing cyan chip with a top-lit edge for premium depth. */
+.navItemActive {
+  color: var(--textOnAccent);
+  background: var(--gradient-accent);
+  border-color: var(--accent);
+  border-top-color: color-mix(in srgb, var(--accent) 55%, white 45%);
+  box-shadow: var(--shadow-glass), var(--glow-halo-md);
+}
+
+.navItem:active {
+  transform: translateY(1px);
+}
+
+.navLabel {
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navItem {
+    transition: none;
+  }
+  .navItem:active {
+    transform: none;
+  }
+}
+
+/* ─── Right pane ────────────────────────────────────────────────── */
+.pane {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  /* Scroll a tall tab body instead of growing the (fixed-height) dialog. */
+  overflow-y: auto;
+}
+
+/* ─── Stub / unsupported panes ──────────────────────────────────── */
+.comingSoon,
+.unsupported {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 200px;
+  padding: 24px;
+  text-align: center;
+}
+
+.comingSoonHeadline {
+  margin: 0;
+  font-family: var(--font-trading);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.comingSoonLabel {
+  margin: 0;
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.comingSoonBody,
+.unsupportedBody {
+  margin: 0;
+  font-family: var(--font-trading);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--textMuted);
+  max-width: 280px;
+}

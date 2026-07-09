@@ -1,0 +1,1007 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* Content-height: the dock grows with the active tab and the page (.shell in
+     trading-page.module.css) owns the primary scrollbar. Each tab's row list is
+     capped at --dock-list-max-height and scrolls internally only past the cap,
+     so a whale with 60 open orders doesn't make an absurdly long page.
+     flex-grow so the dock can absorb the slack when its host (.positionsCard)
+     is stretched taller than the active tab's own content. */
+  --dock-list-max-height: 60vh;
+  flex: 1 1 auto;
+  min-height: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  background-color: var(--surface);
+  color: var(--text);
+
+  /* Shared grid tracks so each table's header row and body rows align on one
+     set of columns (mirrors the market-list `--market-grid` pattern).
+     Trade History (9 cols): Time Asset Side Price Size Value Fee ClosedPNL Type
+     The Side track holds the direction chip ('Open Long', 'Short > Long') and
+     the Value/Fee/ClosedPNL money cells carry a ' USDC' suffix, so those tracks
+     are widened past the old BUY/SELL + bare-$ sizing. */
+  --fills-grid: 1.2fr 1fr 1.5fr 0.9fr 1.2fr 1.3fr 1.3fr 1.4fr 0.8fr;
+  /* Positions (11 cols): Asset Size PositionValue Entry Mark Liq PNL(ROE)
+     Margin Funding Actions TP/SL. Actions holds Close + the ⋯ manage button
+     side by side; an fr track let them squash, so it is a fixed 100px floor that
+     fits both. The value-bearing PNL (two figures + parens) and Margin (figure +
+     "(Cross)" suffix) tracks are widened, paid for by trimming the short price
+     tracks (Entry/Mark/Liq) — whale-sized values were overflowing past FitCell's
+     0.5 floor and clipping their tails (Issue #253). Total fr is unchanged (11.1),
+     so the 1100px floor below still holds (no new horizontal scroll). */
+  --positions-grid: 1.6fr 1fr 1.1fr 0.85fr 0.85fr 0.85fr 1.55fr 1.2fr 0.7fr 100px 1.4fr;
+  /* Spectate variant: the Actions column (Close / Manage) is dropped while
+     viewing another account, so the 100px Actions track is removed (10 cols).
+     The remaining fr tracks are identical, so the other columns stay put. */
+  --positions-grid-spectate: 1.6fr 1fr 1.1fr 0.85fr 0.85fr 0.85fr 1.55fr 1.2fr 0.7fr 1.4fr;
+  /* Open Orders (11 cols): Time Type Asset Direction Size OrigSize OrderValue
+     Price ReduceOnly TriggerConditions Actions. The Actions track holds Cancel +
+     Modify side by side (each a 26px-tall pixel button); 88px clipped Modify to
+     "M", so the fixed track is widened to fit both. The OrderValue/Trigger fr
+     tracks shrink slightly to keep the row total balanced. Time is 0.9fr — the
+     localized `MMM dd, HH:mm` stamp is compact, so the old 1.2fr left dead space. */
+  --orders-grid: 0.9fr 0.8fr 1.1fr 72px 1fr 1fr 1fr 1fr 0.9fr 1.1fr 150px;
+  /* Spectate variant: the Actions column (Cancel / Modify) is dropped while
+     viewing another account, so the trailing 150px Actions track is removed
+     (10 cols). The remaining tracks are identical, so columns stay put. */
+  --orders-grid-spectate: 0.9fr 0.8fr 1.1fr 72px 1fr 1fr 1fr 1fr 0.9fr 1.1fr;
+  /* Order History (12 cols): Time Type Asset Direction Size FilledSize
+     OrderValue Price ReduceOnly TriggerConditions Status OrderID */
+  --order-history-grid: 1.2fr 0.9fr 1fr 72px 0.9fr 0.9fr 1fr 0.9fr 0.8fr 1.1fr 1fr 1.1fr;
+  /* Funding History (5 cols): Time Asset Payment Rate PositionSize */
+  --funding-grid: 1.4fr 1.3fr 1.2fr 1fr 1.1fr;
+  /* Interest History (3 cols): Time Asset NetInterest */
+  --interest-grid: 1.6fr 1fr 1.2fr;
+  /* Account Activity (10 cols): Time Status Asset Action From To Destination
+     AccountChange USDValue Fee */
+  --activity-grid: 1.7fr 0.9fr 0.7fr 1.3fr 0.95fr 0.95fr 1.15fr 1.2fr 1fr 0.7fr;
+  /* TWAP Active (11 cols): Select Asset Side Size Executed AvgPrice StartedAt
+     Duration TimeRemaining Progress Cancel */
+  --twap-active-grid: 36px 1.2fr 64px 0.9fr 0.9fr 1.1fr 1.3fr 1fr 1.2fr 1.4fr 88px;
+  /* TWAP History (10 cols): Time Asset Side TotalSize ExecutedSize AvgPrice
+     Duration ReduceOnly Randomize Status */
+  --twap-history-grid: 1.3fr 1.1fr 64px 0.9fr 1fr 1.1fr 1fr 0.9fr 0.9fr 1fr;
+  /* TWAP Fill History (8 cols): Time Asset Side Price Size TradeValue Fee ClosedPNL */
+  --twap-fill-grid: 1.3fr 1.1fr 64px 1fr 1.2fr 1.3fr 1.2fr 1.3fr;
+}
+
+/* Pin the tab strip to the top of the page's scroll container (`.shell` on the
+   trading page, the ScrollArea viewport on portfolio, `.mobileScrollBody` on
+   mobile — none of which clip between here and the dock), so the tabs stay in
+   view while the dock's rows scroll past beneath them. The tab-bar `.list`
+   already paints a `surface-elevated` background, so rows are occluded as they
+   pass under it; the z-index keeps it above the (non-sticky) column headers. */
+/* Sticky wrapper around the tab bar so it pins to the top of the dock as the
+   active tab's rows scroll under it. On mobile it also anchors the scroll
+   affordance (the fade below). */
+/* Flex row: the scrollable tab strip on the left, a non-shrinking toolbar slot
+   (Close-all / Cancel-all) pinned to the right — mirrors the reference venue UI,
+   where the bulk action stays fixed while tabs scroll underneath it. */
+.tabsWrap {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: stretch;
+}
+
+.dockTabsScroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dockTabs {
+  width: 100%;
+}
+
+/* Desktop + mobile: the tab bar is a single horizontal-scroll row (wrap is off).
+   A right-edge fade hints that more tabs exist past the viewport — the affordance
+   the old hidden-scrollbar single-row variant lacked (why wrapping was chosen).
+   With 9 long-labeled tabs the bar overflows at the dock's realistic widths, so a
+   static hint never misleads; hiding it at scroll-end would need JS and isn't
+   worth it. Scoped to `.dockTabsScroll` (not `.tabsWrap`) so it never paints over
+   the toolbar slot. */
+.dockTabsScroll::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 32px;
+  background: linear-gradient(to right, transparent, var(--surface-elevated));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Trailing toolbar slot in the main tab row (Close-all / Cancel-all). Matches
+   the tab strip's own background + bottom border so the two flex children read
+   as one continuous strip with a single divider line. */
+.tabsToolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  background-color: var(--surface-elevated);
+  border-bottom: var(--border-pixel) solid var(--border-strong);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  /* Grows to fill the dock's available height (see .container) so an
+     empty-state or short tab doesn't leave dead space below it; `.list` still
+     carries the max-height cap for populated tables. `.panelHidden` wins for
+     inactive tabs regardless. */
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.panelHidden {
+  display: none;
+}
+
+.tableHeader {
+  display: grid;
+  gap: 8px;
+  padding: 8px 10px;
+  color: var(--textMuted);
+  border-bottom: var(--border-pixel) solid var(--border-strong);
+  background-color: var(--surface-elevated);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+  box-shadow: 0 1px 0 0 var(--border) , 0 4px 8px -6px rgb(0 0 0 / 40%);
+  /* Pin the column header to the top of the single `.tableScroll` viewport so it
+     stays above the rows on VERTICAL scroll, while still scrolling WITH them on
+     HORIZONTAL scroll (sticky only offsets the `top` axis). This is what keeps
+     each value under its label — one scroll container, not two. z-index sits
+     above the rows but below the sticky tab strip (`.tabsWrap`, z-index 10). */
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.positionsHeader {
+  grid-template-columns: var(--positions-grid);
+}
+
+.positionsHeaderSpectate {
+  grid-template-columns: var(--positions-grid-spectate);
+}
+
+.ordersHeader {
+  grid-template-columns: var(--orders-grid);
+}
+
+.ordersHeaderSpectate {
+  grid-template-columns: var(--orders-grid-spectate);
+}
+
+.fillsHeader {
+  grid-template-columns: var(--fills-grid);
+}
+
+.orderHistoryHeader {
+  grid-template-columns: var(--order-history-grid);
+}
+
+.fundingHeader {
+  grid-template-columns: var(--funding-grid);
+}
+
+.interestHeader {
+  grid-template-columns: var(--interest-grid);
+}
+
+.activityHeader {
+  grid-template-columns: var(--activity-grid);
+}
+
+.twapActiveHeader {
+  grid-template-columns: var(--twap-active-grid);
+}
+
+.twapHistoryHeader {
+  grid-template-columns: var(--twap-history-grid);
+}
+
+.twapFillHeader {
+  grid-template-columns: var(--twap-fill-grid);
+}
+
+.headerCell {
+  /* Numeric column labels are centered (matches the centered value cells below);
+     the Asset/label columns opt out via `.headerCellLeft` or `:first-child`. */
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.headerCell:first-child {
+  text-align: left;
+}
+
+/* Header-label FitCell: fills the header track so the scaleX measure uses the
+   real column width. Mirrors how body cells host a FitCell that fills `.cell`;
+   without `width: 100%` the inline-block FitCell outer would shrink to the
+   label's natural width and never measure overflow, so long headers (e.g.
+   "POSITION VALUE", "TRIGGER CONDITIONS") would not compress. */
+.headerFit {
+  width: 100%;
+}
+
+/* Left-aligned header cell for label columns (account-activity Status/Asset/
+   Action/From/To/Destination, and the Asset/symbol columns in the orders /
+   fills / TWAP tables whose body cell is a left-packed `symbolCell`) so the
+   header matches the left-aligned body. Carries the same nowrap+overflow as
+   `.headerCell` so the label stays one line. */
+.headerCellLeft {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.list {
+  /* Plain block — NO own overflow. The vertical cap + scroll live on the single
+     `.tableScroll` container (below). Giving `.list` `overflow-y:auto` would
+     coerce its `overflow-x` to `auto` too (CSS: a non-`visible` axis forces the
+     other off `visible`), turning the row list into a SECOND horizontal scroller
+     independent of the header — the misalignment bug this layout had. */
+  display: block;
+}
+
+.row {
+  display: grid;
+  gap: 8px;
+  padding: 6px 10px;
+  cursor: default;
+  user-select: none;
+  align-items: center;
+  border-bottom: var(--border-pixel) solid var(--border);
+  transition: background-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.positionsRow {
+  grid-template-columns: var(--positions-grid);
+}
+
+.positionsRowSpectate {
+  grid-template-columns: var(--positions-grid-spectate);
+}
+
+.ordersRow {
+  grid-template-columns: var(--orders-grid);
+}
+
+.ordersRowSpectate {
+  grid-template-columns: var(--orders-grid-spectate);
+}
+
+.fillsRow {
+  grid-template-columns: var(--fills-grid);
+}
+
+.orderHistoryRow {
+  grid-template-columns: var(--order-history-grid);
+}
+
+.fundingRow {
+  grid-template-columns: var(--funding-grid);
+}
+
+.interestRow {
+  grid-template-columns: var(--interest-grid);
+}
+
+.activityRow {
+  grid-template-columns: var(--activity-grid);
+}
+
+.twapActiveRow {
+  grid-template-columns: var(--twap-active-grid);
+}
+
+.twapHistoryRow {
+  grid-template-columns: var(--twap-history-grid);
+}
+
+.twapFillRow {
+  grid-template-columns: var(--twap-fill-grid);
+}
+
+/* The single scroll container for a table — owns BOTH axes. Horizontal: below
+   the table's min-width the columns would squash into unreadable overlap, so it
+   scrolls X (header + rows together, header sticky only on Y). Vertical: capped
+   at --dock-list-max-height; short tables grow the dock and the page scrolls,
+   taller ones scroll internally with the header pinned. The toolbar / pagination
+   stay OUTSIDE it, at the viewport width. One container = header and rows can
+   never scroll out of column-alignment. */
+.tableScroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  max-height: var(--dock-list-max-height);
+}
+
+/* Per-table min-widths: the floor at which columns stay readable. Header and
+   rows share the same floor so they stay column-aligned while scrolling. Above
+   the floor the fr tracks expand to fill (desktop unaffected). */
+.positionsHeader,
+.positionsRow {
+  min-width: 1100px;
+}
+
+.positionsHeaderSpectate,
+.positionsRowSpectate {
+  /* One fewer column than the trading layout — drop the 100px Actions track and
+     its 8px gap: 1100 - 108 = 992px. */
+  min-width: 992px;
+}
+
+.ordersHeader,
+.ordersRow {
+  min-width: 1140px;
+}
+
+.ordersHeaderSpectate,
+.ordersRowSpectate {
+  /* One fewer column than the trading layout — drop the 150px Actions track and
+     its 8px gap: 1140 - 158 = 982px. */
+  min-width: 982px;
+}
+
+.orderHistoryHeader,
+.orderHistoryRow {
+  min-width: 1160px;
+}
+
+.fillsHeader,
+.fillsRow {
+  min-width: 960px;
+}
+
+.fundingHeader,
+.fundingRow {
+  min-width: 640px;
+}
+
+.interestHeader,
+.interestRow {
+  min-width: 440px;
+}
+
+.activityHeader,
+.activityRow {
+  min-width: 1140px;
+}
+
+.twapActiveHeader,
+.twapActiveRow {
+  min-width: 1100px;
+}
+
+.twapHistoryHeader,
+.twapHistoryRow {
+  min-width: 1000px;
+}
+
+.twapFillHeader,
+.twapFillRow {
+  min-width: 900px;
+}
+
+/* Left-aligned text cell for the account-activity label columns (Status, Asset,
+   Action, From, To, Destination). Truncates rather than wrapping so the 10-col
+   grid stays one line per row. */
+.activityText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.activityStatus {
+  color: var(--textMuted);
+}
+
+/* Time cell pairs the timestamp with the explorer link icon. */
+.activityTimeCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.activityTimeLink {
+  display: inline-flex;
+  align-items: center;
+  color: var(--textMuted);
+  transition: color var(--dur-fast) var(--ease-out-quart);
+}
+
+.activityTimeLink:hover {
+  color: var(--accent);
+}
+
+.activityTimeLink:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+.orderIdCell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--textMuted);
+}
+
+.row:nth-child(even) {
+  background-color: var(--surface-elevated);
+}
+
+.row:hover {
+  background-color: var(--accent-soft);
+}
+
+.cell {
+  /* Centered under the (now centered) column label. The Asset cell stays left
+     because its content is a full-width `.symbolCell` flex box (left-packed),
+     and the first column also opts out via `:first-child`. */
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cell:first-child {
+  text-align: left;
+}
+
+/* Actions / TP-SL cells host elevated (ADR-0070) IconButtons whose glass-chrome
+   box-shadow would otherwise be clipped by `.cell`'s overflow:hidden (needed
+   there for text truncation, not applicable here — these cells hold buttons,
+   not truncatable text). */
+.actionsCell {
+  overflow: visible;
+}
+
+/* In-cell FitCell: when a FitCell renders inside a flex cell (e.g. the PNL cell
+   beside its share icon, the TP/SL cell beside its pencil), the FitCell's outer
+   span is block-level and would not shrink to share the row with the icon.
+   `min-width: 0` + `flex: 1` lets it occupy the remaining track so the scaleX
+   measure uses the real available width. Right-aligned by default so numbers
+   stay anchored to the column's right edge. */
+.fitCellFlex {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Asset/label cell content: a full-width flex box (not inline-flex) so it fills
+   its cell and left-packs its icon + symbol + badges regardless of the parent
+   `.cell` centering — keeping the Asset column left-aligned under its header. */
+.symbolCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* A whole position row that loads its market on the chart when clicked
+   (`role="button"`). The row already highlights on `:hover`; this just adds the
+   pointer affordance and a keyboard focus ring. */
+.rowSelectable {
+  cursor: pointer;
+}
+
+.rowSelectable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.pnlCell {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pnlCell[data-pnl-sign='positive'] {
+  color: var(--directionUp);
+}
+
+.pnlCell[data-pnl-sign='negative'] {
+  color: var(--directionDown);
+}
+
+.pnlCell[data-pnl-sign='zero'] {
+  color: var(--textMuted);
+}
+
+/* Positions PNL cell that also hosts the inline share affordance (trade.xyz
+   parity): right-aligned value + share icon on one line. */
+.pnlCellWithShare {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Inline share beside the PNL value uses the shared `IconButton` (ghost tone);
+   the row-action cluster uses the same `IconButton` (neutral / destructive). */
+
+/* Position Size amount, tinted by the position's direction (long ⇒ up, short ⇒
+   down) to match trade.xyz's colored size column. */
+.directionAmount[data-direction='long'] {
+  color: var(--directionUp);
+}
+
+.directionAmount[data-direction='short'] {
+  color: var(--directionDown);
+}
+
+/* Margin-mode suffix ("(Cross)") — muted so the dollar figure stays primary. */
+.marginMode {
+  color: var(--textMuted);
+}
+
+.errorBanner {
+  padding: 8px 10px;
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--directionDown);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-bottom: var(--border-pixel) solid var(--directionDown);
+  background-color: var(--directionDown-soft);
+  flex-shrink: 0;
+}
+
+.loadMoreRow {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+/* Row action cluster: every control is the shared `IconButton` (26px, hairline,
+   square — dense data surface, ADR-0043), so Share / Close / Manage / Edit read
+   as one set. Close/Cancel use the destructive tone, the rest neutral. */
+.rowActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* TP/SL cell: the trigger prices read back from resting orders ("70,000 / --",
+   "-- / --" when unset) plus a compact edit affordance, aligned and sized like
+   the row actions. */
+.tpslCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tpslValue {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--textMuted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.dialogTitle {
+  margin: 0 0 12px 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 260px;
+}
+
+.dialogSymbol {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.dialogField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dialogLabel {
+  font-family: var(--font-trading);
+  color: var(--textMuted);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.dialogSizeRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.dialogInput {
+  padding: 8px 10px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.dialogInput:focus {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+.dialogHint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--textMuted);
+  font-variant-numeric: tabular-nums;
+}
+
+.triggerLegHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.dialogActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.bulkActionButton {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  border: var(--border-pixel) solid var(--border-strong);
+  /* Raised glass chrome (ADR-0070) — same recipe as Badge, so bulk actions
+     read with the same 3D presence as the badges elsewhere in the dock. */
+  border-top-color: color-mix(in srgb, var(--border-strong) 55%, white 22%);
+  background: var(--gradient-glass);
+  box-shadow: var(--shadow-glass);
+  color: var(--textMutedStrong);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    background-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.bulkActionButton:hover {
+  border-color: var(--directionDown);
+  color: var(--directionDown);
+  background-color: var(--directionDown-soft);
+}
+
+.bulkActionButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+/* ── Position TP/SL modal ────────────────────────────────────────────── */
+
+.tpslInfoRows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 10px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+}
+
+.tpslInfoRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tpslInfoLabel {
+  font-family: var(--font-trading);
+  color: var(--textMuted);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.tpslInfoValue {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tpslSizeLong {
+  color: var(--directionUp);
+}
+
+.tpslSizeShort {
+  color: var(--directionDown);
+}
+
+.tpslCreatePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tpslLegRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.tpslOptionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tpslAmountBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tpslOrdersEmpty {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--textMuted);
+}
+
+.tpslOrdersTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tpslOrdersTable th {
+  text-align: left;
+  padding: 6px 8px;
+  font-family: var(--font-trading);
+  color: var(--textMuted);
+  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border-bottom: var(--border-pixel) solid var(--border-strong);
+}
+
+.tpslOrdersTable td {
+  padding: 8px;
+  color: var(--text);
+  border-bottom: var(--border-pixel) solid var(--border);
+}
+
+/* TWAP panel: the sub-tab bar sits flush above the active sub-panel. The bar is
+   denser than the dock's main tab strip (size="sm") and does not stick — it
+   scrolls with the panel since the dock tab strip above it already sticks. */
+.twapPanel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* TWAP sub-tab row: same scrollable-strip + trailing-toolbar-slot pattern as
+   the main `.tabsWrap`/`.tabsToolbar`, sized for the denser `size="sm"` bar and
+   not sticky (it scrolls with the panel since the dock tab strip above it
+   already sticks). */
+.twapSubTabsWrap {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 4px;
+}
+
+.twapSubTabsScroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.twapSubTabs {
+  width: 100%;
+}
+
+.twapSubTabsToolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  background-color: var(--surface-elevated);
+  border-bottom: var(--border-pixel) solid var(--border-strong);
+}
+
+/* Progress cell: a framed track with a hard-edged accent fill plus a right-
+   aligned percent label, sized to the row's Progress column. */
+.progressCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+}
+
+.progressTrack {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 40px;
+  height: 8px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: calc(var(--radius-sm) - 2px);
+  background-color: var(--surface-elevated);
+  overflow: hidden;
+}
+
+/* Compositor-cheap meter (modernize Concept 8): the fill is full-width and
+   glides via transform: scaleX from the left, never animating layout `width`.
+   The fraction arrives as the --progress-fill custom property from the row. */
+.progressFill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(var(--progress-fill, 0));
+  transform-origin: left center;
+  background-color: var(--accent);
+  transition: transform var(--dur-base) var(--ease-out-quart);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressFill {
+    transition: none;
+  }
+}
+
+.progressLabel {
+  flex: 0 0 auto;
+  min-width: 34px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--textMuted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Narrow layout: scale the dock down — smaller type, tighter gaps/padding, and
+   proportionally smaller per-table min-widths — so columns + labels shrink together
+   (no value clipping) and more fits before the table scrolls. */
+@media (max-width: 768px) {
+  .container {
+    font-size: 11px;
+  }
+
+  .tableHeader {
+    gap: 5px;
+    padding: 6px 8px;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  .row {
+    gap: 5px;
+    padding: 5px 8px;
+  }
+
+  .cell {
+    font-size: 11px;
+  }
+
+  .positionsHeader,
+  .positionsRow {
+    min-width: 940px;
+  }
+
+  .positionsHeaderSpectate,
+  .positionsRowSpectate {
+    min-width: 850px;
+  }
+
+  .ordersHeader,
+  .ordersRow {
+    min-width: 970px;
+  }
+
+  .ordersHeaderSpectate,
+  .ordersRowSpectate {
+    min-width: 840px;
+  }
+
+  .orderHistoryHeader,
+  .orderHistoryRow {
+    min-width: 990px;
+  }
+
+  .fillsHeader,
+  .fillsRow {
+    min-width: 820px;
+  }
+
+  .fundingHeader,
+  .fundingRow {
+    min-width: 545px;
+  }
+
+  .interestHeader,
+  .interestRow {
+    min-width: 380px;
+  }
+
+  .activityHeader,
+  .activityRow {
+    min-width: 970px;
+  }
+
+  .twapActiveHeader,
+  .twapActiveRow {
+    min-width: 940px;
+  }
+
+  .twapHistoryHeader,
+  .twapHistoryRow {
+    min-width: 850px;
+  }
+
+  .twapFillHeader,
+  .twapFillRow {
+    min-width: 765px;
+  }
+}

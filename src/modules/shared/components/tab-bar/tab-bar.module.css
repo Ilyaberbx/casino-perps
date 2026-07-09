@@ -1,0 +1,134 @@
+.list {
+  display: flex;
+  align-items: stretch;
+  border-bottom: var(--border-pixel) solid var(--border-strong);
+  overflow-x: auto;
+  /* Pin the cross axis: with only `overflow-x: auto` set, the spec promotes the
+     `visible` y-axis to `auto`, so the single-row (non-wrap) tab strip becomes
+     vertically scrollable too — the account-dock tab picker "scrolls vertically"
+     bug on touch devices. A tab strip is one row; it must never scroll on y. */
+  overflow-y: hidden;
+  scrollbar-width: none;
+  background-color: var(--surface-elevated);
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.listFitted {
+  position: relative; /* anchors the sliding indicator */
+}
+
+.listFitted .tab {
+  flex: 1 1 0;
+}
+
+/* Grow: tabs expand to share the strip's width but never shrink below their
+   label (flex-basis: auto + no shrink). When their combined natural width
+   exceeds the strip, the base `.list` overflow-x scrolls instead — so a wide
+   container is filled edge-to-edge while a narrow one still scrolls. */
+.listGrow .tab {
+  flex: 1 0 auto;
+}
+
+/* Fitted tabs slide a single indicator instead of the per-tab ::after. */
+.listFitted .tabActive::after {
+  display: none;
+}
+
+/* Offset + width are measured from the active tab element and applied inline by
+   `use-tab-bar` (issue #266) — never an equal-width index assumption, which
+   breaks the moment the tabs are unequal width or the strip overflow-scrolls.
+   Defaults to zero-width (invisible) until the first measurement lands. */
+.indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  transform: translateX(0);
+  background-color: var(--tab-active-marker);
+  box-shadow: 0 0 8px var(--tab-active-marker);
+  pointer-events: none;
+  transition: transform var(--dur-base) var(--ease-out-quint),
+    width var(--dur-base) var(--ease-out-quint),
+    box-shadow var(--dur-base) var(--ease-out-quart);
+}
+
+/* Wrap overflowing tabs onto another row instead of being a horizontal scroll
+   container. Defined after `.list` so it overrides its `overflow-x: auto` at
+   equal specificity. */
+.listWrap {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  /* Keep BOTH axes `visible` in wrap mode: pairing `visible` (x) with the base
+     rule's `hidden` (y) would promote x back to `auto` and re-introduce a scroll
+     container, defeating the wrap. Wrapped rows grow naturally — no scroll. */
+  overflow-y: visible;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 18px;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--textMuted);
+  background: none;
+  border: none;
+  border-right: var(--border-pixel) solid var(--border);
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: background-color var(--dur-fast) var(--ease-out-quart), color var(--dur-fast) var(--ease-out-quart);
+  min-height: 44px;
+}
+
+.sizeSm.tab {
+  padding: 8px 12px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  min-height: 32px;
+}
+
+.tab:last-child {
+  border-right: none;
+}
+
+.tab:hover:not(:disabled):not(.tabActive) {
+  color: var(--text);
+  background-color: var(--accent-soft);
+}
+
+.tab:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tabActive {
+  color: var(--textOnAccent);
+  background-color: var(--accent);
+}
+
+.tabActive::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 4px;
+  background-color: var(--tab-active-marker);
+}
+
+@media (max-width: 720px) {
+  .tab {
+    padding: 12px 14px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+}

@@ -1,0 +1,33 @@
+.frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 8px;
+  background-color: #ffffff;
+  border-style: solid;
+  border-width: var(--border-pixel);
+  border-color: var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-pixel-sm);
+}
+
+.svg {
+  display: block;
+}
+
+.fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 12px;
+  font-family: var(--font-trading);
+  font-size: 11px;
+  color: var(--danger);
+  border-style: solid;
+  border-width: var(--border-pixel);
+  border-color: var(--danger);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}

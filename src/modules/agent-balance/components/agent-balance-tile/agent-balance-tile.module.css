@@ -1,0 +1,86 @@
+/* The Agent Balance tile reads as a quiet AI surface: a faint accent tint + a
+   soft 1px raised inner highlight (no neon bloom / dither / bezel). The static
+   mascot glyph carries the AI identity. */
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  border: var(--border-pixel) solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent) 14%, transparent);
+  transition:
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft-md);
+}
+
+/* AI marker row — mascot + label across the tile head. */
+.aiRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tileLabel {
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--textMuted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.tileBody {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* Failed-read state — an explicit, muted-danger "Unavailable" in place of a
+   misleading real-looking $0.00. Smaller than the figure so it reads as a status. */
+.tileError {
+  font-family: var(--font-trading);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--danger);
+  line-height: 1.1;
+}
+
+.tileHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--textMuted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    transition: none;
+  }
+  .tile:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .tile {
+    padding: 14px 14px;
+  }
+  .tileBody {
+    font-size: 20px;
+  }
+}

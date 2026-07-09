@@ -1,0 +1,209 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: var(--surface);
+  color: var(--text);
+  font-family: var(--font-mono);
+  overflow: hidden;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Overridable so the desktop trading page can stretch this toolbar to match
+     the orderbook rail's header stack (tabs + controls + Price/Size/Total). */
+  min-height: var(--chart-header-min-height, 44px);
+  padding: 8px 12px;
+  background-color: var(--surface-elevated);
+  border-bottom: var(--border-pixel) solid var(--border-strong);
+  flex-shrink: 0;
+  gap: 12px;
+  /* Never wrap: the timeframe picker must stay on the OHLCV row. When the strip
+     is too long the `.ohlcv` child truncates (below) instead of pushing the
+     picker to a second line. */
+  flex-wrap: nowrap;
+}
+
+.ohlcv {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--textMutedStrong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Shrinkable below content width (min-width:0 defeats the flex auto floor) so
+     a long strip clips here rather than wrapping the header. */
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Keep the timeframe dropdown at full width when the OHLCV strip is long — the
+   strip truncates, the picker does not shrink. */
+.timeframeSelect {
+  flex-shrink: 0;
+}
+
+.ohlcvLabel {
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--textMutedStrong);
+  margin-right: 4px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ohlcvValue {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ohlcvUp {
+  color: var(--directionUp);
+}
+
+.ohlcvDown {
+  color: var(--directionDown);
+}
+
+.body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.canvasHost {
+  position: absolute;
+  inset: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface);
+  z-index: 2;
+}
+
+.errorTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  background-color: var(--surface);
+  border: var(--border-pixel) solid var(--directionDown);
+  box-shadow: var(--shadow-soft-sm);
+  color: var(--textMutedStrong);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.errorMessage {
+  color: var(--directionDown);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.unavailableTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  background-color: var(--surface);
+  border: var(--border-pixel) solid var(--border-strong);
+  box-shadow: var(--shadow-soft-sm);
+  color: var(--textMutedStrong);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.unavailableHeading {
+  color: var(--textMutedStrong);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.unavailableSubline {
+  color: var(--textMutedStrong);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.skeleton {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 2px;
+  width: 70%;
+  height: 60%;
+  align-items: end;
+}
+
+.skeletonBar {
+  background-color: var(--accent-soft);
+  border-top: var(--border-pixel) solid var(--accent);
+  width: 100%;
+  height: var(--bar-height, 0%);
+  opacity: 0.55;
+  /* Shared skeleton motion material: an accent-soft pulse, staggered across the
+     bars so it reads as a shimmer wave (matches RowsSkeleton / TableSkeleton). */
+  animation: chart-skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+.skeletonBar:nth-child(3n) {
+  animation-delay: 0.2s;
+}
+
+.skeletonBar:nth-child(3n + 1) {
+  animation-delay: 0.4s;
+}
+
+@keyframes chart-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeletonBar {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+.liveBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  padding: 4px 8px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--warning);
+  color: var(--warning);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}

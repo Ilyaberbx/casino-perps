@@ -1,0 +1,1 @@
+export { HotMarketsTicker } from './HotMarketsTicker'

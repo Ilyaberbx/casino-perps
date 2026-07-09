@@ -1,0 +1,80 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.tabStripWrap {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelHidden {
+  display: none;
+}
+
+/* Tick aggregation + size denomination toolbar (book/trades tabs only) —
+   mirrors the desktop BookTradesPanel controls so the pickers behave
+   identically across layouts. */
+.controlsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-bottom: var(--border-pixel) solid var(--border);
+  flex-shrink: 0;
+}
+
+/* Left cluster: the both/bids/asks side picker sits before the tick select;
+   size denomination stays on the right (mirrors the desktop controls row). */
+.controlsLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.controlsSpacer {
+  flex: 0 0 auto;
+}
+
+/* Override IconSelect's pixel font for the tick dropdown: tick values are
+   numeric, so mono with tabular-nums reads better than the pixel display font. */
+.tickSelect button,
+.tickSelect li {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.tickSelect button {
+  padding: 1px 8px;
+}
+
+.controlsRow [role='group'] {
+  align-items: center;
+}
+
+/* Touch-friendly targets on mobile: taller than the desktop 20px compact row so
+   the side picker + size toggle are comfortable to tap. */
+.controlsRow [role='group'] button {
+  padding: 3px 10px;
+  min-height: 30px;
+}

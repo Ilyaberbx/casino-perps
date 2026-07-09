@@ -1,0 +1,61 @@
+/* Shared pixel checkbox — the canonical calm-terminal box skin promoted out of
+   order-entry's `.pixelCheckbox` so every trading surface renders one control.
+   Token-driven, works in dark + white themes. */
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.box {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: var(--border-pixel) solid var(--border-strong);
+  /* Inner radius nests inside the rounded chrome scale (ADR-0043). */
+  border-radius: calc(var(--radius-sm) - 2px);
+  background-color: var(--background);
+  cursor: inherit;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.box:hover:not(:disabled):not(:checked) {
+  border-color: var(--accent);
+}
+
+.box:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  /* Inset ring carries the "on" state by shape as well as colour (a11y). */
+  box-shadow: inset 0 0 0 2px var(--background);
+}
+
+.box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.box:disabled {
+  cursor: not-allowed;
+}
+
+.labelText {
+  font-family: var(--font-trading);
+  color: var(--textMutedStrong);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}

@@ -1,0 +1,47 @@
+# spectate (client)
+
+> **Scope of this file:** non-obvious context only. If something is obvious from `index.ts` or by reading a few files, do NOT add it here. Update this file in the same PR that changes the module's public surface, the things it owns (tables/routes/providers), or its dependencies on other modules.
+
+## Purpose
+
+Spectate Mode: re-key the whole app to an arbitrary **Spectated Address** driven by a `?spectate=0x…` URL query param (see `CONTEXT.md` for **Spectate/Spectating** and **Spectated Address**; ADR-0021 for the closure-override decision). The module owns only the spectate *session* (URL ↔ state); the actual re-keying happens via the address-closure override in `app/wallet-address-holder.ts`, written by the app-level `SpectateBridge`. No venue capability port is involved.
+
+## Public surface
+
+- `SpectateProvider` — provider component; mounted by `app/` (in `AccountSessionRoot`, inside the router so `useSearchParams` resolves, above both Trade and Portfolio). Takes an optional `isWalletConnected` prop (the single `useIsWalletConnected()` source of truth, threaded from `AccountSessionRoot` — the module stays Privy-free; defaults to `true` for provider-free tests). Spectating requires a connected wallet: while disconnected, `startSpectating` is a no-op that fires a `Connect wallet first` warning toast and writes no `?spectate=`, and `spectatedAddress`/`isSpectating` read as inactive — so no banner shows and the dock never re-keys to a spectated address without a connected wallet. A pre-existing `?spectate=` override is **ignored, not stripped**, so a shared link (or a reload before Privy resolves — `useIsWalletConnected()` reads false during that window) resumes spectating the moment the wallet connects.
+- `useSpectate()` — consumer hook returning `{ spectatedAddress, isSpectating, startSpectating(address), stopSpectating(), watchlist, addToWatchlist(entry), removeFromWatchlist(address), isWatchlisted(address) }`. The watchlist is a locally-persisted list of saved `{ address, label? }` entries (`WatchlistItem[]`); `addToWatchlist` is upsert-by-address (re-adding the same address replaces its label).
+- `useSpectateLink()` — returns a builder `(pathname: string) => To` that carries the active `?spectate=` forward onto a navigation target, or returns the bare pathname when not spectating. Preserves **only** the spectate param (never `trade`'s `?market=`). Used by the `app/` header nav (`AppShell`) and `trading/`'s mobile bottom-nav so navigating between pages does not drop the spectate session. Reads `SpectateContext` directly, so it is inert (returns bare pathnames) when no provider is mounted — same convention as `SpectateBanner`.
+- `useSpectatedAddress()` — returns the active `WalletAddress | null` (null when not spectating). Reads `SpectateContext` directly, so it is inert (returns null) when no provider is mounted — same convention as `useSpectateLink`. Consumed by `trading/` and `portfolio/` page hooks as the account dock's `reloadKey`, so picking a new user to spectate re-bootstraps the dock against the new address.
+- `useIsSpectating()` — returns whether a spectate session is active (false when not spectating). Reads `SpectateContext` directly, so it is inert (returns false) when no provider is mounted — same convention as `useSpectatedAddress`. Consumed by the shared money affordances (`shared/components/transfer-trigger`, `deposit-trigger`, `account-dock/use-balances-panel`) to **hide** the Transfer/Deposit buttons while spectating: those flows sign with / credit the connected wallet, never the Spectated Address (ADR-0021), so the affordance would otherwise act on the User's own funds from someone else's account view. Hiding the affordance is the mode-3 idiom (`wallet-gate.md`); it mirrors the dock's row-action `canAct = !isSpectating` lockout.
+- `SpectateContextValue` / `WatchlistItem` — the context-value type and watchlist entry type (for consumers in later slices).
+- `SpectateLauncher` — header entry point: a ghost-icon button that opens the Spectate window (a shared `Modal`) with two tabs. **Enter address** tab: a valid `0x…` address (validated via `parseWalletAddress`) calls `startSpectating` or `addToWatchlist` ("Save to watchlist"); malformed input is rejected with inline feedback and starts no session. **Watchlist** tab: lists saved entries (label + truncated address via `formatWalletAddress`) with per-row spectate / remove / edit-label actions. Takes a required `isWalletConnected: boolean` prop (the single `useIsWalletConnected()` source of truth, threaded from `AppShell` — the module stays Privy-free). Mounted by `app/` in the `AppShell` header and **always rendered**: clicking the trigger while disconnected shows a `Connect wallet first` warning toast instead of opening the window (spectating requires a connected wallet).
+- `SpectateBanner` — global banner mounted by `app/` in `AppShell` (sibling of `ConnectionBanner`). Renders only while `isSpectating`, names the spectated address (truncated via `formatWalletAddress`), exposes a SHARE control that copies `window.location.href` (incl. `?spectate=`) to the clipboard, and an `×` control plus a Ctrl+X keydown shortcut that both call `stopSpectating`. The Ctrl+X listener is registered only while spectating and removed on unmount. The clipboard write is a banner-local side effect — there is no `shareUrl()` on the provider.
+
+## Owns
+
+- The `?spectate=` query param as the single source of truth for the spectate *session* (no localStorage, no module state — URL only). The param value is a raw lowercased `0x…` address (no venue prefix), validated/normalized via `parseWalletAddress`; an invalid value reads as "not spectating".
+- The **watchlist** localStorage key `spectate.watchlist.v1` and its store (`services/watchlist-store.ts`, `createWatchlistStore()`). Versioned schema `{ version: 1, entries: { address, label? }[] }` (Zod-validated), safe load/save returning neverthrow `Result`s (`storage-read-failed` / `storage-write-failed`), and migration of loose legacy shapes (bare `string[]` of addresses, `{ addresses: string[] }`). Pure service — no React, no logging of address data. The store is wrapped by `SpectateProvider`; the in-memory watchlist re-validates each stored address (dropping malformed entries) so it is typed `WalletAddress`.
+
+## Depends on
+
+- `shared/domain/wallet-address.ts` — `parseWalletAddress`, `WalletAddress`. Used to validate/normalize the `?spectate=` value, watchlist entries, and the `SpectateLauncher` address input.
+- `shared/utils/format-wallet-address.ts` — `formatWalletAddress`. Truncated display of watchlist entry addresses in the Watchlist tab and the spectated address in the `SpectateBanner`.
+- `shared/components/modal` — `Modal`. The `SpectateLauncher` window reuses the shared Modal.
+- `shared/services/toast` — the imperative `toast` singleton. `SpectateLauncher` fires a `Connect wallet first` warning toast when opened while the wallet is disconnected.
+- `app/logger.ts` — the `SpectateBanner` hook logs a PII-free `warn` when the clipboard SHARE write fails.
+- `react-router-dom` — `useSearchParams` for URL-as-source-of-truth (mirrors `trading/`'s `?market=` selected-market provider).
+
+## Cross-app contract
+
+None — spectate is a client-only session concept; no backend route.
+
+## Gotchas
+
+- `SpectateProvider` must mount **inside** the router context (it calls `useSearchParams`). It is mounted in `AccountSessionRoot`, not in `App.tsx` above `RouterProvider`.
+- The provider does NOT touch the wallet-address holder or the venue. That coupling lives in `app/spectate-bridge.tsx` (composition root): the bridge writes the active address into the holder (`spectate ?? connected` precedence) and calls `venue.refreshAddress?.()` on change. Keeping the venue out of the module preserves the `trading/ ↮ venue` boundary.
+- Spectating requires a connected wallet — the wallet-gate rule is unchanged. The override only redirects *reads*; signing/trading stays gated on the connected wallet. Enforced in the provider via the `isWalletConnected` prop: while disconnected, `startSpectating` no-ops with a toast and `spectatedAddress` reads null (so `useSpectatedAddress`, `useSpectateLink`, `SpectateBridge`, and `SpectateBanner` all see "not spectating"). A present `?spectate=` override is ignored but deliberately **not stripped** — stripping would drop a legitimate shared link during the Privy-resolving window (when `useIsWalletConnected()` is transiently false) and break resume-on-connect. The launcher trigger gate (`onOpen` toast) is the first line; the provider gate is the backstop.
+
+## Out of scope
+
+- The order-entry swap — a trading-side slice that *consumes* `useSpectate` (lives in `trading/`, not here). The submit-stack swap (`StopSpectatingButton`) + the `isSpectating` guard STAY (ADR-0038 D-4); only the order-entry DATA was re-keyed to the Acting Address (ADR-0038), which is a `trading/`-side change reading the venue's `ownAccount` group — not a spectate-module concern.
+- The address-closure override mechanics and venue refresh — those live in `app/`. ADR-0038 split the single ADR-0021 closure into a **Viewing Address** (`spectate ?? connected`, keys Portfolio + dock) and an **Acting Address** (connected-only, keys the order flow), both in `app/wallet-address-holder.ts`; `SpectateBridge` still writes only the spectated override and calls `venue.refreshAddress()` (viewing), never `refreshActingAddress()` (which is wallet-rotation-only).

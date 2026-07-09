@@ -1,0 +1,1 @@
+export { ManageFundsModal } from './ManageFundsModal'

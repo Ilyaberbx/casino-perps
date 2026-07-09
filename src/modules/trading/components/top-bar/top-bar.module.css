@@ -1,0 +1,379 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 6px 14px;
+  background: var(--surface);
+  font-family: var(--font-trading);
+  font-size: 12px;
+  overflow: hidden;
+}
+
+.favoriteStar,
+.favoriteStarActive {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: var(--border-pixel) solid transparent;
+  color: var(--textMutedStrong);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out-quart), border-color var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart);
+}
+
+.favoriteStar:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  transform: translate(-1px, -1px);
+}
+
+.favoriteStarActive {
+  color: var(--warning);
+  border-color: var(--warning);
+}
+
+.favoriteStarActive:hover {
+  color: var(--warning);
+  transform: translate(-1px, -1px);
+}
+
+.iconSlot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+}
+
+.marketDropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--background);
+  border: var(--border-pixel) solid var(--border-strong);
+  box-shadow: var(--shadow-pixel-sm);
+  color: var(--text);
+  cursor: pointer;
+  min-width: 140px;
+  transition: transform var(--dur-fast) var(--ease-out-quart), box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.marketDropdown:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-pixel-md);
+}
+
+.marketDropdownLabel {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* HIP-3 dex badge beside the stripped symbol (LOCKED DECISION c) — mirrors the
+   selector row's dex tag: uppercase pixel chip in the teal accent-soft fill. */
+.marketDropdownDexTag {
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: var(--border-pixel) solid var(--accent);
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.marketDropdownChevron {
+  margin-left: auto;
+  color: var(--textMutedStrong);
+}
+
+.marketDropdownSelect {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  background-color: var(--surface-elevated);
+  color: var(--text);
+}
+
+.tickerStats {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.tickerStats::-webkit-scrollbar {
+  display: none;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.statLabel {
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--textMutedStrong);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.statValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.statValuePrice {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  text-shadow: var(--text-glow-accent); /* subtle live-data aura on dark (ADR-0042) */
+}
+
+/* Directional tick flash (ADR-0043): the price span is keyed on its text, so a
+   value change remounts it and replays this colour pulse — green up, red down,
+   settling back to --text. One element, compositor-cheap. */
+.statValuePrice[data-flash='up'] {
+  animation: priceTickUp var(--dur-base) var(--ease-out-quart);
+}
+
+.statValuePrice[data-flash='down'] {
+  animation: priceTickDown var(--dur-base) var(--ease-out-quart);
+}
+
+@keyframes priceTickUp {
+  0% {
+    color: var(--directionUp);
+  }
+  100% {
+    color: var(--text);
+  }
+}
+
+@keyframes priceTickDown {
+  0% {
+    color: var(--directionDown);
+  }
+  100% {
+    color: var(--text);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statValuePrice,
+  .mobilePrice {
+    animation: none !important;
+  }
+}
+
+.statValueUp {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--directionUp);
+}
+
+.statValueDown {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--directionDown);
+}
+
+/* ── Mobile header (stacked layout, < 1024px) ──────────────────────────────
+   Two tiers: an identity row (star · icon · market dropdown) over a prominent
+   price + 24h change, with the remaining stats in a horizontal-scroll strip.
+   Matches the app.trade.xyz mobile market header feel. */
+.mobileContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 10px;
+  background: var(--surface);
+  font-family: var(--font-trading);
+  overflow: hidden;
+}
+
+.mobileIdentityRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Identity-row action cluster: the Place Order trigger plus the app controls
+   (spectate / wallet / venue) injected via `mobileAction`. Pinned to the row's
+   right end (margin-left:auto) and never shrinks, so the market dropdown keeps the
+   remaining width. */
+.mobileIdentityAction {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobileTicker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mobilePriceRow {
+  display: flex;
+  align-items: baseline;
+  /* Spread price + 24h change to the row edges so the row fills the full width
+     instead of packing on the left with dead space to the right. */
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.mobilePrice {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+  text-shadow: var(--text-glow-accent); /* subtle live-data aura (ADR-0042) */
+}
+
+.mobilePrice[data-flash='up'] {
+  animation: priceTickUp var(--dur-base) var(--ease-out-quart);
+}
+
+.mobilePrice[data-flash='down'] {
+  animation: priceTickDown var(--dur-base) var(--ease-out-quart);
+}
+
+.mobileChangeUp,
+.mobileChangeDown {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mobileChangeUp {
+  color: var(--directionUp);
+}
+
+.mobileChangeDown {
+  color: var(--directionDown);
+}
+
+.mobileStatStrip {
+  display: flex;
+  align-items: baseline;
+  /* Spread the stats across the full row width (Oracle left, 24h Vol right on a
+     2-stat market; perp's 4 stats spread evenly). Collapses to packed + scroll
+     when the stats can't all fit. */
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-top: 6px;
+  border-top: var(--border-pixel) solid var(--border);
+  scrollbar-width: none;
+}
+
+.mobileStatStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.mobileStat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mobileStatLabel {
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--textMutedStrong);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.mobileStatValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mobileStatValueUp {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--directionUp);
+}
+
+.mobileStatValueDown {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--directionDown);
+}
+
+@media (max-width: 720px) {
+  .container {
+    gap: 10px;
+    padding: 6px 10px;
+  }
+  .tickerStats {
+    gap: 14px;
+  }
+  .marketDropdown {
+    min-width: 110px;
+  }
+}

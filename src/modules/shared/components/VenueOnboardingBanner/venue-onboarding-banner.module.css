@@ -1,0 +1,89 @@
+/* Container (no longer the click target — it holds the main open-sheet button
+   and the trailing close button). */
+.banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: var(--accent-soft);
+  border-bottom: 2px solid var(--border-strong);
+  /* Square the top corners so the banner flows straight out of the top bar
+     above it (no notch); only the bottom corners stay rounded. */
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  height: 40px;
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* The open-sheet click region: fills the banner and centres the message. Side
+   padding clears the absolutely-positioned close button so the centred text
+   never runs under it. */
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  height: 100%;
+  padding: 0 44px;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+/* Trailing close (X) — the shared IconButton, pinned to the right edge so the
+   message stays centred. */
+.close {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 719.98px) {
+  .banner {
+    height: 48px;
+    font-size: 11px;
+  }
+  /* Tighter side padding (still clears the right-pinned close button) + gap so the
+     shortened label + CTA fit one row on narrow phones. */
+  .main {
+    padding: 0 36px;
+    gap: 8px;
+  }
+}
+
+.message {
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.cta {
+  font-family: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.spinner {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  animation: banner-spin 800ms linear infinite;
+}
+
+@keyframes banner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

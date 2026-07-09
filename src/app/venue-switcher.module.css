@@ -1,0 +1,8 @@
+/* Pins the header venue switcher to the shared control height. The class lands
+   on IconSelect's `inline-flex` wrapper; its default `align-items: stretch`
+   then stretches the inner trigger button to this height — so the dropdown
+   lines up with the account / theme / spectate controls without touching the
+   shared IconSelect base styles (reused by chart, order-entry, etc.). */
+.switcher {
+  height: var(--header-control-h);
+}

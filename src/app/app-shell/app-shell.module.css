@@ -1,0 +1,252 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* dvh (not vh): on iOS Safari `100vh` is the chrome-collapsed "large viewport"
+     height, taller than what's actually visible while the address bar / bottom
+     toolbar are showing. That mismatch is what let the fixed MobileTradeDock
+     footer sit lower than its reserved bottom padding accounted for, overlapping
+     the ConnectionStatusBar + AccountDock on iPhone Safari. `dvh` tracks the
+     real visible viewport, mirroring trading-page.module.css `.mobileShell`. */
+  min-height: 100dvh;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 16px;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+  /* Clip rather than spill: if the row is ever too tight even after the controls
+     condense, the nav truncates inside its own box instead of overlapping the
+     right-side controls. */
+  overflow: hidden;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Hold the controls at their natural width and let the brand/nav side yield
+     instead — otherwise both sides shrink below their content and the nav text
+     spills visibly over the controls (the overlap bug on narrow portfolio). */
+  flex-shrink: 0;
+}
+
+.logo {
+  display: block;
+  height: 34px;
+  width: auto;
+  image-rendering: pixelated;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 2px;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--textMuted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.navLink:hover {
+  color: var(--text);
+}
+
+.navLinkActive {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--header-control-h);
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  color: var(--text);
+  padding: 0 12px;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.toggleButton:hover {
+  background-color: var(--accent);
+  border-color: var(--border-strong);
+  color: var(--textOnAccent);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--shadow-pixel-color);
+}
+
+.toggleButton:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--shadow-pixel-color);
+}
+
+/* Theme toggle label/glyph: the text reads on desktop; the narrow header
+   (≤560px) collapses it to a single ◐ glyph so the row's controls stop
+   colliding (see the media query below). */
+.toggleGlyph {
+  display: none;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.toggleLabel {
+  display: inline;
+}
+
+.outlet {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.loadingShell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100dvh;
+  background-color: var(--background);
+  color: var(--textMuted);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.loginShell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100dvh;
+  padding: 32px;
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+/* ---------------------------------------------------------------------------
+   Adaptive header — the fixed-height single row collides on narrow viewports
+   (logo + nav vs. Connect / venue / theme controls). Tablet & phone widths
+   compress gaps, type, and control padding; the brand text drops on very
+   narrow so the nav + controls never overlap. Mirrors Hyperliquid's header
+   condensation while keeping the pixel-art chrome.
+   --------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 10px;
+    gap: 8px;
+  }
+  .headerLeft {
+    gap: 14px;
+    flex-shrink: 1;
+  }
+  .nav {
+    gap: 12px;
+  }
+  .logo {
+    height: 24px;
+  }
+  .navLink {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  .headerRight {
+    gap: 5px;
+  }
+  .toggleButton {
+    padding: 0 8px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* Narrow header (≤560px): the row can't hold full-text controls + nav without
+   colliding. Collapse the theme toggle to its ◐ glyph; the venue switcher goes
+   icon-only in parallel via `iconOnly` (VenueSwitcher reads the matching
+   `max-width: 560px` query). Tighten gaps so the condensed controls breathe. */
+@media (max-width: 560px) {
+  .toggleLabel {
+    display: none;
+  }
+  .toggleGlyph {
+    display: inline;
+  }
+  .header {
+    gap: 6px;
+  }
+  .headerLeft {
+    gap: 10px;
+  }
+  .headerRight {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 6px;
+  }
+  /* mascot shrinks to give the row to the nav + account controls */
+  .logo {
+    height: 26px;
+  }
+  .headerLeft {
+    gap: 10px;
+  }
+  .navLink {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+  .toggleButton {
+    padding: 0 6px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    box-shadow: 1px 1px 0 var(--shadow-pixel-color);
+  }
+}

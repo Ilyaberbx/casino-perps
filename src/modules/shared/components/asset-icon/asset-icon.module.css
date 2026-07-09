@@ -1,0 +1,54 @@
+.container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  border-radius: 50%;
+  /* white fill so dark-on-transparent coin SVGs stay legible. The dark-fill
+     coins (HYPE, etc.) override this via .darkFillContainer below. */
+  background-color: #fff;
+  overflow: hidden;
+  /* no width/height — applied inline as runtime props from the size prop */
+}
+
+/* Thin circular outline drawn on top of the icon at the container edge.
+   A pseudo-element (not `border`) so it never affects layout/size and stays
+   visible above opaque circular coin art. Recolours with the theme. */
+.container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: var(--border-pixel) solid var(--border-strong);
+  pointer-events: none;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.darkFillContainer {
+  /* intentionally not var(--surface): must be dark regardless of [data-theme] so dark-fill SVGs remain
+     visible in light theme. Hard-coded to the dark-theme surface value. */
+  background-color: #16007a;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.letterPlaceholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--textOnAccent);
+  /* no font-size here — applied inline as calc({size}px * 0.55) since it is runtime-dependent */
+}

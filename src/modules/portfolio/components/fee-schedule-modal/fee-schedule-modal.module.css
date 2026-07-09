@@ -1,0 +1,74 @@
+.section {
+  margin-bottom: 24px;
+}
+
+.sectionHeading {
+  margin: 0 0 8px;
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: var(--textMuted);
+  background-color: var(--surface-strong, var(--surface));
+  border: 1px solid var(--border);
+}
+
+.badgeActive {
+  color: var(--text);
+  border-color: var(--accent, var(--border));
+}
+
+.toggleRow {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+}
+
+.table th,
+.table td {
+  padding: 6px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th:first-child,
+.table td:first-child,
+.table th:nth-child(2),
+.table td:nth-child(2) {
+  text-align: left;
+}
+
+.table th {
+  color: var(--textMuted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 11px;
+}
+
+.tableRowActive {
+  background-color: var(--surface-strong, var(--surface));
+  color: var(--text);
+  font-weight: 700;
+}
+
+.footnote {
+  margin: 12px 0 0;
+  color: var(--textMuted);
+  font-size: 11px;
+}

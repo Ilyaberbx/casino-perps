@@ -1,0 +1,157 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Pixel-art trigger — mirrors the IconSelect / theme-toggle chrome and pins to
+   the shared header control height so it lines up with the venue / theme /
+   spectate controls. */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--header-control-h);
+  padding: 0 10px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+/* Avatar-only chip for the condensed (mobile) header. */
+.triggerCompact {
+  gap: 3px;
+  padding: 0 6px;
+}
+
+.trigger:hover {
+  background-color: var(--accent);
+  border-color: var(--border-strong);
+  color: var(--textOnAccent);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--shadow-pixel-color);
+}
+
+.trigger:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--shadow-pixel-color);
+}
+
+.trigger[aria-expanded='true'] {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+}
+
+.triggerLabel {
+  max-width: 9ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caret {
+  font-size: 9px;
+  line-height: 1;
+}
+
+/* Positioned by the shared Popover (portaled to document.body, `position:fixed`
+   written inline by use-popover-position). This rule owns only the panel skin +
+   stacking. ADR-0037. */
+.menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: 4px;
+  gap: 4px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft-md);
+  z-index: var(--z-popover);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px;
+  background-color: transparent;
+  border: var(--border-pixel) solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.row:hover:not(:disabled) {
+  background-color: var(--surface);
+}
+
+.row:disabled {
+  cursor: default;
+}
+
+.rowSelected {
+  border-color: var(--accent);
+}
+
+.rowLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.check {
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: var(--border-pixel) dashed var(--border);
+}
+
+.hint {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--textMuted);
+}

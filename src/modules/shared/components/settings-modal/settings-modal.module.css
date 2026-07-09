@@ -1,0 +1,133 @@
+/* Two-column shell: left nav rail + right active-section pane. The shared Modal
+ * caps width at 720px desktop / full-screen on mobile, where the rail flips to a
+ * top scroll strip via `.navMobile`. Mirrors `manage-funds-modal`. */
+.layout {
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+}
+
+@media (max-width: 1023.98px) {
+  .layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* ─── Left nav rail ─────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 0 168px;
+  min-width: 0;
+}
+
+.navMobile {
+  flex-direction: row;
+  flex: 0 0 auto;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.navMobile::-webkit-scrollbar {
+  display: none;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--textMutedStrong);
+  background: none;
+  border: var(--border-pixel) solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.navMobile .navItem {
+  width: auto;
+}
+
+.navItem:hover:not(.navItemActive) {
+  color: var(--text);
+  background-color: var(--accent-soft);
+}
+
+.navItem:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.navItemActive {
+  color: var(--textOnAccent);
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.navLabel {
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navItem {
+    transition: none;
+  }
+}
+
+/* ─── Right pane ────────────────────────────────────────────────── */
+.pane {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.fieldDescription {
+  margin: 0 0 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--textMuted);
+  max-width: 320px;
+}
+
+/* Keep the Pro/Simple toggle sized to its two segments and left-aligned, rather
+   than stretching the full pane width (which left dead space after "Simple"). */
+.tradingModeToggle {
+  align-self: flex-start;
+}

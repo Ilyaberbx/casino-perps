@@ -1,0 +1,119 @@
+.banner {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 14px;
+  background-color: var(--surface);
+  color: var(--text);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-pixel-md);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  max-width: calc(100vw - 32px);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--warning);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  flex-shrink: 0;
+  animation: bannerBlink 800ms ease-in-out infinite;
+}
+
+.dotDead {
+  background-color: var(--directionDown);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.label {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--textMuted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 360px;
+}
+
+.reconnectButton {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+  border: var(--border-pixel) solid var(--border-strong);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+  flex-shrink: 0;
+}
+
+.reconnectButton:hover {
+  background-color: var(--accent-hover);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--shadow-pixel-color);
+}
+
+.reconnectButton:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--shadow-pixel-color);
+}
+
+.reconnectButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+}
+
+@keyframes bannerBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.35; }
+}
+
+@media (max-width: 480px) {
+  .banner {
+    bottom: 12px;
+    padding: 8px 10px;
+    gap: 10px;
+    font-size: 10px;
+  }
+  .hint {
+    max-width: 180px;
+    font-size: 9px;
+  }
+  .reconnectButton {
+    padding: 4px 8px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+}

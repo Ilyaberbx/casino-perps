@@ -1,0 +1,142 @@
+/* Inline leverage section in the order ticket: a header row (label + market +
+   margin-mode dropdown) above the leverage slider + editable value chip. The
+   modal that once held this dissolved into the ticket. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.labelGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.fieldLabel {
+  font-family: var(--font-trading);
+  color: var(--textMuted);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.marketLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--textMutedStrong);
+  letter-spacing: 0.02em;
+}
+
+/* Margin dropdown sits at the right of the header row; its trigger keeps the
+   elevated dual black+teal patch shadow (overrides IconSelect's single black). */
+.marginDropdown {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.marginDropdown > button {
+  box-shadow: var(--shadow-pixel-md);
+}
+
+.marginDropdown > button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-pixel-lg);
+}
+
+.marginDropdown > button:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color), 4px 4px 0 var(--shadow-pixel-color-soft);
+}
+
+.fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.fieldset:disabled {
+  opacity: 0.6;
+}
+
+/* Slider + editable value chip share one row; the slider grows, the chip is a
+   fixed-width pixel field at the right. */
+.sliderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sliderRow > div:first-child {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Shares the Amount % readout chip width (--slider-chip-width) so the leverage
+   and amount slider rows line up. Fixed width + reserved gutter means the
+   slider's rightmost (max×) tick caption can never underlap the chip. */
+.valueChip {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  flex: 0 0 auto;
+  width: var(--slider-chip-width, 56px);
+  padding: 4px 8px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+}
+
+/* Refined focus ring matches the ticket text fields: one crisp accent ring at a
+   1px offset from the 2px accent border, instead of a stacked 4px slab. */
+.valueChip:focus-within {
+  border-color: var(--accent);
+  outline: var(--border-pixel) solid var(--accent);
+  outline-offset: 1px;
+}
+
+.valueChipInput {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  outline: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.valueChipInput::-webkit-outer-spin-button,
+.valueChipInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.valueChipSuffix {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--textMuted);
+}

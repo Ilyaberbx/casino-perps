@@ -1,0 +1,195 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Pixel-art trigger — matches the app-shell theme-toggle button. */
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+/* Icon-only trigger (mobile app-shell venue switcher): tighten to an icon +
+   caret chip with the label removed. */
+.triggerIconOnly {
+  gap: 3px;
+  padding: 4px 6px;
+}
+
+.trigger:hover {
+  background-color: var(--accent);
+  border-color: var(--border-strong);
+  color: var(--textOnAccent);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--shadow-pixel-color);
+}
+
+.trigger:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--shadow-pixel-color);
+}
+
+/* Open-state affordance: while the listbox is open the trigger holds the accent
+   treatment (same colours as :hover, but no lift transform — the popup is
+   anchored to the trigger and a shift would look detached). `aria-expanded` is
+   set by IconSelect.tsx. */
+.trigger[aria-expanded='true'] {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+}
+
+/* Positioned by the shared Popover (portaled to document.body, `position:fixed`
+   written inline by use-popover-position). This rule owns only the panel skin +
+   stacking. ADR-0037. */
+.list {
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft-md);
+  z-index: var(--z-popover);
+  transform-origin: top center;
+  animation: iconSelectIn var(--dur-fast) var(--ease-out-quart);
+}
+
+@keyframes iconSelectIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list {
+    animation: none;
+  }
+}
+
+.list:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart);
+}
+
+.option:hover,
+.optionActive {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+}
+
+.option[aria-selected='true'] {
+  border-left: var(--border-pixel) solid var(--accent);
+}
+
+.option[aria-selected='true'].optionActive,
+.option[aria-selected='true']:hover {
+  border-left-color: var(--textOnAccent);
+}
+
+/* A non-selectable option (e.g. a "coming soon" venue/agent): muted, no hover
+   affordance, never receives the active highlight. */
+.optionDisabled,
+.optionDisabled:hover {
+  color: var(--textMuted);
+  background-color: transparent;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Section header for grouped options (e.g. MINUTES / HOURS / DAYS). Non-interactive:
+   rendered as role="presentation" between the listbox options. */
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px 4px;
+  color: var(--textMutedStrong);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  cursor: default;
+  user-select: none;
+  background-color: var(--surface);
+  border-top: var(--border-pixel) solid var(--border);
+}
+
+.groupHeader:first-child {
+  border-top: none;
+}
+
+.groupChevron {
+  font-size: 8px;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.icon img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  display: block;
+}
+
+.label {
+  flex: 1 1 auto;
+}
+
+.caret {
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.7;
+}

@@ -1,0 +1,61 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  max-width: 360px;
+}
+
+.swatch {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--swatch-color);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  /* Near-black ink for the check glyph: every swatch fill is a LIGHT pastel
+     (each color's dark-theme accent), so a fixed dark ink reads on all ten
+     regardless of the active app theme. */
+  color: #04141b;
+  cursor: pointer;
+  box-shadow: var(--shadow-pixel-sm);
+  transition:
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.swatch:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-pixel-md);
+}
+
+.swatch:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+.swatch:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* Selected ring reads on any swatch hue: a surface gap then a text-colored ring. */
+.swatchSelected {
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--text);
+}
+
+.swatchSelected:hover {
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swatch {
+    transition: none;
+  }
+}

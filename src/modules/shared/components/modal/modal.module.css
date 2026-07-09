@@ -1,0 +1,212 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: rgb(0 0 0 / 0.55);
+  animation: modalBackdropIn var(--dur-base) var(--ease-out-quart);
+}
+
+/* ─── Desktop-only scrim blur ─────────────────────────────────────
+ * The 0.55 scrim already fully obscures the background; the blur is pure
+ * polish. On mobile the modal becomes a full-screen 100dvh sheet (see the
+ * `max-width: 1023.98px` block below), so blurring the whole viewport behind
+ * it every frame is wasted GPU work on the lowest-power surface. Gate the blur
+ * behind the desktop breakpoint (the inverse of the mobile MOBILE_MEDIA_QUERY
+ * in shared/hooks/use-is-mobile.ts). */
+@media (min-width: 1024px) {
+  .backdrop {
+    backdrop-filter: blur(2px);
+  }
+}
+
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* keepMounted modals stay in the DOM when closed; `display:none` removes them
+ * from layout/paint and `inert` (set on the element) removes them from the
+ * a11y tree + tab order, while their subtree (e.g. the market-icon list) is
+ * preserved so reopening does not tear down and re-fetch it. */
+.hidden {
+  display: none;
+}
+
+.dialog {
+  position: relative;
+  /* Above the backdrop and the Sheet band; below Toast. The backdrop already
+     establishes the modal stacking context at --z-modal-backdrop, so this is
+     explicit-intent more than load-bearing — it keeps the modal band readable
+     against the scale in index.css. */
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 48px);
+  width: min(720px, 100%);
+  /* Raised premium surface — subtle top cyan tint + top-lit accent border edge
+     + layered 3D depth with a bounded accent halo, matching the Portfolio cards
+     (portfolio-summary-card / dockCard) and the terminal `.pane`. */
+  background: var(--gradient-surface);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-top-color: color-mix(in srgb, var(--border-strong) 45%, white 55%);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-3d-panel), var(--glow-halo-soft);
+  overflow: hidden;
+  isolation: isolate;
+  animation: modalDialogIn var(--dur-slow) var(--ease-out-quint);
+}
+
+/* Wider preset for content that needs two-column room (e.g. the PnL share
+   window). Height + mobile full-screen behaviour below are unchanged. */
+.dialog[data-size='lg'] {
+  width: min(960px, 100%);
+}
+
+/* Narrow preset for single-column, narrow-form content (e.g. a single labeled
+   input) that would otherwise float in a lot of empty space at the default
+   720px width. Height + mobile full-screen behaviour below are unchanged. */
+.dialog[data-size='sm'] {
+  width: min(440px, 100%);
+}
+
+/* Top accent glow edge — a slim bright cyan line catching the top of the dialog,
+   echoing the Portfolio cards' accent top edge. Pure paint, no layout. */
+.dialog::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 70%, transparent) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Ambient liquid backdrop — two slow, very-low-opacity accent blooms drifting
+   behind the content. Sits below everything (negative z within the isolated
+   stacking context) and is compositor-cheap (transform/opacity only). */
+.dialog::after {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    radial-gradient(
+      36% 36% at 22% 18%,
+      rgba(var(--accent-rgb), 0.12) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      40% 40% at 82% 88%,
+      rgba(var(--accent-rgb), 0.09) 0%,
+      transparent 72%
+    );
+  animation: modalAmbientDrift 22s var(--ease-out-quart) infinite alternate;
+}
+
+@keyframes modalAmbientDrift {
+  from {
+    transform: translate3d(-3%, -2%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(3%, 2%, 0) scale(1.08);
+  }
+}
+
+@keyframes modalDialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .dialog,
+  .dialog::after {
+    animation: none;
+  }
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: var(--border-pixel) solid var(--border);
+  /* Slightly raised header band over the calm surface — reads as chrome. */
+  background-color: color-mix(in srgb, var(--surface-elevated) 60%, transparent);
+}
+
+.title {
+  margin: 0;
+  /* Modernized: the readable trading sans, weight + tracking carry emphasis
+     (matches the Portfolio card header treatment), not an uppercase pixel face. */
+  font-family: var(--font-trading);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+/* The close affordance is the shared `IconButton` (see Modal.tsx). In the
+ * no-title branch it floats over the body's top-right corner (mirrors Sheet's
+ * `.closeRow` "floating close, no header" convention). The 12px offsets match
+ * the `.dialog` corner inset; raw px matches the offset idiom used throughout
+ * this stylesheet. */
+.closeFloating {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  flex: 1;
+  /* min-height: 0 lets a flex child with its own ScrollArea (e.g. the
+   * Market Selection list) shrink below its content basis instead of
+   * forcing `.body` into a second scroll container — the inner viewport
+   * must own the wheel events so the virtualizer's scroll observer fires. */
+  min-height: 0;
+}
+
+/* ─── Mobile: full-screen sheet ───────────────────────────────────
+ * Breakpoint matches MOBILE_MEDIA_QUERY in shared/hooks/use-is-mobile.ts.
+ * Every modal becomes an edge-to-edge sheet on phones/tablets so content
+ * (e.g. the market grid) has the full viewport to work with. */
+@media (max-width: 1023.98px) {
+  .backdrop {
+    padding: 0;
+  }
+
+  .dialog {
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: none;
+    border-radius: 0; /* edge-to-edge sheet on phones: no corners to round */
+  }
+}

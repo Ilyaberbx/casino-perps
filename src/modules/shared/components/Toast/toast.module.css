@@ -1,0 +1,238 @@
+.container {
+  position: fixed;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  pointer-events: none;
+  max-width: 100%;
+}
+
+@media (min-width: 720px) {
+  .container {
+    right: 0;
+    bottom: 0;
+    top: auto;
+    left: auto;
+    align-items: flex-end;
+    width: min(420px, 100%);
+  }
+}
+
+@media (max-width: 719px) {
+  .container {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    align-items: stretch;
+  }
+}
+
+.toast {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 14px;
+  min-width: 280px;
+  max-width: 100%;
+  border-style: solid;
+  border-width: var(--border-pixel);
+  border-color: var(--border-strong);
+  border-radius: var(--radius-sm);
+  /* Opaque elevated surface — never expose the raw page behind the toast. */
+  background-color: var(--surface-elevated);
+  color: var(--text);
+  /* Signature stacked pixel shadow (black + teal offset), matching Sheet/Modal
+     and the data panels — ties the toast into the rest of the surface. */
+  box-shadow: var(--shadow-soft-md);
+  /* The whole surface dismisses — no close button. */
+  cursor: pointer;
+  animation: toast-in var(--dur-base) var(--ease-out-quart) both;
+}
+
+.toast:active {
+  transform: scale(0.99);
+}
+
+@media (max-width: 719px) {
+  .toast {
+    width: 100%;
+  }
+}
+
+/* Keep-mounted exit window: the provider hook flips data-state to 'exiting'
+   and removes the node after TOAST_EXIT_MS (kept in sync with this duration). */
+.toast[data-state='exiting'] {
+  pointer-events: none;
+  animation: toast-out 160ms var(--ease-out-quart) both;
+}
+
+/* The variant colours the full 2px frame — never a side stripe. */
+.variantSuccess {
+  border-color: var(--success);
+}
+
+.variantError {
+  border-color: var(--danger);
+}
+
+.variantWarning {
+  border-color: var(--warning);
+}
+
+.variantInfo {
+  border-color: var(--info);
+}
+
+/* Pixel icon chip: variant-soft fill behind a variant-colour glyph + frame.
+   The icon (not colour alone) carries the variant — same contract as Callout. */
+.icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-pixel) solid currentColor;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.iconSuccess {
+  color: var(--success);
+  background-color: var(--success-soft);
+}
+
+.iconError {
+  color: var(--danger);
+  background-color: var(--danger-soft);
+}
+
+.iconWarning {
+  color: var(--warning);
+  background-color: var(--warning-soft);
+}
+
+.iconInfo {
+  color: var(--info);
+  background-color: var(--info-soft);
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.title {
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+  color: var(--text);
+  word-break: break-word;
+}
+
+/* --text, not --textMuted: muted grey only hits 3.35:1 on the elevated
+   surface and fails AA. Hierarchy comes from the pixel/mono + case contrast. */
+.description {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.actionButton {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  border-style: solid;
+  border-width: var(--border-pixel);
+  border-color: currentColor;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart);
+}
+
+.actionButton:hover {
+  background-color: var(--text);
+  color: var(--surface-elevated);
+}
+
+.actionButton:focus-visible {
+  outline: var(--border-pixel) solid var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 719px) {
+  @keyframes toast-in {
+    from {
+      transform: translateY(-12px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes toast-out {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-12px);
+      opacity: 0;
+    }
+  }
+}

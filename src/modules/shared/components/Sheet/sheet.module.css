@@ -1,0 +1,202 @@
+/* Sheet — side panel built on <dialog>, opened NON-modally (`show()`).
+ *
+ * Slides from the right (desktop + mobile landscape), the left
+ * (consumer opt-in via `side='left'`), or the bottom
+ * (consumer opt-in via `side='bottom'`). Calm-terminal language (ADR-0042/0043):
+ * rounded (--radius-md), a soft ambient shadow, smooth ease-out slide.
+ *
+ * Stacking: the dialog is opened with `show()`, NOT `showModal()`, so it stays
+ * off the browser top layer and seats at `--z-sheet` (1300) — the lowest overlay
+ * band, below Modal (1500) and Toast (1600), and below Privy's wallet modal (a
+ * body-level div at z-index 999999), so that pop-up overlays the sheet instead
+ * of hiding behind it. A non-modal dialog draws no `::backdrop`, so
+ * the scrim is a sibling `.backdrop` element (below). Sheet.tsx portals both to
+ * document.body so the z-index compares cleanly against Privy's, not against an
+ * ancestor stacking context.
+ *
+ * Motion: enter + exit both animate in pure CSS via `@starting-style`
+ * (entry from-state) + `transition-behavior: allow-discrete` (keeps the
+ * panel/scrim rendered through the exit transition). The host just calls
+ * show()/close() — no JS timer. The transform glides on `--ease-out-quint`. */
+
+/* Scrim. `display`/`overlay` are discrete — allow-discrete defers them to the
+   end of the transition so the scrim stays painted for the whole exit, then
+   unmounts. `.open` is toggled by isOpen; closed → display:none (no paint). */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-sheet-backdrop);
+  background-color: var(--scrim);
+  display: none;
+  opacity: 0;
+  transition:
+    opacity 200ms,
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+
+.backdrop.open {
+  display: block;
+  opacity: 1;
+}
+
+@starting-style {
+  .backdrop.open {
+    opacity: 0;
+  }
+}
+
+.dialog {
+  /* <dialog> in user-agent stylesheet centers itself; reset for edge-anchoring. */
+  padding: 0;
+  margin: 0;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--border-strong);
+  /* Top-lit edge — consistent with the raised panels/tiles (ADR-0043). */
+  border-top-color: color-mix(in srgb, var(--border-strong) 45%, white 55%);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: fixed;
+  /* Below Modal/Toast and Privy's wallet modal (999999); above all app chrome.
+     See header — the sheet is the lowest overlay band above page content. */
+  z-index: var(--z-sheet);
+  max-width: 100vw;
+  /* `display` + `overlay` are discrete — allow-discrete defers them to the end
+     of the transition so the panel stays rendered while it slides out. Without
+     this, close() would pop it off instantly (no exit anim). */
+  transition:
+    transform var(--dur-base) var(--ease-out-quint),
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+
+/* Side: right (default) — anchor to right edge, full viewport height, 420px.
+   Soft ambient shadow casts toward the page. */
+.right {
+  inset: 0 0 0 auto;
+  width: 420px;
+  /* `dvh`, not `vh`: on mobile browsers `vh` is the LARGER viewport that ignores
+     the dynamic bottom URL/search bar, so a full-height sheet's bottom CTA (e.g.
+     the onboarding setup's primary action) sits behind that bar — invisible and
+     untappable. `dvh` shrinks with the chrome so the whole panel stays on-screen.
+     `vh` kept as a fallback for browsers without `dvh`. */
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  transform: translateX(100%);
+  box-shadow: var(--shadow-soft-lg);
+}
+
+.right[open] {
+  transform: translateX(0);
+}
+
+@starting-style {
+  .right[open] {
+    transform: translateX(100%);
+  }
+}
+
+/* Side: left — anchor to left edge, full viewport height, 420px.
+   Soft ambient shadow casts toward the page. */
+.left {
+  inset: 0 auto 0 0;
+  width: 420px;
+  /* `dvh` with a `vh` fallback — see `.right`. */
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  transform: translateX(-100%);
+  box-shadow: var(--shadow-soft-lg);
+}
+
+.left[open] {
+  transform: translateX(0);
+}
+
+@starting-style {
+  .left[open] {
+    transform: translateX(-100%);
+  }
+}
+
+/* Side: bottom — anchor to bottom edge, full width, auto height.
+   Shadow casts UP (toward the page) since the bottom edge is off-screen. */
+.bottom {
+  inset: auto 0 0 0;
+  width: 100vw;
+  height: auto;
+  /* `dvh` with a `vh` fallback — caps the bottom sheet to the VISIBLE viewport so
+     it never tucks its CTA under the mobile browser's bottom bar (see `.right`). */
+  max-height: 90vh;
+  max-height: 90dvh;
+  transform: translateY(100%);
+  box-shadow: var(--shadow-soft-lg);
+}
+
+.bottom[open] {
+  transform: translateY(0);
+}
+
+@starting-style {
+  .bottom[open] {
+    transform: translateY(100%);
+  }
+}
+
+/* Mobile: full-width sheet from either edge on phones (<720px). Above that, the
+ * sheet stays a 420px side panel with the page visible behind via the scrim —
+ * the standard overlay affordance, adaptive at any width. The phone-width inner
+ * gap (panel narrower than the full-width dialog) is fixed at the panel level,
+ * not here — see perp-suggestion-sheet's `.panel` (width:100% + border-box). */
+@media (max-width: 719.98px) {
+  .right,
+  .left {
+    width: 100vw;
+  }
+}
+
+.body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  /* Clear the home indicator / bottom browser chrome so the last content (often
+     the primary CTA) is never flush against — or hidden behind — the viewport
+     bottom edge on mobile. Pairs with the `dvh` panel heights above. */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Close affordance lives in its own top row, anchored to the right edge.
+ * flex-shrink: 0 keeps it from collapsing when the content below scrolls. */
+.closeRow {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  padding: 8px 8px 0 8px;
+}
+
+/* Standardized header (opt-in via the `title` prop): title + close, with a
+   divider. The consistent header for plain sheets (deposit, transfer, venue
+   onboarding); the AI sheets keep their richer mascot band in `children`. */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 14px 16px;
+  border-bottom: var(--border-pixel) solid var(--border);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/gif" href="/whitejaw.gif" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Invader</title>
+    <meta http-equiv="Content-Security-Policy" content="img-src 'self' data: https://app.hyperliquid.xyz https://s3-symbol-logo.tradingview.com;" />
+    <!-- Boot splash: paints the themed brand colour + mascot during the JS-load
+         gap so there is no white flash before React hydrates. The bundled CSS is
+         not available yet, so the styles + theme resolution are inlined here.
+         See DESIGN.md "Loading & empty states". -->
+    <script>
+      // Resolve the theme before first paint (mirrors theme-provider's
+      // `perps-dex-theme` key + dark default) so the splash bg is correct.
+      (function () {
+        var theme = 'dark'
+        try {
+          var stored = localStorage.getItem('perps-dex-theme')
+          if (stored === 'white' || stored === 'dark') theme = stored
+        } catch (error) {
+          theme = 'dark'
+        }
+        document.documentElement.setAttribute('data-theme', theme)
+      })()
+    </script>
+    <style>
+      :root {
+        --boot-bg: #0a0e16;
+        --boot-ink: #f3f5fa;
+      }
+      html[data-theme='white'] {
+        --boot-bg: #f3f5f7;
+        --boot-ink: #0f1620;
+      }
+      html,
+      body {
+        margin: 0;
+        background: var(--boot-bg);
+      }
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        /* Boot layer: sits above the (empty) #root during hydration, then fades.
+           Outside the app's semantic z-index scale by design. */
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background: var(--boot-bg);
+        transition: opacity 240ms ease-out;
+      }
+      #boot-splash[data-hidden='true'] {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #boot-splash .boot-mascot {
+        width: 96px;
+        height: 96px;
+        image-rendering: pixelated;
+      }
+      #boot-splash .boot-mascot-light {
+        display: none;
+      }
+      html[data-theme='white'] #boot-splash .boot-mascot-dark {
+        display: none;
+      }
+      html[data-theme='white'] #boot-splash .boot-mascot-light {
+        display: block;
+      }
+      #boot-splash .boot-caption {
+        font-family: 'General Sans', system-ui, sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.12em;
+        text-transform: lowercase;
+        color: var(--boot-ink);
+        opacity: 0.85;
+      }
+      #boot-splash .boot-dots::after {
+        content: '';
+        animation: boot-dots 1.2s steps(1, end) infinite;
+      }
+      @keyframes boot-dots {
+        0% {
+          content: '';
+        }
+        25% {
+          content: '·';
+        }
+        50% {
+          content: '··';
+        }
+        75% {
+          content: '···';
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot-splash {
+          transition: none;
+        }
+        /* A GIF animates regardless of reduced-motion, so omit it and the dot
+           animation; show a static caption instead. */
+        #boot-splash .boot-mascot {
+          display: none;
+        }
+        #boot-splash .boot-dots::after {
+          content: '···';
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="boot-splash" role="status" aria-label="Loading">
+      <img class="boot-mascot boot-mascot-dark" src="/whitejaw.gif" alt="" aria-hidden="true" />
+      <img class="boot-mascot boot-mascot-light" src="/blackjaw.gif" alt="" aria-hidden="true" />
+      <p class="boot-caption">booting<span class="boot-dots"></span></p>
+    </div>
+    <script type="module" src="/src/app/main.tsx"></script>
+  </body>
+</html>

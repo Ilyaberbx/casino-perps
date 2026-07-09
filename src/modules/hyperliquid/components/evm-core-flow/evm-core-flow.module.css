@@ -1,0 +1,262 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.title {
+  font-family: var(--font-trading);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  margin: 0;
+}
+
+.track {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--textMuted);
+}
+
+.directionToggle {
+  display: flex;
+  gap: 8px;
+}
+
+.directionButton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: var(--border-pixel) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    background-color var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-glow) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart);
+}
+
+.directionButton:hover:not(.directionButtonActive):not(:disabled) {
+  border-color: var(--border-strong);
+  background-color: var(--accent-soft);
+}
+
+.directionButton:focus-visible {
+  outline: none;
+  box-shadow: var(--glow-accent-sm);
+}
+
+/* Active direction — a raised, glowing cyan-framed chip with a top-lit edge. */
+.directionButtonActive {
+  border-color: var(--accent);
+  border-top-color: color-mix(in srgb, var(--accent) 55%, white 45%);
+  color: var(--accent);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-glass), var(--glow-halo-md);
+}
+
+.directionButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.directionButton:disabled {
+  color: var(--textMuted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.directionSoon {
+  font-family: var(--font-trading);
+  font-size: 10px;
+  color: var(--textMuted);
+}
+
+.select {
+  font-family: var(--font-trading);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: var(--border-pixel) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  width: 100%;
+  transition:
+    border-color var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-glow) var(--ease-out-quart);
+}
+
+.select:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent-sm);
+}
+
+.availableLine {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  color: var(--textMuted);
+  margin: 0;
+}
+
+.availableValue {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  flex: 1;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-top-color: color-mix(in srgb, var(--border-strong) 45%, white 55%);
+  border-radius: var(--radius-sm);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-3d-panel);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.summaryLabel {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  color: var(--textMuted);
+}
+
+.summaryValue {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.summaryNote {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  color: var(--textMuted);
+  margin: 0;
+}
+
+.reviewRows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reviewRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reviewLabel {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--textMuted);
+}
+
+.reviewValue {
+  font-family: var(--font-trading);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action {
+  flex: 1;
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  text-align: center;
+}
+
+.successIcon {
+  font-family: var(--font-trading);
+  font-size: 28px;
+  color: var(--success);
+}
+
+.successLabel {
+  font-family: var(--font-trading);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.successNote {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  color: var(--textMuted);
+  margin: 0;
+}
+
+.txLink {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.txLink:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .directionButton,
+  .select {
+    transition: none;
+  }
+  .directionButton:active:not(:disabled) {
+    transform: none;
+  }
+}

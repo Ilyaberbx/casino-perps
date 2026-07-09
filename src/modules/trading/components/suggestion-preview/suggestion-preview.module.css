@@ -1,0 +1,221 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(420px, 92vw);
+  padding: 20px;
+}
+
+/* Raw agent response */
+.raw {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.rawHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.agentBadge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  color: var(--textSecondary);
+}
+
+.symbol {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--textPrimary);
+}
+
+.side {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.side[data-side='long'] {
+  color: var(--directionUp);
+}
+
+.side[data-side='short'] {
+  color: var(--directionDown);
+}
+
+.confidenceValue {
+  margin-left: auto;
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+}
+
+.confidenceTrack {
+  height: 6px;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-elevated);
+}
+
+/* Signature beat: the confidence bar fills once on reveal (compositor-only). */
+.confidenceFill {
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left center;
+  animation: confidenceFill 520ms var(--ease-out-quint, ease) both;
+  will-change: transform;
+}
+
+@keyframes confidenceFill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.levels {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.levelRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.levelRow dt {
+  color: var(--textSecondary);
+}
+
+.mono {
+  font-family: var(--font-mono, monospace);
+}
+
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notesTitle {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--textMuted);
+}
+
+.notesList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Signature beat: reasons/risks stagger in (delay set inline per index). */
+.note {
+  font-size: 12px;
+  padding-left: 10px;
+  border-left: 2px solid var(--border);
+  animation: noteIn 360ms var(--ease-out-quint, ease) both;
+  will-change: transform, opacity;
+}
+
+.note[data-tone='up'] {
+  border-left-color: var(--directionUp);
+}
+
+.note[data-tone='down'] {
+  border-left-color: var(--directionDown);
+}
+
+@keyframes noteIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Editable legs */
+.legs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.leg {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legLabel {
+  font-size: 12px;
+  color: var(--textSecondary);
+}
+
+.legInput {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono, monospace);
+}
+
+.legInput[data-invalid='true'] {
+  border-color: var(--directionDown);
+}
+
+.legInput:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.legIssue {
+  font-size: 11px;
+  color: var(--directionDown);
+}
+
+.issueList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.issue {
+  font-size: 11px;
+  color: var(--directionDown);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confidenceFill,
+  .note {
+    animation: none;
+  }
+}

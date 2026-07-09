@@ -1,0 +1,22 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 96px;
+  flex: 1 1 auto;
+  padding: 16px;
+  color: var(--textMuted);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.toneError {
+  color: var(--directionDown);
+}

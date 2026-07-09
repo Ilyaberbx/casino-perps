@@ -1,0 +1,269 @@
+/*
+ * Crash-screen styling — the calm-terminal / cyan-glow language (ADR-0042,
+ * ADR-0066). A danger-tinted fault glyph carries the "something broke" semantics
+ * while the recovery + Discord CTAs stay on the brand cyan, so the hierarchy
+ * reads: acknowledge the fault → recover or report. Uses the global CSS custom
+ * properties directly, so it renders correctly even when the class boundary
+ * catches a crash above ThemeProvider (base tokens live on :root).
+ */
+
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: auto;
+  background: var(--background);
+  color: var(--text);
+  isolation: isolate;
+}
+
+/* Faint grid + a soft danger bloom from the top — sets the mood without noise. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(60% 45% at 50% 0%, var(--danger-soft) 0%, transparent 70%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 100% 100%, 44px 44px, 44px 44px;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  padding: 40px 36px;
+  text-align: center;
+  background: var(--surface);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft-lg);
+}
+
+/* Danger-tinted fault frame with a resting red halo + a slow breath. */
+.glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 16px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: var(--border-pixel-strong) solid var(--danger);
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 24px var(--danger-soft);
+  animation: fault-breath 3.2s var(--ease-out-quart) infinite;
+}
+
+@keyframes fault-breath {
+  0%,
+  100% {
+    box-shadow: 0 0 18px var(--danger-soft);
+  }
+  50% {
+    box-shadow: 0 0 34px var(--danger-soft);
+  }
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--danger);
+}
+
+.title {
+  margin: 0 0 14px;
+  font-family: var(--font-pixel-display); /* hero label — sanctioned pixel face */
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+.body {
+  margin: 0 auto 24px;
+  max-width: 44ch;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--textSecondary);
+}
+
+/* Help band — the "send us the log" moment. Cyan hairline + faint tint lifts it
+   off the card without shouting. */
+.helpBand {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  text-align: left;
+  background: var(--accent-soft);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.helpText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.helpTitle {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.helpSubtitle {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--textMuted);
+}
+
+.helpActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Collapsible technical panel. */
+.details {
+  margin-bottom: 24px;
+  text-align: left;
+  border-top: var(--border-pixel) solid var(--border);
+}
+
+.detailsSummary {
+  padding: 14px 2px 0;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--textMuted);
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--dur-fast) var(--ease-out-quart);
+}
+
+.detailsSummary::-webkit-details-marker {
+  display: none;
+}
+
+.detailsSummary::before {
+  content: '▸ ';
+  color: var(--accent);
+}
+
+.details[open] .detailsSummary::before {
+  content: '▾ ';
+}
+
+.detailsSummary:hover {
+  color: var(--text);
+}
+
+.detailsBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.requestId {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.requestIdLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--textMuted);
+}
+
+.requestIdValue {
+  padding: 2px 7px;
+  font-family: var(--font-pixel-display);
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--background);
+  border: var(--border-pixel) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.report {
+  max-height: 200px;
+  margin: 0;
+  padding: 12px 14px;
+  overflow: auto;
+  font-family: var(--font-pixel-display);
+  font-size: 11px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--textSecondary);
+  background: var(--background);
+  border: var(--border-pixel) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+@media (max-width: 560px) {
+  .card {
+    padding: 32px 20px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .helpBand {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .helpActions {
+    flex-direction: column;
+  }
+
+  .helpActions > * {
+    width: 100%;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph {
+    animation: none !important;
+  }
+}

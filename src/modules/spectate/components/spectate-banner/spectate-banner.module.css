@@ -1,0 +1,129 @@
+.banner {
+  position: fixed;
+  left: 50%;
+  top: 24px;
+  transform: translateX(-50%);
+  z-index: 41;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background-color: var(--surface);
+  color: var(--text);
+  border: var(--border-pixel) solid var(--accent);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-pixel-md);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  max-width: calc(100vw - 32px);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  flex-shrink: 0;
+  animation: spectateBlink 800ms ease-in-out infinite;
+}
+
+.label {
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.address {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--accent);
+}
+
+.shareButton {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+  border: var(--border-pixel) solid var(--border-strong);
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+  flex-shrink: 0;
+}
+
+.shareButton:hover {
+  background-color: var(--accent-hover);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--shadow-pixel-color);
+}
+
+.shareButton:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--shadow-pixel-color);
+}
+
+.exitButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background-color: var(--surface-elevated);
+  color: var(--text);
+  border: var(--border-pixel) solid var(--border-strong);
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+  flex-shrink: 0;
+}
+
+.exitButton:hover {
+  background-color: var(--directionDown);
+  color: var(--textOnAccent);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--shadow-pixel-color);
+}
+
+.exitButton:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--shadow-pixel-color);
+}
+
+@keyframes spectateBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.35; }
+}
+
+@media (max-width: 480px) {
+  .banner {
+    top: 12px;
+    padding: 8px 10px;
+    gap: 10px;
+    font-size: 10px;
+  }
+  .shareButton {
+    padding: 4px 8px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+}

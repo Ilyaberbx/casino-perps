@@ -1,0 +1,20 @@
+{
+  "JPY": "country/JP",
+  "EUR": "country/EU",
+  "GBP": "country/GB",
+  "KRW": "country/KR",
+  "EBAY": "ebay",
+  "SPY": "spdr-sandp500-etf-tr",
+  "CORN": "commodity/corn",
+  "SKHX": "sk-telecom",
+  "KR200": "indices/kospi-200",
+  "BRENTOIL": "crude-oil",
+  "OIL": "crude-oil",
+  "COIN": "coinbase",
+  "HOOD": "robinhood",
+  "MU": "micron-technology",
+  "MSTR": "strategy-cad-hedged-cibc-cdr",
+  "META": "meta-platforms",
+  "GOLDJM": "metal/gold",
+  "VIX": "indices/volatility-s-and-p-500"
+}

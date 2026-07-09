@@ -1,0 +1,25 @@
+/* Square pixel venue mark. The edge length is set inline from the `size` prop;
+   this rule owns only the pixel-art object-fit + zero radius. */
+.icon {
+  display: inline-block;
+  border-radius: 0;
+  object-fit: contain;
+}
+
+/* Fallback monogram for a venue with no icon asset: the label's first letter on
+   a square pixel chip. Mirrors the visual of the former DexSelector
+   `.venueMonogram` / SelectedWalletBalancesPanel `.venueGlyph` rules so the
+   migration is visually neutral. The edge length is set inline from `size`. */
+.monogram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+}

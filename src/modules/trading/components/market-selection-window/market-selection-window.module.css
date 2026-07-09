@@ -1,0 +1,374 @@
+/* market-selection-window.module.css
+ * All styles for the MarketSelectionWindow feature folder.
+ * No hard-coded hex values — all colors via CSS custom properties from index.css.
+ * Fixed heights per UI-SPEC: MarketRow = 48px, watchlistHeading = 32px.
+ */
+
+/* ─── Window body wrapper ─────────────────────────────────────── */
+
+/*
+ * .windowBody: cancels Modal's default 20px body padding so the window
+ * controls its own internal spacing precisely.
+ */
+/*
+ * Definite height that ALWAYS fits inside Modal `.body`'s content area:
+ *   dialog max-height = calc(100vh - 48px)   (backdrop padding 24px × 2)
+ *   body content area = dialog - 40px        (body padding 20px × 2)
+ *   → windowBody max  = calc(100vh - 88px)
+ * A pure `flex: 1` chain collapses because `.dialog` only has max-height
+ * (no definite height), so flex items resolve to their content basis (0).
+ * The earlier `min(72vh, 760px)` pin over-shot on shorter viewports — the
+ * bottom of the ScrollArea viewport extended below the visible modal and
+ * the user could only see the first overscan window. The `min()` here
+ * picks the smaller of "what fits the viewport" and "a hard ceiling for
+ * very tall displays", so the inner viewport is always fully on-screen.
+ */
+.windowBody {
+  margin: -20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: min(calc(100vh - 88px), 720px);
+  /* Shared 7-column track: icon · symbol · tag · price · 24h% · volume · star.
+   * Both .row and .headerRow consume this so every metric label sits directly
+   * above its column (issue 8 / ADR-0016). */
+  --market-grid: 24px minmax(0, 1fr) 48px 76px 60px 76px 28px;
+}
+
+/* ─── Tab bar row (keeps the type tabs at full height) ────────────
+ * The shared TabBar's .list sets overflow-x:auto, which forces its flex
+ * automatic-minimum-size to 0. As a flex child of the fixed-height
+ * .windowBody column it would otherwise be shrunk to ~0 when a long
+ * watchlist + list exceed the pinned height (issue 7 redux). Pinning
+ * flex-shrink:0 here — mirroring .pillRow — keeps the strip visible. */
+.tabBarRow {
+  flex-shrink: 0;
+}
+
+/* ─── Window header (search + close button row) ───────────────── */
+
+.windowHeader {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  min-height: 52px;
+  gap: 8px;
+  flex-shrink: 0;
+  border-bottom: var(--border-pixel) solid var(--border);
+}
+
+/* ─── Pill row (SegmentedControl wrapper) ─────────────────────── */
+
+.pillRow {
+  padding: 8px 16px;
+  flex-shrink: 0;
+}
+
+/* ─── Market row (48px fixed height) ─────────────────────────── */
+
+.row {
+  display: grid;
+  grid-template-columns: var(--market-grid);
+  align-items: center;
+  height: 48px;
+  flex-shrink: 0;
+  gap: 8px;
+  padding: 0 16px;
+  cursor: pointer;
+  background-color: var(--surface);
+}
+
+/* ─── Column header row (sticky above the list) ───────────────── */
+
+.headerRow {
+  display: grid;
+  grid-template-columns: var(--market-grid);
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  flex-shrink: 0;
+  background-color: var(--surface-elevated);
+  border-bottom: var(--border-pixel) solid var(--border);
+}
+
+.headerCell {
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--textMuted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerNumeric {
+  text-align: right;
+}
+
+.row:hover {
+  background-color: var(--accent-soft);
+  transition: background-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.rowSelected {
+  background-color: var(--accent-soft);
+  border-left: 2px solid var(--accent);
+}
+
+/* ─── Symbol + name column ────────────────────────────────────── */
+
+.symbolCol {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Legacy class names used by MarketRow (plan used symbolText/nameText/nameCol/iconCol) */
+.iconCol {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 24px;
+}
+
+.nameCol {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.symbolText {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+}
+
+.nameText {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--textMuted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Type/dex badge ─────────────────────────────────────────── */
+
+/* Grid placement + overflow only — the visual chrome (glass, border, font,
+   tone) is owned by the shared `Badge` primitive this class is passed to. */
+.typeBadge {
+  justify-self: start;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* ─── Price column ───────────────────────────────────────────── */
+
+.priceCol {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+/* ─── 24h notional volume column ─────────────────────────────── */
+
+.volumeCol {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  text-align: right;
+  color: var(--textSecondary); /* 24h volume is data — readable secondary tier, not muted (ADR-0042) */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── 24h change / volume column ────────────────────────────── */
+
+.changeCol {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.change {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.change[data-direction='up'] {
+  color: var(--directionUp);
+}
+
+.change[data-direction='down'] {
+  color: var(--directionDown);
+}
+
+.change[data-direction='neutral'] {
+  color: var(--textMuted);
+}
+
+.changeUp {
+  color: var(--directionUp);
+}
+
+.changeDown {
+  color: var(--directionDown);
+}
+
+.changeNeutral {
+  color: var(--textMuted);
+}
+
+/* ─── Star button (28×28 touch target) ───────────────────────── */
+
+.star {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--textMuted);
+  padding: 0;
+}
+
+.starActive {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--warning);
+  padding: 0;
+}
+
+/* ─── Watchlist section ──────────────────────────────────────── */
+
+/*
+ * .watchlistSection sits between the column header and the main list inside
+ * the fixed-height flex column. Without flex-shrink:0 + its own bounded
+ * scroll, a long favorites list grew unbounded — stealing the main list's
+ * space and visually colliding with the type tabs (issue 7). Capping it and
+ * giving it its own overflow contains it to its own band.
+ */
+.watchlistSection {
+  background-color: var(--surface-elevated);
+  flex-shrink: 0;
+  max-height: 38%;
+  overflow-y: auto;
+}
+
+.watchlistHeading {
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--textMuted);
+  background-color: var(--surface-elevated);
+}
+
+.watchlistDivider {
+  border-bottom: var(--border-pixel) solid var(--border-strong);
+}
+
+/* ─── Search input ───────────────────────────────────────────── */
+
+.searchInput {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface);
+  border: var(--border-pixel) solid var(--border);
+  padding: 6px 8px;
+}
+
+.searchInput::placeholder {
+  color: var(--textMuted);
+}
+
+/* ─── Scrollable list area ───────────────────────────────────── */
+
+.listScrollArea {
+  flex: 1;
+  /* Allow the flex item to shrink below its content size so the ScrollArea
+   * (not the window) owns the overflow — without this the 629-row list
+   * would push .windowBody past its pinned height instead of scrolling. */
+  min-height: 0;
+}
+
+/* ─── Mobile (full-screen sheet) ──────────────────────────────────
+ * Breakpoint matches MOBILE_MEDIA_QUERY in shared/hooks/use-is-mobile.ts.
+ * The Modal goes full-screen at this width (modal.module.css), so the
+ * window fills the viewport and the grid is compressed to fit a phone. */
+@media (max-width: 1023.98px) {
+  .windowBody {
+    /* On mobile the modal is full-viewport (dialog gets 100dvh, no backdrop
+     * padding) — body content area = 100dvh - 40px, so windowBody can fill it. */
+    height: calc(100dvh - 40px);
+    /* Narrower 7-col track: icon · symbol · tag · price · 24h% · volume · star.
+     * 24+44+64+56+64+28 = 280 + 6×6 gap + 24 pad ≈ 340 → fits ~342px. */
+    --market-grid: 24px minmax(0, 1fr) 44px 64px 56px 64px 28px;
+  }
+
+  .row,
+  .headerRow {
+    padding-left: 12px;
+    padding-right: 12px;
+    gap: 6px;
+  }
+
+  .windowHeader,
+  .pillRow {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}

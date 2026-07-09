@@ -1,0 +1,58 @@
+.container {
+  display: block;
+  width: 100%;
+}
+
+.row {
+  display: grid;
+  gap: 8px;
+  padding: 6px 10px;
+  align-items: center;
+}
+
+/* Mirror the data list's zebra striping so the skeleton reads as real rows. */
+.row:nth-child(even) {
+  background-color: var(--surface-elevated);
+}
+
+.cell {
+  height: 11px;
+  width: 70%;
+  /* Accent-tinted + pixel-bordered to read clearly as a placeholder and match
+     the sibling RowsSkeleton, rather than a faint surface-on-surface bar. */
+  background-color: var(--accent-soft);
+  border: var(--border-pixel) solid var(--accent);
+  opacity: 0.6;
+  animation: table-skeleton-pulse 1.1s ease-in-out infinite;
+}
+
+/* Vary cell widths across the row so it reads as data, not a solid block. */
+.cell:nth-child(3n) {
+  width: 52%;
+}
+
+.cell:nth-child(3n + 1) {
+  width: 82%;
+}
+
+/* Stagger the pulse between alternating rows so the panel shimmers down the
+   column instead of flashing as one. */
+.row:nth-child(odd) .cell {
+  animation-delay: 0.22s;
+}
+
+@keyframes table-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    animation: none;
+  }
+}

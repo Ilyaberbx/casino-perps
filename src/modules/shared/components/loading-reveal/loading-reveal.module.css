@@ -1,0 +1,58 @@
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Loaded content fades + settles in as the exiting skeleton fades out over it.
+   Also a flex column + grow so a short/empty result (e.g. PlaceholderMessage)
+   can absorb the parent's available height instead of leaving dead space. */
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  animation: loading-reveal-in 420ms ease-out;
+}
+
+.exit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* `forwards` holds the fully-faded end state for the frame before the timer
+     unmounts the node, so it never flashes back to opaque. Duration MUST match
+     LOADING_REVEAL_EXIT_MS in loading-reveal.constants.ts. */
+  animation: loading-reveal-out 420ms ease-out forwards;
+}
+
+@keyframes loading-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loading-reveal-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content {
+    animation: none;
+  }
+  /* No crossfade overlay under reduced motion — the swap is instant. */
+  .exit {
+    display: none;
+  }
+}

@@ -1,0 +1,221 @@
+/*
+ * PixelButton — modern cyan-glow CTA (ADR-0066). Rounded, smooth ease-out motion
+ * (the retro steps() "wink" is retired here per the product-owner reskin), a
+ * tactile press, and an animated outline glow on the accent variants. The glow
+ * animates between two same-structure shadow tokens so it stays theme-aware; the
+ * global prefers-reduced-motion kill switch freezes it to a static ring.
+ */
+.button {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--font-display); /* accent moment: CTAs keep the display face */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  border-style: solid;
+  border-width: var(--border-pixel);
+  border-radius: var(--radius-md); /* rounder, smoother (was square) */
+  overflow: hidden; /* clips the hover sheen to the button shape (glow box-shadow is unaffected) */
+  transition: transform var(--dur-fast) var(--ease-out-quint),
+    box-shadow var(--dur-glow) var(--ease-out-quint),
+    background var(--dur-base) var(--ease-out-quint),
+    color var(--dur-fast) var(--ease-out-quint),
+    border-color var(--dur-base) var(--ease-out-quint),
+    filter var(--dur-fast) var(--ease-out-quint);
+}
+
+/* Hover sheen — a one-pass diagonal light sweep across accent buttons. */
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 65%
+  );
+  transform: translateX(-130%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes button-sheen {
+  from {
+    transform: translateX(-130%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(130%);
+    opacity: 1;
+  }
+}
+
+/* Animated outline glow — breathes between the soft and md glow tokens. */
+@keyframes button-outline-glow {
+  0%,
+  100% {
+    box-shadow: var(--glow-accent-soft);
+  }
+  50% {
+    box-shadow: var(--glow-accent-md);
+  }
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.button:disabled,
+.button[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.button:disabled:hover,
+.button[aria-disabled='true']:hover {
+  transform: none;
+  animation: none;
+}
+
+.fullWidth {
+  display: flex;
+  width: 100%;
+}
+
+.sizeSm {
+  padding: 4px 12px;
+  font-size: 11px;
+  min-height: 28px;
+}
+
+.sizeMd {
+  padding: 8px 18px;
+  font-size: 13px;
+  min-height: 40px;
+}
+
+/* default = neutral outline */
+.variantDefault {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-soft-sm);
+}
+.variantDefault:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft-md);
+}
+.variantDefault:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.96);
+}
+
+/* accent = outline accent; fills + animated glow on hover */
+.variantAccent {
+  color: var(--accent);
+  background: transparent;
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent-soft);
+}
+.variantAccent:hover:not(:disabled):not([aria-disabled='true']) {
+  color: var(--textOnAccent);
+  background: var(--gradient-accent);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  animation: button-outline-glow 1.6s var(--ease-out-quart) infinite;
+}
+.variantAccent:hover:not(:disabled):not([aria-disabled='true'])::before,
+.variantAccentFilled:hover:not(:disabled):not([aria-disabled='true'])::before {
+  animation: button-sheen 0.6s var(--ease-out-quint);
+}
+.variantAccent:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.95);
+  filter: brightness(1.2); /* click flash */
+  animation: none;
+  box-shadow: var(--glow-accent-md);
+}
+
+/* accentFilled = primary CTA: cyan gradient, a gentle always-on outline-glow
+   breath, faster + brighter on hover. */
+.variantAccentFilled {
+  color: var(--textOnAccent);
+  background: var(--gradient-accent);
+  border-color: var(--accent);
+  animation: button-outline-glow 2.6s var(--ease-out-quart) infinite;
+}
+.variantAccentFilled:hover:not(:disabled):not([aria-disabled='true']) {
+  transform: translateY(-1px);
+  animation: button-outline-glow 1.3s var(--ease-out-quart) infinite;
+}
+.variantAccentFilled:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.95);
+  filter: brightness(1.2); /* click flash */
+  animation: none;
+  box-shadow: var(--glow-accent-lg);
+}
+
+/* directionUp = solid green (buy) */
+.variantDirectionUp {
+  color: var(--background);
+  background: var(--directionUp);
+  border-color: var(--directionUp);
+  box-shadow: var(--shadow-soft-sm);
+}
+.variantDirectionUp:hover:not(:disabled):not([aria-disabled='true']) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft-md), 0 0 16px var(--directionUp-soft);
+}
+.variantDirectionUp:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.96);
+}
+
+/* directionDown = solid red (sell) */
+.variantDirectionDown {
+  color: var(--textOnAccent);
+  background: var(--directionDown);
+  border-color: var(--directionDown);
+  box-shadow: var(--shadow-soft-sm);
+}
+.variantDirectionDown:hover:not(:disabled):not([aria-disabled='true']) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft-md), 0 0 16px var(--directionDown-soft);
+}
+.variantDirectionDown:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.96);
+}
+
+/*
+ * elevated = extra lifted depth for hero CTAs. Soft drop + resting cyan halo so
+ * the button reads raised against tiles/cards. Declared last so it wins by
+ * source order over the equal-specificity .variant* shadows above (the animated
+ * accent variants override box-shadow via their keyframes, so the glow still
+ * animates on those).
+ */
+.elevated {
+  box-shadow: var(--shadow-soft-md), var(--glow-halo-soft);
+}
+.elevated:hover:not(:disabled):not([aria-disabled='true']) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft-lg), var(--glow-halo-md);
+}
+.elevated:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .button::before {
+    animation: none !important;
+  }
+}

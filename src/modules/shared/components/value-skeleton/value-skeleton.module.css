@@ -1,0 +1,26 @@
+/* Scalar-value placeholder — matches table-skeleton's accent-tinted, pixel-
+   bordered look so all loading surfaces read as one system. */
+.bar {
+  display: inline-block;
+  vertical-align: middle;
+  background-color: var(--accent-soft);
+  border: var(--border-pixel) solid var(--accent);
+  opacity: 0.6;
+  animation: value-skeleton-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes value-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}

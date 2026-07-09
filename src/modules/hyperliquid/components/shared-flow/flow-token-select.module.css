@@ -1,0 +1,183 @@
+/*
+ * Custom accessible token dropdown (FlowTokenSelect). A native <select> can't
+ * render image icons in options, so this is a button trigger + popover listbox.
+ * Modernized to the premium pass: readable trading sans, soft rounded shapes,
+ * an accent glow focus ring on the trigger, a raised 3D popover listbox, and a
+ * subtle accent highlight on the active/hovered option. Motion is
+ * compositor-cheap (box-shadow/transform/opacity) and disabled under
+ * prefers-reduced-motion.
+ */
+
+.wrap {
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-family: var(--font-trading);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: var(--border-pixel) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-glow) var(--ease-out-quart);
+}
+
+.trigger:hover {
+  border-color: var(--border-strong);
+}
+
+.trigger:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent-sm);
+}
+
+.trigger[aria-expanded='true'] {
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent-soft);
+}
+
+.triggerLabel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.triggerSymbol {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caret {
+  font-family: var(--font-trading);
+  font-size: 10px;
+  color: var(--textMuted);
+  transition: transform var(--dur-base) var(--ease-out-quart);
+}
+
+.trigger[aria-expanded='true'] .caret {
+  transform: rotate(180deg);
+}
+
+.listbox {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  /* Raised popover — gradient surface, top-lit accent border, 3D depth + a soft
+     accent halo so it reads as a floating premium panel. */
+  background: var(--gradient-surface);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-top-color: color-mix(in srgb, var(--border-strong) 45%, white 55%);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-3d-panel), var(--glow-halo-soft);
+  animation: tokenListboxIn var(--dur-base) var(--ease-out-quint);
+}
+
+@keyframes tokenListboxIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  font-family: var(--font-trading);
+  font-size: 13px;
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.option:hover {
+  background: var(--accent-soft);
+}
+
+/* Keyboard-highlighted option — a soft accent fill + bounded halo, not a hard
+   outline, so it matches the premium glow language. */
+.optionActive {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent),
+    var(--glow-halo-soft);
+}
+
+.optionSelected {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.optionText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.optionAvailable {
+  color: var(--textMuted);
+}
+
+.stateBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  font-family: var(--font-trading);
+  font-size: 13px;
+  color: var(--textMuted);
+  background: var(--surface);
+  border: var(--border-pixel) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.stateError {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  color: var(--text);
+  border-color: var(--danger);
+}
+
+.stateErrorText {
+  color: var(--danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .caret,
+  .option,
+  .listbox {
+    transition: none;
+    animation: none;
+  }
+}

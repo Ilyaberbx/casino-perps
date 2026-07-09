@@ -1,0 +1,49 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  font-family: var(--font-trading);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  border: var(--border-pixel) solid var(--badge-border);
+  /* Raised glass chrome (ADR-0070): a top-lit border + the shared glass gradient +
+     the glass elevation shadow lift the pill off the row so it reads as a deliberate
+     raised chip, matching the chart toggle buttons. Static gradient/shadow only —
+     compositor-cheap, no backdrop-filter (ADR-0043). */
+  border-top-color: color-mix(in srgb, var(--badge-border) 55%, white 22%);
+  background: var(--gradient-glass);
+  box-shadow: var(--shadow-glass);
+  color: var(--badge-color);
+}
+
+/* Denser scale for the market-selection row badge (leverage / SPOT / dex). */
+.sizeMd {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.toneUp {
+  --badge-color: var(--directionUp);
+  --badge-border: var(--directionUp);
+}
+
+.toneDown {
+  --badge-color: var(--directionDown);
+  --badge-border: var(--directionDown);
+}
+
+.toneAccent {
+  --badge-color: var(--accent);
+  --badge-border: var(--accent);
+}
+
+.toneNeutral {
+  --badge-color: var(--textMuted);
+  --badge-border: var(--border-strong);
+}

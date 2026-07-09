@@ -1,0 +1,737 @@
+.container {
+  /* Shared readout-chip width for the leverage + Amount % slider rows so the two
+     rows line up and reserve a gutter wide enough that the slider's rightmost
+     (max×/100%) tick caption never underlaps the chip. */
+  --slider-chip-width: 56px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 14px;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text);
+  background-color: var(--surface);
+  overflow: auto;
+}
+
+.readOnlyNotice {
+  padding: 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-elevated);
+}
+
+.fullWidthSegment {
+  display: flex;
+  width: 100%;
+}
+
+.fullWidthSegment > * {
+  flex: 1 1 0;
+  display: flex;
+}
+
+.fullWidthSegment > * > button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+/* Order-type control — a 3-segment row (Market | Limit | [Pro ▾]) with a
+   pixel-art dropdown anchored to the 3rd segment. Mirrors the segmented-control
+   skin (hard borders, square corners) but the Pro segment owns a popover. */
+.typeControl {
+  position: relative;
+  width: 100%;
+}
+
+.typeSegments {
+  display: inline-flex;
+  width: 100%;
+  align-items: stretch;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  /* Clip the active segment's accent fill + inset underline to the rounded
+     frame so the corners read clean. */
+  overflow: hidden;
+  background-color: var(--background);
+}
+
+.typeSegment {
+  flex: 1 1 0;
+  /* Allow the segment (and its label child) to shrink below content width so the
+     relabelled 3rd segment ("Stop Market ⌄") ellipsizes instead of forcing the
+     row to overflow on a narrow sheet. Flex items default to min-width:auto. */
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 6px 12px;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--textMutedStrong);
+  background: none;
+  border: none;
+  border-right: var(--border-pixel) solid var(--border-strong);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart);
+}
+
+.typeSegment:last-child {
+  border-right: none;
+}
+
+.typeSegment:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.typeSegment:hover:not(.typeSegmentActive) {
+  color: var(--text);
+  background-color: var(--accent-soft);
+}
+
+.typeSegmentActive {
+  color: var(--textOnAccent);
+  background-color: var(--accent);
+  box-shadow: inset 0 -3px 0 var(--tab-active-marker);
+}
+
+.typeSegmentLabel {
+  min-width: 0;
+}
+
+/* On desktop the relabelled Pro segment ("Stop Market ⌄" / "Stop Limit ⌄" /
+   "TWAP ⌄") sizes to its own content so the full label shows; Market/Limit
+   stay `flex: 1 1 0` and split the remaining width. The plain "Pro ⌄" state
+   keeps the default `flex: 1 1 0` so the row still reads as equal thirds. */
+.proSegmentRelabeled {
+  flex: 0 1 auto;
+}
+
+.typeSegmentCaret {
+  flex: 0 0 auto;
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+/* Positioned by the shared Popover (portaled to document.body, `position:fixed`
+   written inline by use-popover-position). This rule owns only the panel skin +
+   stacking. ADR-0037. */
+.proMenu {
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: 3px 3px 0 var(--shadow-pixel-color);
+  z-index: var(--z-popover);
+  outline: none;
+  /* Dropdown "retrieval" reveal — matches IconSelect's open animation so every
+     popover dropdown opens the same way. */
+  transform-origin: top center;
+  animation: proMenuIn var(--dur-fast) var(--ease-out-quart);
+}
+
+@keyframes proMenuIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proMenu {
+    animation: none;
+  }
+}
+
+.proOption {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  /* Inner radius = menu radius (--radius-sm) minus its 2px padding, so the
+     hover/selected fill nests cleanly inside the rounded menu frame. */
+  border-radius: calc(var(--radius-sm) - 2px);
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart);
+}
+
+.proOption:hover,
+.proOptionActive {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+}
+
+.proOption[aria-selected='true'] {
+  border-left: var(--border-pixel) solid var(--accent);
+}
+
+.proOption[aria-selected='true'].proOptionActive,
+.proOption[aria-selected='true']:hover {
+  border-left-color: var(--textOnAccent);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* When .field is applied to a <fieldset> (TWAP Running Time), reset the browser
+   default groove border + padding so it matches the styled <div> .field look;
+   without this the native fieldset border + <legend> notch bleed through. */
+fieldset.field {
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-inline-size: 0;
+}
+
+.fieldLabel {
+  font-family: var(--font-trading);
+  color: var(--textMutedStrong);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+/* When .fieldLabel is a <legend> (TWAP Running Time), strip the legend's default
+   padding and make it flow as a normal flex child (legends render specially), so
+   it reads as a plain section label like the other .fieldLabel spans. */
+legend.fieldLabel {
+  display: block;
+  width: 100%;
+  padding: 0;
+}
+
+.input {
+  padding: 8px 10px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+/* Refined focus: a single crisp accent ring offset 1px from the 2px accent
+   border, so the field reads as one sophisticated frame rather than a stacked
+   4px slab. Shared by every text field in the ticket (both themes, accent token
+   is theme-aware). */
+.input:focus {
+  border-color: var(--accent);
+  outline: var(--border-pixel) solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Price field with an inline MID chip pinned to the right edge. */
+.inputWithChipWrapper {
+  position: relative;
+  display: flex;
+}
+
+.inputWithChip {
+  width: 100%;
+  padding-right: 48px;
+}
+
+.midButton {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  padding: 2px 6px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--textMutedStrong);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out-quart), color var(--dur-fast) var(--ease-out-quart);
+}
+
+.midButton:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.midButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+.midButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.inputInvalid {
+  border-color: var(--directionDown);
+}
+
+.inputInvalid:focus {
+  border-color: var(--directionDown);
+  outline-color: var(--directionDown);
+}
+
+.inputDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.submitWrapper {
+  margin-top: auto;
+}
+
+.errorMessage {
+  padding: 6px 10px;
+  color: var(--directionDown);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: var(--border-pixel) solid var(--directionDown);
+  border-radius: var(--radius-sm);
+  background-color: var(--directionDown-soft);
+}
+
+.fieldHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.unitToggle {
+  display: inline-flex;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  /* Clip the active option's accent fill to the rounded frame. */
+  overflow: hidden;
+}
+
+.unitOption {
+  padding: 2px 8px;
+  border: none;
+  background-color: var(--background);
+  color: var(--textMutedStrong);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.unitOption + .unitOption {
+  border-left: var(--border-pixel) solid var(--border-strong);
+}
+
+.unitOption:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.unitOptionActive {
+  background-color: var(--accent);
+  color: var(--background);
+}
+
+.chipRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.chip {
+  padding: 4px 0;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--textMutedStrong);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out-quart), color var(--dur-fast) var(--ease-out-quart);
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 8px 10px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.summaryLabel {
+  font-family: var(--font-trading);
+  /* Readable muted: the pre-trade/TWAP footer labels sit on --surface where
+     --textMuted (#64748b) is only 3.83:1 on dark. --textMutedStrong clears AA. */
+  color: var(--textMutedStrong);
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.summaryValue {
+  margin: 0;
+  font-family: var(--font-mono);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Muted legal disclaimer line below the pre-trade summary (all order types). */
+.disclaimer {
+  margin: 0;
+  /* Same AA concern as .summaryLabel — sits below the --surface summary panel. */
+  color: var(--textMutedStrong);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+
+/* "Terms of Use" link inside the disclaimer (ADR-0075). Reads as a link without
+   shouting — underlined, brightening to the accent on hover/focus. */
+.disclaimerLink {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--dur-fast) var(--ease-out-quart);
+}
+
+.disclaimerLink:hover,
+.disclaimerLink:focus-visible {
+  color: var(--accent);
+}
+
+/* Entry-attached TP/SL (2×2 grid). Header carries the checkbox + the $/% toggle;
+   the body is two coupled rows of [Price | Gain/Loss]. */
+.tpslSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tpslHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tpslGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tpslRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* TP/SL price input — a tighter variant of the primary .input skin so the 2×2
+   grid reads as part of the ticket rather than oversized full-width fields. */
+.tpslPriceInput {
+  padding: 6px 8px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.tpslPriceInput:focus {
+  border-color: var(--accent);
+  outline: var(--border-pixel) solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Gain/Loss cell: a numeric input with a hard-bordered $/% suffix box pinned to
+   the right edge, sharing the field's border (no rounded corners). */
+.tpslAmountCell {
+  position: relative;
+  display: flex;
+}
+
+.tpslAmountInput {
+  width: 100%;
+  padding: 6px 24px 6px 8px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.tpslAmountInput:focus {
+  border-color: var(--accent);
+  outline: var(--border-pixel) solid var(--accent);
+  outline-offset: 1px;
+}
+
+.tpslAmountSuffix {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  color: var(--textMutedStrong);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+/* Available-to-Trade / Current-Position info rows (reuse summary typography). */
+.infoRows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Amount label + MAX button group. */
+.amountLabelGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.maxButton {
+  padding: 2px 6px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--textMutedStrong);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out-quart), color var(--dur-fast) var(--ease-out-quart);
+}
+
+.maxButton:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.maxButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+/* % size slider row. Aligns to the start so the slider + its tick-caption scale
+   sit beside the fixed-width readout chip; the chip never overlaps the slider's
+   rightmost (100%) caption because the slider reserves that caption inboard
+   (.scaleLabel:last-child in pixel-slider). */
+.sliderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sliderRow > div:first-child {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* The Amount % slider itself is the shared PixelSlider (pixel-slider/). This
+   row only lays it out beside the % readout chip. The chip shares the leverage
+   value-chip width (--slider-chip-width) so the two slider rows line up. */
+.sliderValue {
+  flex: 0 0 auto;
+  width: var(--slider-chip-width, 56px);
+  padding: 4px 8px;
+  text-align: right;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* TWAP running-time field pair (Hour / Minute). Two equal-width numeric inputs,
+   each with a unit suffix, sharing the same hard-bordered pixel skin. */
+.twapRunningTimeFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.twapUnitField {
+  position: relative;
+  display: flex;
+}
+
+.twapUnitInput {
+  width: 100%;
+  padding-right: 36px;
+}
+
+.twapUnitSuffix {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--textMutedStrong);
+  pointer-events: none;
+}
+
+/* Reduce-only + TIF options row. */
+.optionsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tifControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Editable slippage cell inside the pre-trade summary. */
+.slippageField {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.slippageInput {
+  width: 52px;
+  padding: 2px 6px;
+  text-align: right;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--background);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.slippageInput:focus {
+  border-color: var(--accent);
+  outline: var(--border-pixel) solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Mobile sheet pass (≤1023.98px — the app-wide breakpoint shared by
+   `OrderEntrySheet` and `MobileTabPanel`). The same `.container` renders inside
+   an auto-height scroll surface (the sheet's own `overflow-y: auto`, or the
+   mobile tab panel). On desktop the container sits in a fixed-height pane, so
+   `height: 100%` + `overflow: auto` is correct there; inside a content-sized
+   sheet that pair collapses the height and clips the tall layouts (Stop Limit,
+   Limit + TP/SL expanded). Hand scrolling back to the sheet: the container grows
+   with its content and the sheet scrolls as one surface — no nested scrollbar,
+   no clipped submit/summary. `margin-top: auto` on the submit wrapper degrades
+   to a no-op in natural flow, which is the intended mobile stacking. */
+@media (max-width: 1023.98px) {
+  .container {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  /* Ellipsis only fires in the mobile sheet, where the row is narrow enough
+     that the full Pro label cannot fit. On desktop the relabelled segment
+     grows to its content instead (see `.proSegmentRelabeled`). */
+  .typeSegmentLabel {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

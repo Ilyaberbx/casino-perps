@@ -1,0 +1,76 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--header-control-h);
+  padding: 0 10px 0 4px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.trigger:hover {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--shadow-pixel-color);
+}
+
+.trigger:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--shadow-pixel-color);
+}
+
+/* Account glyph chip (ADR-0067/0068): a square pixel frame around the User icon
+   so the account trigger reads as a distinct chip vs. the wallet switcher's
+   gradient avatar. Sized to the old avatar footprint so the layout is unchanged. */
+.iconFrame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  border: var(--border-pixel) solid var(--border-strong);
+  color: var(--accent);
+}
+
+.trigger:hover .iconFrame {
+  color: var(--textOnAccent);
+  border-color: var(--textOnAccent);
+}
+
+.handle {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mirrors `.trigger`'s footprint (padding, gap, border) so the loading skeleton
+   occupies the exact final size — the resolved button reveals with zero shift. */
+.triggerSkeleton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--header-control-h);
+  padding: 0 10px 0 4px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+}

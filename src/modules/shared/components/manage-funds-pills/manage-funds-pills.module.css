@@ -1,0 +1,48 @@
+/* Header quick-launch row for Manage Funds actions. Pure layout — the pill
+ * chrome itself comes from PixelButton. */
+
+/* Simple mode: a single "Manage Funds" button. */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Pro mode: the five funds-action pills. On wide / tablet widths they sit on one
+   line, wrapping (never a hidden horizontal scroll) only if the header truly
+   runs out of room. */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Pro mode on phones: lay the pills out as an explicit two-row grid — three
+   across the top, two across the bottom — instead of a horizontal scroll strip.
+   The strip was undiscoverable: nothing signalled the trailing pills were
+   swipe-reachable (issue #268), so show every pill at once. The span pattern
+   assumes the fixed five-pill set (manage-funds-pills.constants.ts): a six-column
+   track lets the top three span two columns each and the bottom two span three
+   each, so both rows fill the width evenly. `.headerActions` is full-width at
+   this breakpoint (portfolio-page.module.css), giving the grid a definite width. */
+@media (max-width: 720px) {
+  .pills {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .pills > * {
+    grid-column: span 2;
+  }
+
+  .pills > *:nth-child(4),
+  .pills > *:nth-child(5) {
+    grid-column: span 3;
+  }
+}

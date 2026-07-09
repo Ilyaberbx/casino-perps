@@ -1,0 +1,152 @@
+.group {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  /* Raised glass chrome (ADR-0070): a top-lit border + glass gradient + the
+     glass elevation shadow lift the control off the page so it reads as a
+     deliberate, emphasised tile instead of dissolving into the page background.
+     Rounded + clipped so the segments sit inside the frame. */
+  border: var(--border-pixel) solid var(--border-strong);
+  border-top-color: color-mix(in srgb, var(--border-strong) 55%, var(--accent) 45%);
+  border-radius: var(--radius-sm);
+  background: var(--gradient-glass);
+  box-shadow: var(--shadow-glass);
+  padding: 0;
+  /* When the options can't all fit (e.g. the portfolio PERIOD selector at phone
+     widths), scroll the row instead of hard-clipping the last option ("ALL-TIME").
+     Inert when the row fits — no scrollbar, no layout change — and the hidden
+     scrollbar keeps the pixel chrome clean. overflow also clips the segments to
+     the rounded frame. */
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.group::-webkit-scrollbar {
+  display: none;
+}
+
+.btn {
+  padding: 6px 12px;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--textMutedStrong);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  border-right: var(--border-pixel) solid var(--border-strong);
+  transition: background-color var(--dur-fast) var(--ease-out-quart), color var(--dur-fast) var(--ease-out-quart);
+  min-height: 28px;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.btn:last-child {
+  border-right: none;
+}
+
+.btn:hover:not(:disabled):not(.btnActive) {
+  color: var(--text);
+  background-color: var(--accent-soft);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnActive {
+  color: var(--textOnAccent);
+  background-color: var(--accent);
+  /* Inner top highlight + the existing bottom marker read the active segment as a
+     raised glass key (ADR-0070); compositor-cheap static shadow. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -3px 0 var(--tab-active-marker);
+}
+
+.toneDirectionUp.btnActive {
+  background-color: var(--directionUp);
+  color: var(--background);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -3px 0 var(--border-strong);
+}
+
+.toneDirectionDown.btnActive {
+  background-color: var(--directionDown);
+  color: var(--textOnAccent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -3px 0 var(--border-strong);
+}
+
+/* Underline variant (opt-in): clean two-tab look — no group/divider borders,
+   active tab is the tone colour with a tone-coloured bottom underline and no
+   fill; inactive tabs stay muted. Keyboard/a11y is unchanged. Used by the
+   Long/Short side toggle to match the reference. */
+.underline {
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none; /* the glass elevation is a filled-variant device only */
+  position: relative; /* anchors the sliding indicator */
+}
+
+.underline .btn {
+  border-right: none;
+  flex: 1 1 0; /* equal-width segments so the indicator math is exact */
+}
+
+.underline .btnActive {
+  background: none;
+  color: var(--text);
+  box-shadow: none; /* underline marks the active tab with the sliding indicator only */
+}
+
+.underline .toneDirectionUp.btnActive {
+  color: var(--directionUp);
+  background: none;
+}
+
+.underline .toneDirectionDown.btnActive {
+  color: var(--directionDown);
+  background: none;
+}
+
+/* Single sliding indicator (underline variant) — one bar that glides between
+   equal-width segments and tweens its colour with the tone. Width + position
+   come from --seg-count / --seg-index set by the component. Compositor-only
+   (transform); the global reduced-motion kill switch collapses the transition. */
+.indicator {
+  --seg-tone: var(--accent);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: calc(100% / var(--seg-count, 1));
+  transform: translateX(calc(var(--seg-index, 0) * 100%));
+  background-color: var(--seg-tone);
+  box-shadow: 0 0 8px var(--seg-tone);
+  pointer-events: none;
+  transition: transform var(--dur-base) var(--ease-out-quint),
+    background-color var(--dur-base) var(--ease-out-quart),
+    box-shadow var(--dur-base) var(--ease-out-quart);
+}
+
+.underline.toneDirectionUp .indicator {
+  --seg-tone: var(--directionUp);
+}
+
+.underline.toneDirectionDown .indicator {
+  --seg-tone: var(--directionDown);
+}
+
+@media (max-width: 480px) {
+  .btn {
+    padding: 8px 10px;
+    min-height: 36px;
+  }
+}

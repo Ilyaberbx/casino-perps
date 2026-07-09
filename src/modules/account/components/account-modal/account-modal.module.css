@@ -1,0 +1,463 @@
+.layout {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  min-width: 520px;
+  min-height: 360px;
+}
+
+.layoutMobile {
+  grid-template-columns: 1fr;
+  /* Size the nav row to its own content and let the section pane absorb the
+     rest. Without this, the two implicit rows (tab strip + pane) share
+     `.layout`'s desktop-oriented `min-height: 360px` via Grid's default
+     `align-content: stretch` — on a short section (e.g. 2FA's "on" card) that
+     leftover height gets split across BOTH rows, so the tab strip's row (and
+     therefore the active tab's flex-stretched highlight pill) balloons to
+     ~140px tall instead of hugging its label. */
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+  width: 100%;
+}
+
+/* Desktop: vertical sidebar. */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-right: var(--border-pixel) solid var(--border);
+  padding-right: 12px;
+}
+
+/* Mobile: horizontal top tab strip. */
+.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  border-bottom: var(--border-pixel) solid var(--border);
+  padding-bottom: 8px;
+  overflow-x: auto;
+}
+
+.navItem {
+  display: block;
+  /* Full-width is the desktop vertical-sidebar shape; the mobile `.tabs` strip
+     overrides it below. */
+  width: 100%;
+  padding: 8px 10px;
+  background-color: transparent;
+  border: var(--border-pixel) solid transparent;
+  border-radius: 0;
+  color: var(--textMuted);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+/* Mobile horizontal tab strip: each tab sizes to its own label so the active
+   highlight matches the tab's bounds (issue #264). `width:100%` on a flex-row
+   item makes every tab claim the full width then shrink unevenly, blowing the
+   shortest label's (2FA) highlight up far wider than its text. */
+.tabs .navItem {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.navItem:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.navItemActive {
+  background-color: var(--accent);
+  border-color: var(--border-strong);
+  color: var(--textOnAccent);
+}
+
+.pane {
+  min-width: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profileAvatar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowLabel {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--textMuted);
+}
+
+.rowValue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.permanentHint {
+  padding: 1px 6px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--textMuted);
+}
+
+.footer {
+  margin-top: 8px;
+}
+
+.mfaBody {
+  margin: 0;
+  font-family: var(--font-trading);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.mfaOn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--surface);
+  border: var(--border-pixel) solid var(--border-strong);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+}
+
+.mfaGlyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+  font-weight: 700;
+}
+
+.mfaTitle {
+  margin: 0 0 2px 0;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+
+/* Wallets section (PRD-0006 UI-5). */
+.walletList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.walletRow {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  border: var(--border-pixel) solid var(--border);
+  background-color: var(--surface);
+}
+
+.walletRowSelected {
+  border-color: var(--accent);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+}
+
+.walletRowSelect {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.walletRowSelect:hover:not(:disabled) {
+  background-color: var(--surfaceRaised, var(--surface));
+}
+
+.walletRowSelect:disabled {
+  cursor: default;
+}
+
+.walletRowIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.walletRowAddress {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.walletRowSource {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--textMuted);
+}
+
+.walletRowBadge {
+  margin-left: auto;
+  padding: 2px 7px;
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.menuTrigger {
+  padding: 0 10px;
+  height: 100%;
+  background-color: transparent;
+  border: none;
+  border-left: var(--border-pixel) solid var(--border);
+  color: var(--textMuted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.menuTrigger:hover {
+  color: var(--text);
+}
+
+/* Positioned by the shared Popover (portaled to document.body, `position:fixed`
+   written inline by use-popover-position). This rule owns only the panel skin +
+   stacking. ADR-0037. */
+.menuPopover {
+  z-index: var(--z-popover);
+  min-width: 140px;
+  background-color: var(--surface);
+  border: var(--border-pixel) solid var(--border-strong);
+  box-shadow: 2px 2px 0 var(--shadow-pixel-color);
+}
+
+.menuItem {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  background-color: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+}
+
+.menuItemDanger {
+  composes: menuItem;
+  color: var(--danger);
+}
+
+.menuItemDanger:hover {
+  background-color: var(--danger);
+  color: var(--text-on-danger);
+}
+
+.menuNote {
+  margin: 0;
+  padding: 8px 10px;
+  max-width: 200px;
+  color: var(--textMuted);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.importRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.importHint {
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--textMuted);
+}
+
+.agentSeparator {
+  margin: 4px 0;
+  border: none;
+  border-top: var(--border-pixel) dashed var(--border);
+}
+
+.agentRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: var(--border-pixel) solid var(--border);
+  background-color: var(--surface);
+}
+
+/* Holds the animated Ai mascot in the agent-wallet row's avatar column; the
+   mascot sizes itself (28px) — this only keeps it from flex-shrinking. */
+.agentGlyph {
+  flex: none;
+}
+
+.agentTopUp {
+  margin-left: auto;
+  padding: 4px 10px;
+  background-color: transparent;
+  border: var(--border-pixel) solid var(--border-strong);
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+
+.agentTopUp:hover {
+  background-color: var(--accent);
+  color: var(--textOnAccent);
+  border-color: var(--accent);
+}
+
+/* Per-DEX balance panel (PRD-0006 UI-5 / slice 07). */
+.venueBalances {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0 4px;
+  padding: 8px 10px;
+  border: var(--border-pixel) solid var(--border);
+  background-color: var(--surface);
+}
+
+.venueBalanceHeading {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--textMuted);
+}
+
+.venueBalanceRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.venueBalanceLabel {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.venueBalanceValue {
+  margin-left: auto;
+  font-family: var(--font-trading);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.venueOnboardLink {
+  margin-left: auto;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.venueOnboardLink:hover {
+  text-decoration: underline;
+}

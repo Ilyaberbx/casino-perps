@@ -1,0 +1,80 @@
+/* Shared icon-only control (the icon sibling of PixelButton). A perfectly
+   square 26px box (equal sides — no horizontal padding that would make it wider
+   than tall) with the rounded `--radius-sm` chrome corner (ADR-0043 "buttons
+   round"); calm at rest, intent revealed on hover. Four tones cover every
+   dock/sheet icon action and every close button. */
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-elevated);
+  color: var(--textMutedStrong);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart),
+    background-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.iconButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+.iconButton[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* neutral — Modify / Manage / Edit / Close-sheet: accent reveal on hover. */
+.neutral:hover:not([aria-disabled='true']) {
+  border-color: var(--accent);
+  color: var(--text);
+  background-color: var(--accent-soft);
+}
+
+/* destructive — Cancel order / Close position: red reveal on hover. */
+.destructive:hover:not([aria-disabled='true']) {
+  border-color: var(--directionDown);
+  color: var(--directionDown);
+  background-color: var(--directionDown-soft);
+}
+
+/* accent — Transfer: cyan outline at rest, fills on hover. */
+.accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.accent:hover:not([aria-disabled='true']) {
+  color: var(--textOnAccent);
+  background-color: var(--accent);
+}
+
+/* elevated (ADR-0070, opt-in): raised glass chrome for dense action clusters
+   (account-dock row actions) that want the same 3D presence as Badge. Adds
+   only the border-top tint + surface + shadow — tone-driven hover colors are
+   untouched. */
+.elevated {
+  border-top-color: color-mix(in srgb, var(--border-strong) 55%, white 22%);
+  background: var(--gradient-glass);
+  box-shadow: var(--shadow-glass);
+}
+
+/* ghost — inline Share beside a value: borderless, compact, muted → accent. */
+.ghost {
+  min-width: 0;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--textMuted);
+}
+.ghost:hover:not([aria-disabled='true']) {
+  color: var(--accent);
+  background: transparent;
+}

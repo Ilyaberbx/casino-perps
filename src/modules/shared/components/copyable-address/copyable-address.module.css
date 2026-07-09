@@ -1,0 +1,63 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alignCenter {
+  align-items: center;
+}
+
+.alignStart {
+  align-items: flex-start;
+}
+
+.row {
+  display: inline-flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: var(--border-pixel);
+  border-color: var(--border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface);
+}
+
+.address {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  font-family: var(--font-trading);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.copyButton {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  cursor: pointer;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  border-left-style: solid;
+  border-left-width: var(--border-pixel);
+  border-left-color: var(--border-strong);
+  background-color: transparent;
+}
+
+.copyButton:hover {
+  color: var(--textOnAccent);
+  background-color: var(--accent);
+}
+
+.copyButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

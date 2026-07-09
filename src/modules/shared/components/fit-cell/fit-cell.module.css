@@ -1,0 +1,25 @@
+/* Clipping outer box: the column. Single line, hides overflow. */
+.outer {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/*
+ * Inner content: compressed horizontally by `--fit-scale` (set by the hook).
+ * `inline-block` so the transform has a measurable box; the transform-origin
+ * anchors the squeeze to the aligned edge so the visible edge stays put.
+ */
+.inner {
+  display: inline-block;
+  white-space: nowrap;
+  transform: scaleX(var(--fit-scale, 1));
+}
+
+.alignRight {
+  transform-origin: right center;
+}
+
+.alignLeft {
+  transform-origin: left center;
+}

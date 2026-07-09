@@ -1,0 +1,476 @@
+/* General Sans — the single sans workhorse, a free commercially-usable stand-in
+   for Aeonik (Cotype Foundry). It replaced both the JetBrains Mono terminal
+   workhorse and the Bricolage Grotesque display accent in one move — see
+   docs/adr/0073-aeonik-substitute-single-font.md. Numeric column alignment that
+   the old monospace gave for free is now held by `font-variant-numeric:
+   tabular-nums` on `body` (below). */
+@font-face {
+  font-family: 'General Sans';
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+  src: url('/fonts/GeneralSans-Variable.woff2') format('woff2');
+}
+
+/* Monocraft — the pixel/Minecraft-style face. Retired from chrome & data by
+   ADR-0042, kept as a deliberate brand-accent for the Portfolio hero label only
+   (opt in via --font-pixel-display). Not for chrome, labels, or trading data. */
+@font-face {
+  font-family: 'Monocraft';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Monocraft.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Monocraft';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Monocraft-Bold.woff2') format('woff2');
+}
+
+:root {
+  --font-mono: 'General Sans', system-ui, sans-serif;
+  --font-display: 'General Sans', system-ui, sans-serif; /* same family — weight, not face, carries display emphasis */
+  --font-pixel-display: 'Monocraft', ui-monospace, monospace; /* pixel brand-accent face — hero labels only (see ADR-0042) */
+
+  /*
+   * Single-font system — see docs/adr/0073-aeonik-substitute-single-font.md
+   * (supersedes the font-face choices in ADR-0042). General Sans (a free Aeonik
+   * stand-in) is now the one sans across chrome, data, and display; the former
+   * JetBrains Mono workhorse and Bricolage Grotesque display accent are retired.
+   * The token NAMES are kept (300+ consumers) so the swap stays a value change,
+   * not a rename: --font-mono is no longer monospace, --font-display is the same
+   * family at a heavier weight. Monocraft (--font-pixel-display) is the only
+   * remaining accent face. (--font-mono / --font-pixel are now misnomers — both
+   * resolve to the proportional sans.)
+   */
+  --font-pixel: var(--font-mono); /* LEGACY alias → sans workhorse */
+  --font-core: var(--font-mono); /* app chrome & identity */
+  --font-trading: var(--font-mono); /* all trading & account data */
+
+  --radius-pixel: 0; /* explicit-square: dense data surfaces (orderbook, tables, tape) */
+  /* Rounding scale (ADR-0043). Chrome softens; data stays square. */
+  --radius-sm: 6px; /* buttons, inputs, chips, tags, tabs, toasts, callouts, dropdowns, menus */
+  --radius-md: 12px; /* cards, panels, modals, sheets */
+  --border-pixel: 1px; /* hairline: 1 CSS px, refined to a true 1-device-pixel 0.5px on ≥2dppx (see @media below) */
+  --border-pixel-strong: 2px; /* accent frames on CTAs / active panels — stays 2px for weight */
+
+  --header-control-h: 32px; /* shared height for every interactive control in the app-shell header (account, venue, theme, spectate) so they line up as one row */
+
+  /*
+   * Motion system (ADR-0043). Smooth ease-out curves replace the retro
+   * `steps(2,end)` stepped easing across the calm terminal; the stepped "wink" is
+   * kept only on the pixel-accent CTAs. Never bounce/elastic. Durations follow the
+   * 100/200/300 rule: fast = micro-feedback, base = state changes, slow = layout.
+   */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1); /* smooth default */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1); /* slightly snappier */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); /* confident, decisive */
+  --dur-fast: 120ms; /* hover / press / color shifts */
+  --dur-base: 200ms; /* menus, tooltips, tab indicator, state changes */
+  --dur-slow: 300ms; /* modals, sheets, accordions, layout reveals */
+  --dur-glow: 240ms; /* glow / colour-sweep transitions on hover/active (ADR-0066) */
+
+  /*
+   * Semantic stacking order (ADR-0037, revised by ADR-0079). Overlays reference
+   * these tokens, never z-index literals. Theme-independent, so defined once
+   * here. Ascending:
+   * sticky < sheet-backdrop < sheet < modal-backdrop < modal
+   * < popover < toast < tooltip.
+   *
+   * The load-bearing contract (the "global layering" the app depends on):
+   * page content (chrome literals < 1100) < Sheet < Modal < Popover < Toast.
+   * The popover/dropdown layer sits ABOVE both Sheet and Modal (ADR-0079): a
+   * menu always paints above the surface that owns its trigger (page, sheet, or
+   * modal), so an in-sheet/in-modal dropdown is never occluded by its host. A
+   * toast (with its interactive close / action buttons) always sits above the
+   * popover layer too, so it can never be hidden by an open menu. Tooltips ride
+   * highest — they are momentary, pointer-events:none hints that block nothing.
+   */
+  --z-sticky: 1100;
+  --z-sheet-backdrop: 1200;
+  --z-sheet: 1300;
+  --z-modal-backdrop: 1400;
+  --z-modal: 1500;
+  --z-popover: 1550;
+  --z-toast: 1600;
+  --z-tooltip: 1700;
+
+  /* Mobile bottom-nav (MobileTradeDock) chrome height, WITHOUT the safe-area
+     inset. Single source of truth (issue #263): the fixed nav slot sizes itself
+     to this, and every host page that mounts the nav reserves
+     `var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom)` of bottom
+     padding off it, so content / the Account Dock can never hide behind the nav
+     and the reservation can never drift from the nav's real height. */
+  --mobile-bottom-nav-height: 79px;
+}
+
+/*
+ * HiDPI hairline refinement. A 1px CSS border on a ≥2× display paints 2 device
+ * pixels — heavier than a true hairline, and it antialiases into a soft ~1.5px
+ * smear whenever the box doesn't land on a device-pixel boundary (the "fuzzy thin
+ * line" problem). On ≥2dppx we drop the hairline token to 0.5px = exactly 1 device
+ * pixel: the crispest, finest line a screen can draw. 1× displays keep 1px (0.5px
+ * is unreliable there). Only --border-pixel (dividers, table grid, row separators,
+ * fine frames) is refined; --border-pixel-strong stays 2px so accent/active frames
+ * keep their weight, and --focus-ring is untouched so keyboard focus stays visible.
+ */
+@media (min-resolution: 2dppx), (-webkit-min-device-pixel-ratio: 2) {
+  :root {
+    --border-pixel: 0.5px;
+  }
+}
+
+/*
+ * Calm-terminal palette (ADR-0042) — tinted near-black surfaces, a signature
+ * teal accent reserved for active/live, and high-saturation green/red owning all
+ * directional meaning. Each theme defines surfaces, a 3-tier text ramp
+ * (text → textSecondary → textMuted), the teal accent + glow, a P&L up/down pair
+ * + glow, and warning/info markers; everything else (*-soft fills, state colours,
+ * scrim, shadows) is a derived tint/alpha of those — no new hues.
+ */
+:root,
+[data-theme='dark'] {
+  /* Cyan-glow reskin (ADR-0066): near-black canvas so the electric-cyan accent
+     and its bounded glow read vivid. Surfaces step up in small luminance deltas. */
+  --background: #05070d; /* near-black app page */
+  --surface: #0b0f17; /* panel surface (chart, orderbook, tables) */
+  --surface-elevated: #131a26; /* raised elements, header, active chips */
+  --border: #1e2a3d; /* hairline dividers and table grid (reads on near-black) */
+  --border-strong: #36485f; /* contrast borders on active panels and buttons */
+  --chart-grid: rgba(255, 255, 255, 0.06); /* derived: subtle neutral chart gridlines */
+  --grid-line: rgba(255, 255, 255, 0.04); /* derived: subtle page background grid */
+
+  /* 3-tier text ramp: emphasis comes from contrast + weight, not hue. */
+  --text: #f3f5fa; /* primary — bright off-white (not pure white), ~16:1 on --surface */
+  --textSecondary: #b9c2d2; /* secondary values / active labels, ~9:1 */
+  --textMuted: #8d99ab; /* muted labels — ≥4.5:1 on --surface (was #64748b @3.8, failed AA) */
+  --textMutedStrong: #a6b2c4; /* strongest muted, for dense readable labels */
+  --textOnAccent: #04141b; /* near-black ink on the bright cyan fill (white fails AA on #22d3ee) */
+
+  --accent: #22d3ee; /* signature electric-cyan accent (ADR-0066) */
+  /* RGB triplet of --accent, so the translucent/glow tokens below can be derived
+     via rgba(var(--accent-rgb), <alpha>). The Settings accent-color picker
+     overrides --accent + --accent-rgb (+ hover/secondary) inline on :root, and the
+     whole accent/glow/gradient/focus family re-tints with no per-token override. */
+  --accent-rgb: 34, 211, 238;
+  --accent-hover: #67e8f9; /* derived: lightened cyan hover */
+  --accent-secondary: #0e7490; /* derived: deep cyan for gradient ends / tab markers */
+  --accent-soft: rgba(var(--accent-rgb), 0.16); /* translucent cyan fill */
+
+  /* Bounded glow family (ADR-0066) — generalises the already-sanctioned
+     --pnl-glow vocabulary. A crisp 1px accent ring + a bounded soft
+     halo, four intensities. Static box-shadow (compositor-cheap); apply to chrome,
+     accents, CTAs, hover/active/live ONLY — never on tick-updating data paths. */
+  /* halo-only (no ring) — for resting glow on non-interactive surfaces */
+  --glow-halo-soft: 0 0 12px rgba(var(--accent-rgb), 0.16);
+  --glow-halo-md: 0 0 22px rgba(var(--accent-rgb), 0.34);
+  /* ring + halo — for accent / active / live / hover */
+  --glow-accent-soft: 0 0 0 1px var(--accent), 0 0 10px rgba(var(--accent-rgb), 0.18); /* resting rim */
+  --glow-accent-sm: 0 0 0 1px var(--accent), 0 0 12px rgba(var(--accent-rgb), 0.35);
+  --glow-accent-md: 0 0 0 1px var(--accent), 0 0 20px rgba(var(--accent-rgb), 0.45);
+  --glow-accent-lg: 0 0 0 1px var(--accent), 0 0 32px rgba(var(--accent-rgb), 0.55);
+  --accent-glow: var(--glow-accent-sm); /* live / active cyan ring + bounded halo */
+  --text-glow-accent: none; /* live-data text aura stays off (repaints per tick — calm data) */
+
+  /* Gradient tokens (ADR-0066, glass refresh ADR-0070) — derived from
+     accent/surface, no new hue. surface = subtle top cyan tint on calm panels;
+     glass = a brighter top sheen settling to the elevated surface, for raised
+     chrome (segmented controls); accent = CTA / hero fill. */
+  --gradient-surface: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 9%, var(--surface)) 0%,
+    var(--surface) 62%
+  );
+  --gradient-glass: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 12%, var(--surface-elevated)) 0%,
+    var(--surface-elevated) 70%
+  );
+  --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+  --focus-ring: 0 0 0 2px var(--background), 0 0 0 3px var(--accent); /* keyboard focus ring (solid, not a glow) */
+
+  /* P&L up — green for longs, up-candles, and bids */
+  --directionUp: #10b981;
+  --directionUp-soft: rgba(16, 185, 129, 0.14); /* bid-depth fill in the orderbook */
+  --directionUp-glow: none; /* live up-tick halo removed */
+  /* P&L down — red for shorts, warnings, and asks */
+  --directionDown: #f43f5e;
+  --directionDown-soft: rgba(244, 63, 94, 0.14); /* ask-depth fill in the orderbook */
+  --directionDown-glow: none; /* live down-tick halo removed */
+
+  /* State colours map onto the palette: success -> green, danger -> red,
+     warning -> amber, info -> sky blue. */
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.14);
+  --info: #38bdf8;
+  --info-soft: rgba(56, 189, 248, 0.14);
+  --success: #10b981;
+  --success-soft: rgba(16, 185, 129, 0.14);
+  --text-on-success: #0a0e16;
+  --danger: #f43f5e;
+  --danger-soft: rgba(244, 63, 94, 0.14);
+  --text-on-danger: #ffffff;
+  --scrim: rgba(8, 11, 18, 0.76); /* derived from --background */
+
+  --shadow-pixel-color: #000000;
+  --shadow-pixel-color-soft: #0e7490; /* deep-cyan offset shadow ties to palette */
+  /* Calm depth (ADR-0042): the loud dual-layer black+teal "patch" shadow is
+     retired to a single light offset. Panels lean on hairline border + luminance;
+     accent CTAs keep a subtle pixel offset. */
+  --shadow-pixel-sm: 1px 1px 0 var(--shadow-pixel-color);
+  --shadow-pixel-md: 2px 2px 0 var(--shadow-pixel-color);
+  --shadow-pixel-lg: 3px 3px 0 var(--shadow-pixel-color);
+
+  /* Soft modern shadows for FLOATING chrome only (cards, dropdowns, modals,
+     sheets, toasts) — ADR-0043. Neutral drop shadows for elevation; the brand
+     teal/blue accent-glow layer was removed (perf + calm terminal). Static and
+     bounded; never on tick-updating or dense-grid surfaces, so they cost no
+     frames. The pixel offset shadow stays the accent-CTA language; these are the
+     calm-surface language. */
+  --shadow-soft-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.32);
+  --shadow-soft-md: 0 2px 6px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-soft-lg: 0 4px 12px rgba(0, 0, 0, 0.4), 0 18px 48px rgba(0, 0, 0, 0.5);
+  /* 3D raised-panel depth (glass refresh ADR-0070): an inner top highlight reads
+     as light catching the raised glass face, over the crisp 1px contact edge + a
+     short drop so the panel reads as an extruded tile (stays clean at tight gaps).
+     Accent glow stop removed. Paired with a top-lit border on .pane. */
+  --shadow-3d-panel:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 5px 12px rgba(0, 0, 0, 0.5);
+  /* Glass chrome elevation (ADR-0070): inner top highlight + contact edge + a
+     tighter soft drop, tuned for small raised controls (segmented controls). */
+  --shadow-glass:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(0, 0, 0, 0.5),
+    0 3px 8px rgba(0, 0, 0, 0.4);
+  --tab-active-marker: var(--accent);
+
+  /*
+   * Shareable PnL card — side-themed "worlds". A long card is always a
+   * neutral navy field (side-independent, like the trade.xyz reference); the
+   * side colour appears only on the side pill + the recoloured mascot, and the
+   * hero number is tinted by its own profit/loss sign. Hues reuse the existing
+   * direction pair + app surfaces — no brand-new colours. Consumed only by
+   * `shared/components/pnl-card/`.
+   */
+  --pnl-bg-1: #243049; /* lighter navy, top-left of the card field */
+  --pnl-bg-2: #111726; /* deeper navy, bottom-right of the card field */
+  --pnl-long-accent: var(--directionUp); /* #10b981 — long side pill + mascot */
+  --pnl-long-glow: rgba(16, 185, 129, 0.55); /* soft side halo behind a long mascot */
+  --pnl-short-accent: var(--directionDown); /* #f43f5e — short side pill + mascot */
+  --pnl-short-glow: rgba(244, 63, 94, 0.55); /* soft side halo behind a short mascot */
+  /* Hero-number glow, applied as text-shadow; colour follows the hero sign.
+     Soft halo for legibility — calm, not the old CRT bloom. */
+  --pnl-glow-positive: 0 0 2px rgba(16, 185, 129, 0.7), 0 0 22px rgba(16, 185, 129, 0.35);
+  --pnl-glow-negative: 0 0 2px rgba(244, 63, 94, 0.7), 0 0 22px rgba(244, 63, 94, 0.35);
+
+  /* Spectate ghost icon — uses the whiteghost PNG as a silhouette mask so the
+     paint color is theme-driven (no second sprite). Dark theme: white ghost on
+     the deep backdrop; the matched/linked variant lights up in --accent. */
+  --ghost-icon-mask: url('../assets/whiteghost.png');
+  --ghost-color: var(--text);
+  --ghost-color-matched: var(--accent);
+
+  color-scheme: dark;
+}
+
+[data-theme='white'] {
+  --background: #f3f5f7; /* off-white page — replaces the Excel grey-blue #ccd4e0 */
+  --surface: #ffffff; /* clean white working panels */
+  --surface-elevated: #eaedf2; /* light-grey header and inactive elements */
+  --border: #e1e5ec; /* hairline internal dividers */
+  --border-strong: #0f172a; /* dense dark frame for accent CTAs / active panels */
+  --chart-grid: rgba(15, 23, 42, 0.07); /* derived: subtle neutral chart gridlines */
+  --grid-line: rgba(15, 23, 42, 0.05); /* derived: subtle page background grid */
+
+  /* 3-tier text ramp — near-black ink carries the emphasis (minara-style). */
+  --text: #0f1620; /* primary near-black ink, ~17:1 on --surface */
+  --textSecondary: #3f4a5c; /* secondary values / active labels */
+  --textMuted: #586273; /* muted labels — ≥4.5:1 on --surface (#ffffff) */
+  --textMutedStrong: #41495a; /* strongest muted, for dense readable labels */
+  --textOnAccent: #ffffff; /* white on deep cyan #0e7490 — 5:1 */
+
+  --accent: #0e7490; /* deep cyan for readability on light (ADR-0066) */
+  --accent-rgb: 14, 116, 144; /* RGB triplet of --accent — see the dark block */
+  --accent-hover: #155e75; /* derived: deepened cyan hover */
+  --accent-secondary: #155e75; /* derived: deep cyan for gradient ends / tab markers */
+  --accent-soft: rgba(var(--accent-rgb), 0.1); /* light cyan underlay */
+
+  /* Glow family — a dark-theme device; kept subtle on light so it doesn't muddy
+     white panels. Derived from --accent (no new hue). */
+  /* Brighter on light than a pure dark-theme device so the animated outline
+     glow on buttons still reads against white (ADR-0066). */
+  --glow-halo-soft: 0 0 10px rgba(var(--accent-rgb), 0.22);
+  --glow-halo-md: 0 0 18px rgba(var(--accent-rgb), 0.34);
+  --glow-accent-soft: 0 0 0 1px var(--accent), 0 0 10px rgba(var(--accent-rgb), 0.24);
+  --glow-accent-sm: 0 0 0 1px var(--accent), 0 0 12px rgba(var(--accent-rgb), 0.32);
+  --glow-accent-md: 0 0 0 1px var(--accent), 0 0 16px rgba(var(--accent-rgb), 0.42);
+  --glow-accent-lg: 0 0 0 1px var(--accent), 0 0 24px rgba(var(--accent-rgb), 0.5);
+  --accent-glow: var(--glow-accent-sm); /* active cyan ring + subtle halo */
+  --text-glow-accent: none; /* glow is a dark-theme device */
+
+  --gradient-surface: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 5%, var(--surface)) 0%,
+    var(--surface) 60%
+  );
+  --gradient-glass: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 8%, var(--surface)) 0%,
+    var(--surface-elevated) 70%
+  );
+  --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 3px var(--accent); /* keyboard focus ring (solid, not a glow) */
+
+  /* P&L up — saturated green, legible on white */
+  --directionUp: #059669;
+  --directionUp-soft: rgba(5, 150, 105, 0.1); /* soft green depth fill */
+  --directionUp-glow: none; /* glow is a dark-theme device */
+  /* P&L down — saturated red, legible on white */
+  --directionDown: #d13547;
+  --directionDown-soft: rgba(209, 53, 71, 0.1); /* soft red depth fill */
+  --directionDown-glow: none;
+
+  /* State colours map onto the palette: success -> green, danger -> red,
+     warning -> amber, info -> blue. */
+  --warning: #d97706;
+  --warning-soft: rgba(217, 119, 6, 0.1);
+  --info: #0284c7;
+  --info-soft: rgba(2, 132, 199, 0.1);
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.1);
+  --text-on-success: #ffffff;
+  --danger: #d13547;
+  --danger-soft: rgba(209, 53, 71, 0.1);
+  --text-on-danger: #ffffff;
+  --scrim: rgba(15, 23, 42, 0.45); /* derived from --text */
+
+  --shadow-pixel-color: #0f172a;
+  --shadow-pixel-color-soft: #1f7285; /* teal offset shadow */
+  --shadow-pixel-sm: 1px 1px 0 var(--shadow-pixel-color);
+  --shadow-pixel-md: 2px 2px 0 var(--shadow-pixel-color);
+  --shadow-pixel-lg: 3px 3px 0 var(--shadow-pixel-color);
+
+  /* Soft modern shadows for floating chrome (ADR-0043) — lighter inks on light;
+     accent-glow layer removed. */
+  --shadow-soft-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.08);
+  --shadow-soft-md: 0 2px 6px rgba(15, 23, 42, 0.08), 0 8px 24px rgba(15, 23, 42, 0.12);
+  --shadow-soft-lg: 0 4px 12px rgba(15, 23, 42, 0.1), 0 18px 48px rgba(15, 23, 42, 0.18);
+  --shadow-3d-panel:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 1px 0 rgba(15, 23, 42, 0.08),
+    0 5px 12px rgba(15, 23, 42, 0.12);
+  /* Glass chrome elevation (ADR-0070) — lighter inks on light. */
+  --shadow-glass:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1px 0 rgba(15, 23, 42, 0.06),
+    0 3px 8px rgba(15, 23, 42, 0.1);
+  --tab-active-marker: var(--accent);
+
+  /* Spectate ghost icon — same silhouette mask, theme-driven paint. White
+     theme: teal ghost on the light backdrop, matched/linked glow in the same
+     accent. */
+  --ghost-icon-mask: url('../assets/whiteghost.png');
+  --ghost-color: var(--info);
+  --ghost-color-matched: var(--info);
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide scrollbars across the app while preserving scroll behavior (wheel,
+   touch, keyboard). Applied universally; per-component shows would have to
+   override with `scrollbar-width: auto` + a custom ::-webkit-scrollbar block. */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-mono);
+  /* General Sans is proportional; the old workhorse was monospace. Tabular figures
+     keep prices, sizes, and table columns aligned app-wide (inherited property).
+     See docs/adr/0073-aeonik-substitute-single-font.md. */
+  font-variant-numeric: tabular-nums;
+  background-color: var(--background);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Keeps the pixel-art mascot sprites crisp when scaled. Text legibility is
+     handled by font-smoothing above; the calm-terminal type is not pixelated. */
+  image-rendering: pixelated;
+}
+
+/*
+ * Ambient cyan field (ADR-0066) — a reusable, compositor-only drifting glow the
+ * trading & portfolio shells opt into (add the `ambient-cyan` class). Two
+ * oversized cyan radial blobs on a z-index:-1 absolute layer: painted ABOVE the
+ * host's own background/grid (negative-z descendants paint after the element
+ * background) but BELOW the opaque `.pane`s, so panels occlude it and dense data
+ * stays the focus. Transform-only drift (no blur, no background-position
+ * animation) so it never touches a paint path. Under prefers-reduced-motion the
+ * global kill switch freezes it to a static field.
+ */
+.ambient-cyan {
+  position: relative;
+  isolation: isolate;
+}
+
+.ambient-cyan::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 38vmax at 16% 20%, rgba(var(--accent-rgb), 0.1), transparent 60%),
+    radial-gradient(34vmax 34vmax at 84% 80%, rgba(var(--accent-rgb), 0.12), transparent 62%);
+  animation: ambient-drift 26s var(--ease-out-quart) infinite alternate;
+  will-change: transform;
+}
+
+@keyframes ambient-drift {
+  from {
+    transform: translate3d(-2%, -1.5%, 0) scale(1.04);
+  }
+  to {
+    transform: translate3d(2%, 1.5%, 0) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

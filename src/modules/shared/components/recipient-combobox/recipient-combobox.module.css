@@ -1,0 +1,208 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.labelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--textMuted);
+}
+
+.hint {
+  font-family: var(--font-trading);
+  font-size: 11px;
+  color: var(--textMuted);
+}
+
+.invalid {
+  font-family: var(--font-trading);
+  font-size: 12px;
+  color: var(--danger);
+}
+
+/* The widget wrapper — relative so the caret pins to the input's right edge. */
+.anchor {
+  position: relative;
+  display: block;
+}
+
+/* Standard pixel text input (matches the send / withdraw form inputs). The right
+   padding reserves room for the caret button so long addresses never run under it. */
+.input {
+  font-family: var(--font-trading);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  border: var(--border-pixel) solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 36px 10px 12px;
+  width: 100%;
+  transition:
+    border-color var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-glow) var(--ease-out-quart),
+    transform var(--dur-fast) var(--ease-out-quart);
+}
+
+.input:hover {
+  border-color: var(--border-strong);
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent-sm);
+  transform: translateY(-1px);
+}
+
+.inputInvalid {
+  border-color: var(--danger);
+}
+
+.inputInvalid:focus-visible {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 1px var(--danger), 0 0 12px var(--danger-soft);
+}
+
+.toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--textMuted);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out-quart);
+}
+
+.toggle:hover {
+  color: var(--text);
+}
+
+/* Positioned by the shared Popover (portaled to document.body). This owns only the
+   panel skin + stacking; the min-width is written inline to the anchor width. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 4px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft-md);
+  z-index: var(--z-popover);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heading {
+  padding: 4px 8px 2px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--textMuted);
+}
+
+.option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px;
+  background-color: transparent;
+  border: var(--border-pixel) solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.option:hover {
+  background-color: var(--surface);
+}
+
+/* Keyboard-active row (arrow-key cursor) — mirrors hover with an accent edge. */
+.optionActive {
+  background-color: var(--surface);
+  border-color: var(--accent);
+}
+
+/* Square identicon frame — forces web3-avatar's default circular skin square. */
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.avatar :global(.web3-avatar) {
+  border-radius: 0 !important;
+  box-shadow: none;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-trading);
+  font-size: 11px;
+  color: var(--textMuted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input {
+    transition: none;
+  }
+  .input:focus-visible {
+    transform: none;
+  }
+}

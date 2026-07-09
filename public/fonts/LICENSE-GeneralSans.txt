@@ -1,0 +1,24 @@
+General Sans
+============
+
+Designer:  Indian Type Foundry (ITF)
+Source:    Fontshare — https://www.fontshare.com/fonts/general-sans
+File:      GeneralSans-Variable.woff2 (variable, weight 200–700)
+
+License:   ITF Free Font License (FFL)
+           https://www.fontshare.com/licenses/itf-ffl
+
+Used here as a free, commercially-usable substitute for Aeonik (Cotype
+Foundry). General Sans is the closest open alternative in the geometric-
+grotesque genre. See docs/adr/0073-aeonik-substitute-single-font.md.
+
+Summary of the ITF Free Font License (the linked license is authoritative):
+  - Free for personal AND commercial use.
+  - Embedding in documents, applications, and websites is permitted, including
+    self-hosting the webfont files (as done here under public/fonts/).
+  - The font software itself may not be sold or sub-licensed on its own.
+  - No warranty is provided.
+
+If a genuine, licensed Aeonik webfont is procured later, drop the Aeonik
+woff2 into this folder and repoint the `--font-sans` @font-face / family in
+apps/client/src/app/index.css. The swap is a single-file change.

@@ -1,0 +1,182 @@
+/* Pixel-art range slider shared by the leverage + Amount % controls.
+   The native <input type="range"> sits transparent on top for interaction +
+   a11y; the rail, fill segment, thumb, and tick notches are painted by the
+   sibling layers below. Runtime values (fill width, tone color) arrive as the
+   --pixel-slider-fill / --pixel-slider-tone custom properties from
+   pixel-slider.styles.ts. */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.track {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  display: flex;
+  align-items: center;
+}
+
+/* The flat chunky rail (the unfilled portion). */
+.rail {
+  position: absolute;
+  inset: 5px 0;
+  background-color: var(--background);
+  border: var(--border-pixel) solid var(--border-strong);
+  /* Square pixel corners — no rounding on any slider edge. */
+  border-radius: 0;
+}
+
+/* The filled progress segment left of the thumb — width + color are runtime. */
+.fill {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  width: var(--pixel-slider-fill, 0%);
+  background-color: var(--pixel-slider-tone, var(--accent));
+  border: var(--border-pixel) solid var(--pixel-slider-tone, var(--accent));
+  /* Square pixel corners — no rounding on the fill segment. */
+  border-radius: 0;
+  transition: background-color var(--dur-fast) var(--ease-out-quart), border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+/* Pixel tick notches at notable values — a hard 2px mark straddling the rail. */
+.notch {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: var(--border-pixel);
+  margin-left: calc(var(--border-pixel) * -0.5);
+  background-color: var(--border-strong);
+  pointer-events: none;
+}
+
+/* The interactive native input — transparent track, real thumb only. */
+.input {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.input::-webkit-slider-runnable-track {
+  height: 18px;
+  background: transparent;
+  border: none;
+}
+
+.input::-moz-range-track {
+  height: 18px;
+  background: transparent;
+  border: none;
+}
+
+/* Square thumb with the pixel border + offset shadow; the
+   translate(-1px,-1px) hover / translate(1px,1px) press grammar glides on the
+   shared smooth easing (ADR-0043) like the rest of the controls. */
+.input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 18px;
+  margin-top: 0;
+  background-color: var(--pixel-slider-tone, var(--accent));
+  border: var(--border-pixel) solid var(--text);
+  border-radius: 0;
+  box-shadow: var(--shadow-pixel-sm);
+  transition: transform var(--dur-fast) var(--ease-out-quart), box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.input::-moz-range-thumb {
+  width: 14px;
+  height: 18px;
+  background-color: var(--pixel-slider-tone, var(--accent));
+  border: var(--border-pixel) solid var(--text);
+  border-radius: 0;
+  box-shadow: var(--shadow-pixel-sm);
+  transition: transform var(--dur-fast) var(--ease-out-quart), box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.input:hover:not(:disabled)::-webkit-slider-thumb {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-pixel-md);
+}
+
+.input:hover:not(:disabled)::-moz-range-thumb {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-pixel-md);
+}
+
+.input:active:not(:disabled)::-webkit-slider-thumb {
+  transform: translate(1px, 1px);
+  box-shadow: var(--shadow-pixel-sm);
+}
+
+.input:active:not(:disabled)::-moz-range-thumb {
+  transform: translate(1px, 1px);
+  box-shadow: var(--shadow-pixel-sm);
+}
+
+/* Tick captions (e.g. 1× / 5× / max) pinned beneath their notch. */
+.scale {
+  position: relative;
+  height: 14px;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--textMutedStrong);
+}
+
+.scaleLabel {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* Keep the endpoint captions inside the track bounds so the rightmost (max×/100%)
+   caption can never overhang the track edge and underlap the neighbouring value
+   chip. The first caption left-aligns to the track start, the last right-aligns
+   to the track end; the inline `left` from the component still positions them. */
+.scaleLabel:first-child {
+  transform: translateX(0);
+}
+
+.scaleLabel:last-child {
+  transform: translateX(-100%);
+}
+
+/* Reduced motion: the slider stays fully usable — only the stepped thumb/fill
+   transitions collapse (the global reduce block zeroes durations; this local
+   block makes the intent explicit and removes the hover transform). */
+@media (prefers-reduced-motion: reduce) {
+  .fill,
+  .input::-webkit-slider-thumb,
+  .input::-moz-range-thumb {
+    transition: none;
+  }
+
+  .input:hover:not(:disabled)::-webkit-slider-thumb,
+  .input:hover:not(:disabled)::-moz-range-thumb {
+    transform: none;
+  }
+}

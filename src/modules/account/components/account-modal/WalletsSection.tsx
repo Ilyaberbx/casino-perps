@@ -1,7 +1,6 @@
 import { PixelButton } from '@/modules/shared/components/pixel-button'
 import { useWalletsSection } from './use-wallets-section'
 import { WalletRow } from './WalletRow'
-import { AgentWalletRow } from './AgentWalletRow'
 import { SelectedWalletBalancesPanel } from './SelectedWalletBalancesPanel'
 import { ImportKeySheet } from './import-key-sheet/ImportKeySheet'
 import styles from './account-modal.module.css'
@@ -47,11 +46,6 @@ export function WalletsSection() {
           </span>
         )}
       </div>
-
-      <hr className={styles.agentSeparator} />
-      <ul className={styles.walletList}>
-        <AgentWalletRow agent={view.agent} />
-      </ul>
     </section>
   )
 }

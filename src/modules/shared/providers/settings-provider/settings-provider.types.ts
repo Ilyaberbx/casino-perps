@@ -2,11 +2,12 @@ import type { ReactNode } from 'react'
 
 /**
  * The sections of the Settings modal, in nav-rail order (#256). `appearance`
- * holds the Theme switch + Accent Color picker; `trading` holds the Pro/Simple
- * Trading Mode toggle. The union is the extension point — new settings drop in as
- * new members + a `SETTINGS_SECTIONS` entry + a pane.
+ * holds the Theme switch + Accent Color picker. (The Pro/Simple Trading Mode
+ * section was removed with pro mode — PRD-0008 D7.) The union is the extension
+ * point — new settings drop in as new members + a `SETTINGS_SECTIONS` entry + a
+ * pane.
  */
-export type SettingsSection = 'appearance' | 'trading'
+export type SettingsSection = 'appearance'
 
 export interface SettingsContextValue {
   readonly isOpen: boolean

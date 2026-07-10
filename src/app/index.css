@@ -1,20 +1,91 @@
-/* General Sans — the single sans workhorse, a free commercially-usable stand-in
-   for Aeonik (Cotype Foundry). It replaced both the JetBrains Mono terminal
-   workhorse and the Bricolage Grotesque display accent in one move — see
-   docs/adr/0073-aeonik-substitute-single-font.md. Numeric column alignment that
-   the old monospace gave for free is now held by `font-variant-numeric:
-   tabular-nums` on `body` (below). */
+/* Casino type system (PRD 0008 §5.2). Two self-hosted, SIL OFL faces replace the
+   old single "General Sans" workhorse:
+   - Archivo (Omnibus-Type) — the DISPLAY face. A variable grotesque with a wght
+     100–900 axis AND a wdth 62–125 (Expanded) axis, plus a matched italic set. It
+     is the free stand-in for Aeonik's wide italic grotesque and carries the YEET
+     wordmark, poster-card tickers, the big price, and bet amounts.
+   - IBM Plex Sans (IBM) — the BODY face. Variable wght 100–700. The same family
+     yeet uses for chrome, labels, and data.
+   Aeonik is a commercial licence and is never fetched or bundled (PRD §5.2).
+   Latin + latin-ext subsets only (English UI); the woff2 files carry the full
+   variable axes. Licences: public/fonts/OFL-Archivo.txt, OFL-IBMPlexSans.txt. */
+
+/* Archivo — display, upright */
 @font-face {
-  font-family: 'General Sans';
+  font-family: 'Archivo';
   font-style: normal;
-  font-weight: 200 700;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
   font-display: swap;
-  src: url('/fonts/GeneralSans-Variable.woff2') format('woff2');
+  src: url('/fonts/Archivo-Variable-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* Monocraft — the pixel/Minecraft-style face. Retired from chrome & data by
-   ADR-0042, kept as a deliberate brand-accent for the Portfolio hero label only
-   (opt in via --font-pixel-display). Not for chrome, labels, or trading data. */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url('/fonts/Archivo-Variable-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Archivo — display, italic (the wordmark's wide-italic look) */
+@font-face {
+  font-family: 'Archivo';
+  font-style: italic;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url('/fonts/Archivo-Italic-Variable-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: italic;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url('/fonts/Archivo-Italic-Variable-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* IBM Plex Sans — body (variable wght 100–700) */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url('/fonts/IBMPlexSans-Variable-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url('/fonts/IBMPlexSans-Variable-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Monocraft — the pixel/Minecraft-style face. Retained as a deliberate,
+   opt-in-only brand-accent (--font-pixel-display); never used by casino chrome,
+   labels, or data. Kept so any lingering opt-in consumer still resolves. */
 @font-face {
   font-family: 'Monocraft';
   font-style: normal;
@@ -32,39 +103,33 @@
 }
 
 :root {
-  --font-mono: 'General Sans', system-ui, sans-serif;
-  --font-display: 'General Sans', system-ui, sans-serif; /* same family — weight, not face, carries display emphasis */
-  --font-pixel-display: 'Monocraft', ui-monospace, monospace; /* pixel brand-accent face — hero labels only (see ADR-0042) */
-
   /*
-   * Single-font system — see docs/adr/0073-aeonik-substitute-single-font.md
-   * (supersedes the font-face choices in ADR-0042). General Sans (a free Aeonik
-   * stand-in) is now the one sans across chrome, data, and display; the former
-   * JetBrains Mono workhorse and Bricolage Grotesque display accent are retired.
-   * The token NAMES are kept (300+ consumers) so the swap stays a value change,
-   * not a rename: --font-mono is no longer monospace, --font-display is the same
-   * family at a heavier weight. Monocraft (--font-pixel-display) is the only
-   * remaining accent face. (--font-mono / --font-pixel are now misnomers — both
-   * resolve to the proportional sans.)
+   * Casino type tokens (PRD 0008 §5.2). Archivo = display, IBM Plex Sans = body.
+   * The legacy token NAMES are kept (300+ consumers) so the swap stays a value
+   * change, not a rename: --font-mono / --font-trading / --font-core / --font-pixel
+   * are misnomers that all now resolve to the IBM Plex Sans body workhorse.
    */
-  --font-pixel: var(--font-mono); /* LEGACY alias → sans workhorse */
-  --font-core: var(--font-mono); /* app chrome & identity */
-  --font-trading: var(--font-mono); /* all trading & account data */
+  --font-display: 'Archivo', system-ui, sans-serif; /* wordmark, tickers, big price, bet amounts */
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif; /* chrome, labels, data */
+  --font-mono: var(--font-body); /* LEGACY alias → body workhorse (no longer monospace) */
+  --font-core: var(--font-body); /* app chrome & identity */
+  --font-trading: var(--font-body); /* all trading & account data */
+  --font-pixel: var(--font-body); /* LEGACY alias → body workhorse */
+  --font-pixel-display: 'Monocraft', ui-monospace, monospace; /* opt-in pixel accent only */
 
-  --radius-pixel: 0; /* explicit-square: dense data surfaces (orderbook, tables, tape) */
-  /* Rounding scale (ADR-0043). Chrome softens; data stays square. */
-  --radius-sm: 6px; /* buttons, inputs, chips, tags, tabs, toasts, callouts, dropdowns, menus */
-  --radius-md: 12px; /* cards, panels, modals, sheets */
-  --border-pixel: 1px; /* hairline: 1 CSS px, refined to a true 1-device-pixel 0.5px on ≥2dppx (see @media below) */
-  --border-pixel-strong: 2px; /* accent frames on CTAs / active panels — stays 2px for weight */
+  --radius-pixel: 0; /* explicit-square: dense data surfaces */
+  /* Casino radii (PRD §5.3): 8px cards, 10px buttons, 999px pills. */
+  --radius-sm: 10px; /* buttons, inputs, chips, tags, tabs, toasts, callouts, dropdowns, menus */
+  --radius-md: 8px; /* cards, panels, modals, sheets */
+  --radius-pill: 999px; /* segmented pills, payment strip, chips */
+  --border-pixel: 1px; /* hairline: refined to 0.5px on ≥2dppx (see @media below) */
+  --border-pixel-strong: 2px; /* accent frames on CTAs / active panels */
 
-  --header-control-h: 32px; /* shared height for every interactive control in the app-shell header (account, venue, theme, spectate) so they line up as one row */
+  --header-control-h: 32px; /* shared height for app-shell header controls */
 
   /*
-   * Motion system (ADR-0043). Smooth ease-out curves replace the retro
-   * `steps(2,end)` stepped easing across the calm terminal; the stepped "wink" is
-   * kept only on the pixel-accent CTAs. Never bounce/elastic. Durations follow the
-   * 100/200/300 rule: fast = micro-feedback, base = state changes, slow = layout.
+   * Motion system. Smooth ease-out curves; never bounce/elastic. Durations follow
+   * the 100/200/300 rule: fast = micro-feedback, base = state changes, slow = layout.
    */
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1); /* smooth default */
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1); /* slightly snappier */
@@ -72,23 +137,13 @@
   --dur-fast: 120ms; /* hover / press / color shifts */
   --dur-base: 200ms; /* menus, tooltips, tab indicator, state changes */
   --dur-slow: 300ms; /* modals, sheets, accordions, layout reveals */
-  --dur-glow: 240ms; /* glow / colour-sweep transitions on hover/active (ADR-0066) */
+  --dur-glow: 240ms; /* glow / colour-sweep transitions on hover/active */
 
   /*
    * Semantic stacking order (ADR-0037, revised by ADR-0079). Overlays reference
-   * these tokens, never z-index literals. Theme-independent, so defined once
-   * here. Ascending:
+   * these tokens, never z-index literals. Ascending:
    * sticky < sheet-backdrop < sheet < modal-backdrop < modal
    * < popover < toast < tooltip.
-   *
-   * The load-bearing contract (the "global layering" the app depends on):
-   * page content (chrome literals < 1100) < Sheet < Modal < Popover < Toast.
-   * The popover/dropdown layer sits ABOVE both Sheet and Modal (ADR-0079): a
-   * menu always paints above the surface that owns its trigger (page, sheet, or
-   * modal), so an in-sheet/in-modal dropdown is never occluded by its host. A
-   * toast (with its interactive close / action buttons) always sits above the
-   * popover layer too, so it can never be hidden by an open menu. Tooltips ride
-   * highest — they are momentary, pointer-events:none hints that block nothing.
    */
   --z-sticky: 1100;
   --z-sheet-backdrop: 1200;
@@ -99,24 +154,14 @@
   --z-toast: 1600;
   --z-tooltip: 1700;
 
-  /* Mobile bottom-nav (MobileTradeDock) chrome height, WITHOUT the safe-area
-     inset. Single source of truth (issue #263): the fixed nav slot sizes itself
-     to this, and every host page that mounts the nav reserves
-     `var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom)` of bottom
-     padding off it, so content / the Account Dock can never hide behind the nav
-     and the reservation can never drift from the nav's real height. */
+  /* Mobile bottom-nav chrome height, WITHOUT the safe-area inset (issue #263). */
   --mobile-bottom-nav-height: 79px;
 }
 
 /*
- * HiDPI hairline refinement. A 1px CSS border on a ≥2× display paints 2 device
- * pixels — heavier than a true hairline, and it antialiases into a soft ~1.5px
- * smear whenever the box doesn't land on a device-pixel boundary (the "fuzzy thin
- * line" problem). On ≥2dppx we drop the hairline token to 0.5px = exactly 1 device
- * pixel: the crispest, finest line a screen can draw. 1× displays keep 1px (0.5px
- * is unreliable there). Only --border-pixel (dividers, table grid, row separators,
- * fine frames) is refined; --border-pixel-strong stays 2px so accent/active frames
- * keep their weight, and --focus-ring is untouched so keyboard focus stays visible.
+ * HiDPI hairline refinement. On ≥2dppx the hairline token drops to 0.5px = exactly
+ * 1 device pixel. 1× displays keep 1px. --border-pixel-strong and --focus-ring are
+ * untouched so accent frames and keyboard focus keep their weight.
  */
 @media (min-resolution: 2dppx), (-webkit-min-device-pixel-ratio: 2) {
   :root {
@@ -125,61 +170,69 @@
 }
 
 /*
- * Calm-terminal palette (ADR-0042) — tinted near-black surfaces, a signature
- * teal accent reserved for active/live, and high-saturation green/red owning all
- * directional meaning. Each theme defines surfaces, a 3-tier text ramp
- * (text → textSecondary → textMuted), the teal accent + glow, a P&L up/down pair
- * + glow, and warning/info markers; everything else (*-soft fills, state colours,
- * scrim, shadows) is a derived tint/alpha of those — no new hues.
+ * Casino palette (PRD 0008 §5.1) — sampled from yeet's own asset PNGs. Dark-only:
+ * the white theme is deleted. The load-bearing idea is a two-accent system —
+ * TEAL (--accent-primary) is safety/primary, MAGENTA (--accent-action) is
+ * commitment; magenta is NEVER used for a non-committing action. Bright cyan
+ * (--accent-primary-bright) is the active/glow accent and drives the whole engine
+ * --accent/glow family. The legacy engine token NAMES (--background, --surface,
+ * --accent, --directionUp, …) are kept and re-pointed so existing screens restyle
+ * without restructuring; the casino-named tokens (--bg-*, --accent-*, --win,
+ * --loss, --text-*) sit beside them for the new shell/lobby/trade surfaces.
  */
 :root,
 [data-theme='dark'] {
-  /* Cyan-glow reskin (ADR-0066): near-black canvas so the electric-cyan accent
-     and its bounded glow read vivid. Surfaces step up in small luminance deltas. */
-  --background: #05070d; /* near-black app page */
-  --surface: #0b0f17; /* panel surface (chart, orderbook, tables) */
-  --surface-elevated: #131a26; /* raised elements, header, active chips */
-  --border: #1e2a3d; /* hairline dividers and table grid (reads on near-black) */
-  --border-strong: #36485f; /* contrast borders on active panels and buttons */
-  --chart-grid: rgba(255, 255, 255, 0.06); /* derived: subtle neutral chart gridlines */
-  --grid-line: rgba(255, 255, 255, 0.04); /* derived: subtle page background grid */
+  /* Casino surface ladder — literal PRD names */
+  --bg-base: #17161e; /* page background */
+  --bg-rail: #1e1720; /* left rail, chat column */
+  --bg-surface: #292630; /* card rows, ticker strip */
+  --bg-elevated: #272733; /* hero panel, modals */
 
-  /* 3-tier text ramp: emphasis comes from contrast + weight, not hue. */
-  --text: #f3f5fa; /* primary — bright off-white (not pure white), ~16:1 on --surface */
-  --textSecondary: #b9c2d2; /* secondary values / active labels, ~9:1 */
-  --textMuted: #8d99ab; /* muted labels — ≥4.5:1 on --surface (was #64748b @3.8, failed AA) */
-  --textMutedStrong: #a6b2c4; /* strongest muted, for dense readable labels */
-  --textOnAccent: #04141b; /* near-black ink on the bright cyan fill (white fails AA on #22d3ee) */
+  /* Engine surface aliases (existing consumers) */
+  --background: var(--bg-base); /* near-black app page */
+  --surface: var(--bg-surface); /* panel surface */
+  --surface-elevated: var(--bg-elevated); /* raised elements, header, active chips */
+  --border: #322e3b; /* hairline dividers on the purple-grey surfaces */
+  --border-strong: #4a4553; /* contrast borders on active panels and buttons */
+  --chart-grid: rgba(255, 255, 255, 0.06); /* subtle neutral chart gridlines */
+  --grid-line: rgba(255, 255, 255, 0.04); /* subtle page background grid */
 
-  --accent: #22d3ee; /* signature electric-cyan accent (ADR-0066) */
-  /* RGB triplet of --accent, so the translucent/glow tokens below can be derived
-     via rgba(var(--accent-rgb), <alpha>). The Settings accent-color picker
-     overrides --accent + --accent-rgb (+ hover/secondary) inline on :root, and the
-     whole accent/glow/gradient/focus family re-tints with no per-token override. */
-  --accent-rgb: 34, 211, 238;
-  --accent-hover: #67e8f9; /* derived: lightened cyan hover */
-  --accent-secondary: #0e7490; /* derived: deep cyan for gradient ends / tab markers */
+  /* Text ramp */
+  --text-primary: #f8f8f8; /* casino name */
+  --text-muted: #8a8695; /* casino name — section labels (GAMES, GENERAL) */
+  --text: var(--text-primary); /* primary — bright off-white */
+  --textSecondary: #c8c4d0; /* secondary values / active labels */
+  --textMuted: var(--text-muted); /* muted labels */
+  --textMutedStrong: #a6a2b0; /* strongest muted, for dense readable labels */
+  --textOnAccent: #05131a; /* near-black ink on the bright cyan fill (white fails AA on cyan) */
+
+  /* Two-accent system + active/glow accent */
+  --accent-primary: #248894; /* TEAL — safe / primary / "Add Cash" / "Deposit" */
+  --accent-primary-bright: #50d7e9; /* CYAN — active segment, glow, live */
+  --accent-action: #ce37dc; /* MAGENTA — the commit button ONLY ("Create Account", "Place Bet") */
+
+  /* Engine --accent family = the bright-cyan active/glow accent (links, focus,
+     live, tab marker, hover halos). Its RGB triplet feeds the glow tokens below. */
+  --accent: var(--accent-primary-bright); /* #50d7e9 */
+  --accent-rgb: 80, 215, 233; /* triplet of --accent-primary-bright */
+  --accent-hover: #7ce6f4; /* derived: lightened cyan hover */
+  --accent-secondary: var(--accent-primary); /* teal — gradient ends / tab markers */
   --accent-soft: rgba(var(--accent-rgb), 0.16); /* translucent cyan fill */
 
-  /* Bounded glow family (ADR-0066) — generalises the already-sanctioned
-     --pnl-glow vocabulary. A crisp 1px accent ring + a bounded soft
-     halo, four intensities. Static box-shadow (compositor-cheap); apply to chrome,
-     accents, CTAs, hover/active/live ONLY — never on tick-updating data paths. */
-  /* halo-only (no ring) — for resting glow on non-interactive surfaces */
+  /* Bounded cyan glow family — crisp 1px ring + a bounded soft halo, four
+     intensities. Static box-shadow (compositor-cheap); chrome/accents/CTAs/
+     hover/active/live ONLY — never on tick-updating data paths. */
   --glow-halo-soft: 0 0 12px rgba(var(--accent-rgb), 0.16);
   --glow-halo-md: 0 0 22px rgba(var(--accent-rgb), 0.34);
-  /* ring + halo — for accent / active / live / hover */
-  --glow-accent-soft: 0 0 0 1px var(--accent), 0 0 10px rgba(var(--accent-rgb), 0.18); /* resting rim */
+  --glow-accent-soft: 0 0 0 1px var(--accent), 0 0 10px rgba(var(--accent-rgb), 0.18);
   --glow-accent-sm: 0 0 0 1px var(--accent), 0 0 12px rgba(var(--accent-rgb), 0.35);
   --glow-accent-md: 0 0 0 1px var(--accent), 0 0 20px rgba(var(--accent-rgb), 0.45);
   --glow-accent-lg: 0 0 0 1px var(--accent), 0 0 32px rgba(var(--accent-rgb), 0.55);
   --accent-glow: var(--glow-accent-sm); /* live / active cyan ring + bounded halo */
-  --text-glow-accent: none; /* live-data text aura stays off (repaints per tick — calm data) */
+  --text-glow-accent: none; /* live-data text aura stays off */
 
-  /* Gradient tokens (ADR-0066, glass refresh ADR-0070) — derived from
-     accent/surface, no new hue. surface = subtle top cyan tint on calm panels;
-     glass = a brighter top sheen settling to the elevated surface, for raised
-     chrome (segmented controls); accent = CTA / hero fill. */
+  /* Gradient tokens — derived from accent/surface, no new hue. accent = cyan→teal
+     CTA / hero fill; surface/glass = subtle cyan tint on calm panels. */
   --gradient-surface: linear-gradient(
     180deg,
     color-mix(in srgb, var(--accent) 9%, var(--surface)) 0%,
@@ -191,59 +244,48 @@
     var(--surface-elevated) 70%
   );
   --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
-  --focus-ring: 0 0 0 2px var(--background), 0 0 0 3px var(--accent); /* keyboard focus ring (solid, not a glow) */
+  --focus-ring: 0 0 0 2px var(--background), 0 0 0 3px var(--accent); /* keyboard focus ring */
 
-  /* P&L up — green for longs, up-candles, and bids */
-  --directionUp: #10b981;
-  --directionUp-soft: rgba(16, 185, 129, 0.14); /* bid-depth fill in the orderbook */
-  --directionUp-glow: none; /* live up-tick halo removed */
-  /* P&L down — red for shorts, warnings, and asks */
-  --directionDown: #f43f5e;
-  --directionDown-soft: rgba(244, 63, 94, 0.14); /* ask-depth fill in the orderbook */
-  --directionDown-glow: none; /* live down-tick halo removed */
+  /* Directional / P&L — win green, loss red (PRD §5.1). */
+  --win: #24ff96; /* green — wins, profit, UP */
+  --loss: #ff4d6a; /* red — losses, DOWN */
+  --directionUp: var(--win);
+  --directionUp-soft: rgba(36, 255, 150, 0.14);
+  --directionUp-glow: none;
+  --directionDown: var(--loss);
+  --directionDown-soft: rgba(255, 77, 106, 0.14);
+  --directionDown-glow: none;
 
-  /* State colours map onto the palette: success -> green, danger -> red,
-     warning -> amber, info -> sky blue. */
-  --warning: #f59e0b;
-  --warning-soft: rgba(245, 158, 11, 0.14);
-  --info: #38bdf8;
-  --info-soft: rgba(56, 189, 248, 0.14);
-  --success: #10b981;
-  --success-soft: rgba(16, 185, 129, 0.14);
-  --text-on-success: #0a0e16;
-  --danger: #f43f5e;
-  --danger-soft: rgba(244, 63, 94, 0.14);
+  /* State colours: success -> win green, danger -> loss red, warning -> amber,
+     info -> the cyan accent. */
+  --warning: #f5a623;
+  --warning-soft: rgba(245, 166, 35, 0.14);
+  --info: var(--accent-primary-bright);
+  --info-soft: rgba(var(--accent-rgb), 0.14);
+  --success: var(--win);
+  --success-soft: rgba(36, 255, 150, 0.14);
+  --text-on-success: #04160c; /* dark ink on bright green */
+  --danger: var(--loss);
+  --danger-soft: rgba(255, 77, 106, 0.14);
   --text-on-danger: #ffffff;
-  --scrim: rgba(8, 11, 18, 0.76); /* derived from --background */
+  --scrim: rgba(23, 22, 30, 0.76); /* derived from --bg-base */
 
   --shadow-pixel-color: #000000;
-  --shadow-pixel-color-soft: #0e7490; /* deep-cyan offset shadow ties to palette */
-  /* Calm depth (ADR-0042): the loud dual-layer black+teal "patch" shadow is
-     retired to a single light offset. Panels lean on hairline border + luminance;
-     accent CTAs keep a subtle pixel offset. */
+  --shadow-pixel-color-soft: var(--accent-primary); /* teal offset shadow ties to palette */
   --shadow-pixel-sm: 1px 1px 0 var(--shadow-pixel-color);
   --shadow-pixel-md: 2px 2px 0 var(--shadow-pixel-color);
   --shadow-pixel-lg: 3px 3px 0 var(--shadow-pixel-color);
 
   /* Soft modern shadows for FLOATING chrome only (cards, dropdowns, modals,
-     sheets, toasts) — ADR-0043. Neutral drop shadows for elevation; the brand
-     teal/blue accent-glow layer was removed (perf + calm terminal). Static and
-     bounded; never on tick-updating or dense-grid surfaces, so they cost no
-     frames. The pixel offset shadow stays the accent-CTA language; these are the
-     calm-surface language. */
+     sheets, toasts). Static and bounded; never on tick-updating or dense-grid
+     surfaces. */
   --shadow-soft-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.32);
   --shadow-soft-md: 0 2px 6px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-soft-lg: 0 4px 12px rgba(0, 0, 0, 0.4), 0 18px 48px rgba(0, 0, 0, 0.5);
-  /* 3D raised-panel depth (glass refresh ADR-0070): an inner top highlight reads
-     as light catching the raised glass face, over the crisp 1px contact edge + a
-     short drop so the panel reads as an extruded tile (stays clean at tight gaps).
-     Accent glow stop removed. Paired with a top-lit border on .pane. */
   --shadow-3d-panel:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 1px 0 rgba(0, 0, 0, 0.6),
     0 5px 12px rgba(0, 0, 0, 0.5);
-  /* Glass chrome elevation (ADR-0070): inner top highlight + contact edge + a
-     tighter soft drop, tuned for small raised controls (segmented controls). */
   --shadow-glass:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 1px 0 rgba(0, 0, 0, 0.5),
@@ -251,135 +293,25 @@
   --tab-active-marker: var(--accent);
 
   /*
-   * Shareable PnL card — side-themed "worlds". A long card is always a
-   * neutral navy field (side-independent, like the trade.xyz reference); the
-   * side colour appears only on the side pill + the recoloured mascot, and the
-   * hero number is tinted by its own profit/loss sign. Hues reuse the existing
-   * direction pair + app surfaces — no brand-new colours. Consumed only by
-   * `shared/components/pnl-card/`.
+   * Shareable PnL card — side-themed field. The field is a neutral casino-purple
+   * gradient; the side colour appears only on the side pill + mascot, and the hero
+   * number is tinted by its own profit/loss sign. Hues reuse the win/loss pair.
    */
-  --pnl-bg-1: #243049; /* lighter navy, top-left of the card field */
-  --pnl-bg-2: #111726; /* deeper navy, bottom-right of the card field */
-  --pnl-long-accent: var(--directionUp); /* #10b981 — long side pill + mascot */
-  --pnl-long-glow: rgba(16, 185, 129, 0.55); /* soft side halo behind a long mascot */
-  --pnl-short-accent: var(--directionDown); /* #f43f5e — short side pill + mascot */
-  --pnl-short-glow: rgba(244, 63, 94, 0.55); /* soft side halo behind a short mascot */
-  /* Hero-number glow, applied as text-shadow; colour follows the hero sign.
-     Soft halo for legibility — calm, not the old CRT bloom. */
-  --pnl-glow-positive: 0 0 2px rgba(16, 185, 129, 0.7), 0 0 22px rgba(16, 185, 129, 0.35);
-  --pnl-glow-negative: 0 0 2px rgba(244, 63, 94, 0.7), 0 0 22px rgba(244, 63, 94, 0.35);
+  --pnl-bg-1: #2a2533; /* lighter purple, top-left of the card field */
+  --pnl-bg-2: #17161e; /* deep base, bottom-right */
+  --pnl-long-accent: var(--directionUp); /* win green — long side pill + mascot */
+  --pnl-long-glow: rgba(36, 255, 150, 0.5);
+  --pnl-short-accent: var(--directionDown); /* loss red — short side pill + mascot */
+  --pnl-short-glow: rgba(255, 77, 106, 0.5);
+  --pnl-glow-positive: 0 0 2px rgba(36, 255, 150, 0.7), 0 0 22px rgba(36, 255, 150, 0.35);
+  --pnl-glow-negative: 0 0 2px rgba(255, 77, 106, 0.7), 0 0 22px rgba(255, 77, 106, 0.35);
 
-  /* Spectate ghost icon — uses the whiteghost PNG as a silhouette mask so the
-     paint color is theme-driven (no second sprite). Dark theme: white ghost on
-     the deep backdrop; the matched/linked variant lights up in --accent. */
+  /* Spectate ghost icon — silhouette mask, theme-driven paint. */
   --ghost-icon-mask: url('../assets/whiteghost.png');
   --ghost-color: var(--text);
   --ghost-color-matched: var(--accent);
 
   color-scheme: dark;
-}
-
-[data-theme='white'] {
-  --background: #f3f5f7; /* off-white page — replaces the Excel grey-blue #ccd4e0 */
-  --surface: #ffffff; /* clean white working panels */
-  --surface-elevated: #eaedf2; /* light-grey header and inactive elements */
-  --border: #e1e5ec; /* hairline internal dividers */
-  --border-strong: #0f172a; /* dense dark frame for accent CTAs / active panels */
-  --chart-grid: rgba(15, 23, 42, 0.07); /* derived: subtle neutral chart gridlines */
-  --grid-line: rgba(15, 23, 42, 0.05); /* derived: subtle page background grid */
-
-  /* 3-tier text ramp — near-black ink carries the emphasis (minara-style). */
-  --text: #0f1620; /* primary near-black ink, ~17:1 on --surface */
-  --textSecondary: #3f4a5c; /* secondary values / active labels */
-  --textMuted: #586273; /* muted labels — ≥4.5:1 on --surface (#ffffff) */
-  --textMutedStrong: #41495a; /* strongest muted, for dense readable labels */
-  --textOnAccent: #ffffff; /* white on deep cyan #0e7490 — 5:1 */
-
-  --accent: #0e7490; /* deep cyan for readability on light (ADR-0066) */
-  --accent-rgb: 14, 116, 144; /* RGB triplet of --accent — see the dark block */
-  --accent-hover: #155e75; /* derived: deepened cyan hover */
-  --accent-secondary: #155e75; /* derived: deep cyan for gradient ends / tab markers */
-  --accent-soft: rgba(var(--accent-rgb), 0.1); /* light cyan underlay */
-
-  /* Glow family — a dark-theme device; kept subtle on light so it doesn't muddy
-     white panels. Derived from --accent (no new hue). */
-  /* Brighter on light than a pure dark-theme device so the animated outline
-     glow on buttons still reads against white (ADR-0066). */
-  --glow-halo-soft: 0 0 10px rgba(var(--accent-rgb), 0.22);
-  --glow-halo-md: 0 0 18px rgba(var(--accent-rgb), 0.34);
-  --glow-accent-soft: 0 0 0 1px var(--accent), 0 0 10px rgba(var(--accent-rgb), 0.24);
-  --glow-accent-sm: 0 0 0 1px var(--accent), 0 0 12px rgba(var(--accent-rgb), 0.32);
-  --glow-accent-md: 0 0 0 1px var(--accent), 0 0 16px rgba(var(--accent-rgb), 0.42);
-  --glow-accent-lg: 0 0 0 1px var(--accent), 0 0 24px rgba(var(--accent-rgb), 0.5);
-  --accent-glow: var(--glow-accent-sm); /* active cyan ring + subtle halo */
-  --text-glow-accent: none; /* glow is a dark-theme device */
-
-  --gradient-surface: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--accent) 5%, var(--surface)) 0%,
-    var(--surface) 60%
-  );
-  --gradient-glass: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--accent) 8%, var(--surface)) 0%,
-    var(--surface-elevated) 70%
-  );
-  --gradient-accent: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
-  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 3px var(--accent); /* keyboard focus ring (solid, not a glow) */
-
-  /* P&L up — saturated green, legible on white */
-  --directionUp: #059669;
-  --directionUp-soft: rgba(5, 150, 105, 0.1); /* soft green depth fill */
-  --directionUp-glow: none; /* glow is a dark-theme device */
-  /* P&L down — saturated red, legible on white */
-  --directionDown: #d13547;
-  --directionDown-soft: rgba(209, 53, 71, 0.1); /* soft red depth fill */
-  --directionDown-glow: none;
-
-  /* State colours map onto the palette: success -> green, danger -> red,
-     warning -> amber, info -> blue. */
-  --warning: #d97706;
-  --warning-soft: rgba(217, 119, 6, 0.1);
-  --info: #0284c7;
-  --info-soft: rgba(2, 132, 199, 0.1);
-  --success: #059669;
-  --success-soft: rgba(5, 150, 105, 0.1);
-  --text-on-success: #ffffff;
-  --danger: #d13547;
-  --danger-soft: rgba(209, 53, 71, 0.1);
-  --text-on-danger: #ffffff;
-  --scrim: rgba(15, 23, 42, 0.45); /* derived from --text */
-
-  --shadow-pixel-color: #0f172a;
-  --shadow-pixel-color-soft: #1f7285; /* teal offset shadow */
-  --shadow-pixel-sm: 1px 1px 0 var(--shadow-pixel-color);
-  --shadow-pixel-md: 2px 2px 0 var(--shadow-pixel-color);
-  --shadow-pixel-lg: 3px 3px 0 var(--shadow-pixel-color);
-
-  /* Soft modern shadows for floating chrome (ADR-0043) — lighter inks on light;
-     accent-glow layer removed. */
-  --shadow-soft-sm: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.08);
-  --shadow-soft-md: 0 2px 6px rgba(15, 23, 42, 0.08), 0 8px 24px rgba(15, 23, 42, 0.12);
-  --shadow-soft-lg: 0 4px 12px rgba(15, 23, 42, 0.1), 0 18px 48px rgba(15, 23, 42, 0.18);
-  --shadow-3d-panel:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 1px 0 rgba(15, 23, 42, 0.08),
-    0 5px 12px rgba(15, 23, 42, 0.12);
-  /* Glass chrome elevation (ADR-0070) — lighter inks on light. */
-  --shadow-glass:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 1px 0 rgba(15, 23, 42, 0.06),
-    0 3px 8px rgba(15, 23, 42, 0.1);
-  --tab-active-marker: var(--accent);
-
-  /* Spectate ghost icon — same silhouette mask, theme-driven paint. White
-     theme: teal ghost on the light backdrop, matched/linked glow in the same
-     accent. */
-  --ghost-icon-mask: url('../assets/whiteghost.png');
-  --ghost-color: var(--info);
-  --ghost-color-matched: var(--info);
-
-  color-scheme: light;
 }
 
 *,
@@ -390,9 +322,7 @@
   padding: 0;
 }
 
-/* Hide scrollbars across the app while preserving scroll behavior (wheel,
-   touch, keyboard). Applied universally; per-component shows would have to
-   override with `scrollbar-width: auto` + a custom ::-webkit-scrollbar block. */
+/* Hide scrollbars across the app while preserving scroll behavior. */
 * {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -413,29 +343,26 @@ body,
 }
 
 body {
-  font-family: var(--font-mono);
-  /* General Sans is proportional; the old workhorse was monospace. Tabular figures
-     keep prices, sizes, and table columns aligned app-wide (inherited property).
-     See docs/adr/0073-aeonik-substitute-single-font.md. */
+  font-family: var(--font-body);
+  /* IBM Plex Sans is proportional; tabular figures keep prices, sizes, and table
+     columns aligned app-wide (inherited property). */
   font-variant-numeric: tabular-nums;
   background-color: var(--background);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  /* Keeps the pixel-art mascot sprites crisp when scaled. Text legibility is
-     handled by font-smoothing above; the calm-terminal type is not pixelated. */
-  image-rendering: pixelated;
+  /* Casino art (token logos, photographic poster cards) is not pixel-art, so the
+     old global `image-rendering: pixelated` is dropped — it would crunch the
+     lobby's logos and card art. Boot GIF mascots keep their own inline
+     `image-rendering: pixelated` in index.html. */
+  image-rendering: auto;
 }
 
 /*
- * Ambient cyan field (ADR-0066) — a reusable, compositor-only drifting glow the
- * trading & portfolio shells opt into (add the `ambient-cyan` class). Two
- * oversized cyan radial blobs on a z-index:-1 absolute layer: painted ABOVE the
- * host's own background/grid (negative-z descendants paint after the element
- * background) but BELOW the opaque `.pane`s, so panels occlude it and dense data
- * stays the focus. Transform-only drift (no blur, no background-position
- * animation) so it never touches a paint path. Under prefers-reduced-motion the
- * global kill switch freezes it to a static field.
+ * Ambient cyan field — a reusable, compositor-only drifting glow shells opt into
+ * (add the `ambient-cyan` class). Two oversized cyan radial blobs on a z-index:-1
+ * layer, painted above the host background but below opaque panels. Transform-only
+ * drift (no paint path). Frozen under prefers-reduced-motion.
  */
 .ambient-cyan {
   position: relative;

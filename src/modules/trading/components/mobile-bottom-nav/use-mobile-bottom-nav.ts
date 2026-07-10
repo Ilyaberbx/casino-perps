@@ -1,65 +1,68 @@
 import { useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Settings, User } from 'lucide-react'
-import { useSpectateLink } from '@/modules/spectate'
-import { LINK_CELLS } from './mobile-bottom-nav.constants'
+import { Search, MessageCircle } from 'lucide-react'
+import { BROWSE_CELL, MY_BETS_CELL } from './mobile-bottom-nav.constants'
 import type {
+  NavLinkSpec,
+  ResolvedActionCell,
+  ResolvedLinkCell,
   ResolvedNavCell,
   UseMobileBottomNavParams,
   UseMobileBottomNavReturn,
 } from './mobile-bottom-nav.types'
 
+function isLinkActive(spec: NavLinkSpec, pathname: string): boolean {
+  if (spec.match === 'exact') return pathname === spec.to
+  return pathname === spec.to || pathname.startsWith(`${spec.to}/`)
+}
+
+function toLinkCell(spec: NavLinkSpec, pathname: string): ResolvedLinkCell {
+  return {
+    kind: 'link',
+    key: spec.key,
+    label: spec.label,
+    to: spec.to,
+    active: isLinkActive(spec, pathname),
+    testId: `mobile-nav-cell-${spec.key}`,
+    icon: spec.icon,
+  }
+}
+
+/**
+ * Resolves the four casino tabs against the current path. Browse and My Bets are
+ * routes; Markets and Chat open overlays via the injected handlers. The bar
+ * order (Browse, Markets, My Bets, Chat) is assembled here (PRD 0008 §6).
+ */
 export function useMobileBottomNav({
-  onAskAi,
-  onAccount,
-  onSettings,
+  onOpenSearch,
+  onOpenChat,
 }: UseMobileBottomNavParams): UseMobileBottomNavReturn {
   const { pathname } = useLocation()
-  const buildSpectateLink = useSpectateLink()
 
   const cells = useMemo<readonly ResolvedNavCell[]>(() => {
-    const linkCells: ResolvedNavCell[] = LINK_CELLS.map((cell) => {
-      const active = pathname.startsWith(cell.matchPrefix)
-      return {
-        kind: 'link',
-        key: cell.key,
-        label: cell.label,
-        to: buildSpectateLink(cell.to),
-        active,
-        testId: `mobile-nav-cell-${cell.key}`,
-        icon: cell.icon,
-      }
-    })
+    const browse = toLinkCell(BROWSE_CELL, pathname)
+    const myBets = toLinkCell(MY_BETS_CELL, pathname)
 
-    const actionCells: ResolvedNavCell[] = [
-      {
-        kind: 'action',
-        key: 'ask-ai',
-        label: 'Ask AI',
-        onClick: onAskAi,
-        testId: 'mobile-nav-cell-ask-ai',
-        icon: { kind: 'ai' },
-      },
-      {
-        kind: 'action',
-        key: 'account',
-        label: 'Account',
-        onClick: onAccount,
-        testId: 'mobile-nav-cell-account',
-        icon: { kind: 'lucide', Icon: User },
-      },
-      {
-        kind: 'action',
-        key: 'settings',
-        label: 'Settings',
-        onClick: onSettings,
-        testId: 'mobile-nav-cell-settings',
-        icon: { kind: 'lucide', Icon: Settings },
-      },
-    ]
+    const markets: ResolvedActionCell = {
+      kind: 'action',
+      key: 'markets',
+      label: 'Markets',
+      onClick: onOpenSearch,
+      testId: 'mobile-nav-cell-markets',
+      icon: { kind: 'lucide', Icon: Search },
+    }
 
-    return [...linkCells, ...actionCells]
-  }, [pathname, buildSpectateLink, onAskAi, onAccount, onSettings])
+    const chat: ResolvedActionCell = {
+      kind: 'action',
+      key: 'chat',
+      label: 'Chat',
+      onClick: onOpenChat,
+      testId: 'mobile-nav-cell-chat',
+      icon: { kind: 'lucide', Icon: MessageCircle },
+    }
+
+    return [browse, markets, myBets, chat]
+  }, [pathname, onOpenSearch, onOpenChat])
 
   return { cells }
 }

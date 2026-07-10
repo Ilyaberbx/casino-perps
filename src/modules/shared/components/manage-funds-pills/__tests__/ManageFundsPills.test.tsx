@@ -17,26 +17,13 @@ describe('ManageFundsPills', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('Pro mode renders the five funds-action pills', () => {
+  // Pro mode is gone (PRD-0008 D7): the row always collapses to a single
+  // Manage Funds button.
+  it('collapses to a single Manage Funds button', () => {
     render(<ManageFundsPills />, {
       wrapper: wrapWithPillsVenue(
         buildPillsVenue({ deposit: true, transfer: true, withdraw: true }),
-        { mode: 'pro', connected: true },
-      ),
-    })
-    expect(screen.getByRole('button', { name: 'Perps⇄Spot' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'EVM⇄Core' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Deposit' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Withdraw' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Manage Funds' })).not.toBeInTheDocument()
-  })
-
-  it('Simple mode collapses to a single Manage Funds button', () => {
-    render(<ManageFundsPills />, {
-      wrapper: wrapWithPillsVenue(
-        buildPillsVenue({ deposit: true, transfer: true, withdraw: true }),
-        { mode: 'simple', connected: true },
+        { connected: true },
       ),
     })
     expect(screen.getByRole('button', { name: 'Manage Funds' })).toBeInTheDocument()

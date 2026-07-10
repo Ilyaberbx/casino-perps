@@ -1,7 +1,6 @@
 import { FavoriteStar } from './FavoriteStar'
 import { MarketDropdownButton } from './MarketDropdownButton'
 import { MarketSelectionWindow } from '../market-selection-window'
-import { TickerStats } from './TickerStats'
 import { AssetIcon } from '@/modules/shared/components/asset-icon'
 import type { TopBarViewProps } from './top-bar.types'
 import styles from './top-bar.module.css'
@@ -15,8 +14,6 @@ export function TopBarDesktop({
   openWindow,
   closeWindow,
   handleSelectMarket,
-  stats,
-  markFlash,
   isFavorite,
   toggleFavorite,
 }: TopBarViewProps) {
@@ -40,7 +37,6 @@ export function TopBarDesktop({
         onSelectMarket={handleSelectMarket}
         selectedMarket={selectedMarket}
       />
-      <TickerStats stats={stats} markFlash={markFlash} />
     </div>
   )
 }

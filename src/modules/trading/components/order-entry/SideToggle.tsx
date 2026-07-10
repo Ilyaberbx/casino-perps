@@ -8,15 +8,9 @@ const PERP_OPTIONS: ReadonlyArray<{ value: Side; label: string }> = [
   { value: 'sell', label: 'Short' },
 ]
 
-// Spot has no long/short — a buy/sell swaps the base token against USDC.
-const SPOT_OPTIONS: ReadonlyArray<{ value: Side; label: string }> = [
-  { value: 'buy', label: 'Buy' },
-  { value: 'sell', label: 'Sell' },
-]
-
-export function SideToggle({ side, isSpot, onSideChange }: SideToggleProps) {
+export function SideToggle({ side, onSideChange }: SideToggleProps) {
   const tone = side === 'buy' ? 'directionUp' : 'directionDown'
-  const options = isSpot ? SPOT_OPTIONS : PERP_OPTIONS
+  const options = PERP_OPTIONS
   return (
     <div className={styles.fullWidthSegment}>
       <SegmentedControl<Side>

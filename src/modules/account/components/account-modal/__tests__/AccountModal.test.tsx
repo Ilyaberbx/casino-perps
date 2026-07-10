@@ -9,7 +9,6 @@ import { AuthContext, type AuthState } from '../../../providers/auth-provider/au
 import { AccountModalContext } from '../../../providers/account-modal-provider'
 import { createApiClient } from '@/modules/shared/http'
 import { FakeToastProvider } from '@/modules/shared/providers/toast-provider/__fixtures__/fake-toast-provider'
-import { AgentBalanceSheetProvider } from '@/modules/agent-balance'
 import { VenueProvider } from '@/modules/shared/providers/venue-provider'
 import { VenueOnboardingSheetProvider } from '@/modules/shared/providers/venue-onboarding-sheet-provider'
 import { makeVenue } from '@/modules/shared/providers/venue-provider/__fixtures__/venue'
@@ -79,9 +78,7 @@ function wrap(auth: AuthState = baseAuth, flow: OnboardingState = readyFlow, isO
         <AccountModalContext.Provider value={{ isOpen, open: () => {}, close: () => {} }}>
           <VenueProvider venue={venue}>
             <VenueOnboardingSheetProvider>
-              <AgentBalanceSheetProvider>
-                <FakeToastProvider>{children}</FakeToastProvider>
-              </AgentBalanceSheetProvider>
+              <FakeToastProvider>{children}</FakeToastProvider>
             </VenueOnboardingSheetProvider>
           </VenueProvider>
         </AccountModalContext.Provider>

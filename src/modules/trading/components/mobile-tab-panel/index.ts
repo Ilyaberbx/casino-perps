@@ -1,1 +1,0 @@
-export { MobileTabPanel } from './MobileTabPanel'

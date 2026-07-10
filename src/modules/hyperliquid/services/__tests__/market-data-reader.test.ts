@@ -249,17 +249,13 @@ describe('createHyperliquidMarketDataReader.listMarkets — multi-market-type', 
       logger: buildFakeLogger().logger,
     })
     await reader.refresh()
+    // Spot is excluded from the public market list (PRD-0008 D14): the reader
+    // still projects spot internally, but `listMarkets()` filters it out at the
+    // venue boundary so no spot market is ever surfaced to the UI.
     const markets = reader.listMarkets()
     const spots = markets.filter((m) => m.marketType === 'spot')
-    expect(spots.length).toBeGreaterThanOrEqual(1)
-    const hype = markets.find((m) => m.symbol === 'HYPE/USDC')
-    expect(hype).toBeDefined()
-    expect(hype?.marketType).toBe('spot')
-    expect(hype?.hlCoin).toBe('@107')
-    expect(hype?.baseAsset).toBe('HYPE')
-    expect(hype?.quoteAsset).toBe('USDC')
-    expect(hype?.hasCandles).toBe(true)
-    expect(hype?.markPrice).toBe(12.5)
+    expect(spots).toHaveLength(0)
+    expect(markets.find((m) => m.symbol === 'HYPE/USDC')).toBeUndefined()
   })
 
   it('MKT-02: listMarkets returns HIP-3 markets after refresh (≥1 marketType === "hip3")', async () => {
@@ -312,7 +308,7 @@ describe('createHyperliquidMarketDataReader.listMarkets — multi-market-type', 
     expect(aapl?.change24hPct).toBeCloseTo((185.5 - 184) / 184, 5)
   })
 
-  it('MKT-04 (ADR-0017): perp and spot coexist for the same base (BTC-PERP + BTC/USDC)', async () => {
+  it('MKT-04 (ADR-0017 / D14): the perp is surfaced but the same-base spot is excluded (BTC-PERP kept, BTC/USDC dropped)', async () => {
     const gateway = buildFakeGateway({
       getMetaAndAssetCtxs: () => okAsync(buildMetaAndCtxs()),
       getSpotMetaAndAssetCtxs: () =>
@@ -333,11 +329,16 @@ describe('createHyperliquidMarketDataReader.listMarkets — multi-market-type', 
     const perp = btcMarkets.find((m) => m.symbol === 'BTC-PERP')
     const spot = btcMarkets.find((m) => m.symbol === 'BTC/USDC')
     expect(perp?.marketType).toBe('perp')
-    expect(spot?.marketType).toBe('spot')
-    expect(spot?.markPrice).toBe(76000)
+    // Spot is filtered at the venue boundary (PRD-0008 D14).
+    expect(spot).toBeUndefined()
   })
 
-  it('ADR-0018: canonicalizes Unit-bridged spot base (UBTC/USDC → BTC/USDC) while non-Unit U-tokens pass through', async () => {
+  // The reader's spot projection + Unit-bridged canonicalization (ADR-0017/0018)
+  // still runs internally, but every spot market — native, Unit-bridged, or
+  // canonicalized — is filtered out of the public `listMarkets()` at the venue
+  // boundary (PRD-0008 D14). One test asserts that exclusion across the shapes
+  // the old per-case canonicalization tests covered.
+  it('D14: all spot markets (native, Unit-bridged, canonicalized) are excluded from listMarkets', async () => {
     const gateway = buildFakeGateway({
       getMetaAndAssetCtxs: () => okAsync(buildMetaAndCtxs()),
       getSpotMetaAndAssetCtxs: () =>
@@ -363,144 +364,11 @@ describe('createHyperliquidMarketDataReader.listMarkets — multi-market-type', 
     })
     await reader.refresh()
     const markets = reader.listMarkets()
-
-    const btc = markets.find((m) => m.symbol === 'BTC/USDC')
-    expect(btc).toBeDefined()
-    expect(btc?.baseAsset).toBe('BTC')
-    expect(btc?.hlCoin).toBe('@5')
-    expect(btc?.markPrice).toBe(76000)
-    expect(markets.some((m) => m.symbol === 'UBTC/USDC')).toBe(false)
-
-    const uni = markets.find((m) => m.symbol === 'UNI/USDC')
-    expect(uni?.baseAsset).toBe('UNI')
-    expect(uni?.hlCoin).toBe('@6')
-
-    const purr = markets.find((m) => m.symbol === 'PURR/USDC')
-    expect(purr?.baseAsset).toBe('PURR')
-    // Regression: the canonical pair's HL coin key is the literal pair string,
-    // never `@${index}` ("@7"). Sending "@7" left PURR's chart/trades/orderbook
-    // empty. hlCoin must be the raw universe name. See ADR-0017.
-    expect(purr?.hlCoin).toBe('PURR/USDC')
-  })
-
-  it('ADR-0018 errata: native spot pair wins over Unit-bridged collapse (PUMP/USDC + UPUMP/USDC → one PUMP/USDC, native)', async () => {
-    const gateway = buildFakeGateway({
-      getMetaAndAssetCtxs: () => okAsync(buildMetaAndCtxs()),
-      getSpotMetaAndAssetCtxs: () =>
-        okAsync(
-          buildSpotResponse(
-            [
-              { name: 'UPUMP/USDC', index: 213 },
-              { name: 'PUMP/USDC', index: 107 },
-            ],
-            [
-              { coin: 'UPUMP/USDC', markPx: '0.001', prevDayPx: '0.001', dayNtlVlm: '999' },
-              { coin: 'PUMP/USDC', markPx: '0.002', prevDayPx: '0.002', dayNtlVlm: '368960' },
-            ] as unknown as SpotMetaAndAssetCtxsResponse[1],
-          ),
-        ),
-    })
-    const reader = createHyperliquidMarketDataReader({
-      gateway,
-      venueId: VENUE_ID,
-      logger: buildFakeLogger().logger,
-    })
-    await reader.refresh()
-    const markets = reader.listMarkets()
-    const pumpRows = markets.filter((m) => m.symbol === 'PUMP/USDC')
-    expect(pumpRows).toHaveLength(1)
-    // Native entry (index 107) wins; ctx-derived price/volume come from it.
-    expect(pumpRows[0].hlCoin).toBe('@107')
-    expect(pumpRows[0].markPrice).toBe(0.002)
-    expect(pumpRows[0].volume24h).toBe(368960)
-  })
-
-  it('ADR-0018 errata: native wins even when the Unit-bridged entry appears second in the universe', async () => {
-    const gateway = buildFakeGateway({
-      getMetaAndAssetCtxs: () => okAsync(buildMetaAndCtxs()),
-      getSpotMetaAndAssetCtxs: () =>
-        okAsync(
-          buildSpotResponse(
-            [
-              { name: 'MON/USDC', index: 50 },
-              { name: 'UMON/USDC', index: 250 },
-            ],
-            [
-              { coin: 'MON/USDC', markPx: '0.026', prevDayPx: '0.027', dayNtlVlm: '357060' },
-              { coin: 'UMON/USDC', markPx: '0.0259', prevDayPx: '0.0268', dayNtlVlm: '500' },
-            ] as unknown as SpotMetaAndAssetCtxsResponse[1],
-          ),
-        ),
-    })
-    const reader = createHyperliquidMarketDataReader({
-      gateway,
-      venueId: VENUE_ID,
-      logger: buildFakeLogger().logger,
-    })
-    await reader.refresh()
-    const monRows = reader.listMarkets().filter((m) => m.symbol === 'MON/USDC')
-    expect(monRows).toHaveLength(1)
-    expect(monRows[0].hlCoin).toBe('@50')
-    expect(monRows[0].markPrice).toBe(0.026)
-  })
-
-  it('ADR-0018: Unit-only canonical (no native counterpart) is still emitted (UBTC/USDC → BTC/USDC)', async () => {
-    const gateway = buildFakeGateway({
-      getMetaAndAssetCtxs: () => okAsync(buildMetaAndCtxs()),
-      getSpotMetaAndAssetCtxs: () =>
-        okAsync(
-          buildSpotResponse(
-            [{ name: 'UBTC/USDC', index: 5 }],
-            [
-              { coin: 'UBTC/USDC', markPx: '76000', prevDayPx: '77000', dayNtlVlm: '1' },
-            ] as unknown as SpotMetaAndAssetCtxsResponse[1],
-          ),
-        ),
-    })
-    const reader = createHyperliquidMarketDataReader({
-      gateway,
-      venueId: VENUE_ID,
-      logger: buildFakeLogger().logger,
-    })
-    await reader.refresh()
-    const btc = reader.listMarkets().find((m) => m.symbol === 'BTC/USDC')
-    expect(btc).toBeDefined()
-    expect(btc?.hlCoin).toBe('@5')
-    expect(btc?.markPrice).toBe(76000)
-  })
-
-  it('MKT-04 (ADR-0017): spot ctx is joined by ctx.coin, not array position', async () => {
-    // universe[i].index !== i and the ctx array is ordered differently from
-    // the universe array. Only a coin-keyed join attaches the right prices;
-    // an index-based join would swap HYPE's and LICK's numbers.
-    const gateway = buildFakeGateway({
-      getMetaAndAssetCtxs: () => okAsync(buildMetaAndCtxs()),
-      getSpotMetaAndAssetCtxs: () =>
-        okAsync(
-          buildSpotResponse(
-            [
-              { name: 'HYPE/USDC', index: 107 },
-              { name: 'LICK/USDC', index: 2 },
-            ],
-            // Reversed vs. the universe order.
-            [
-              { coin: 'LICK/USDC', markPx: '0.00005', prevDayPx: '0.00005', dayNtlVlm: '1500' },
-              { coin: 'HYPE/USDC', markPx: '44.34', prevDayPx: '43', dayNtlVlm: '141305310' },
-            ] as unknown as SpotMetaAndAssetCtxsResponse[1],
-          ),
-        ),
-    })
-    const reader = createHyperliquidMarketDataReader({
-      gateway,
-      venueId: VENUE_ID,
-      logger: buildFakeLogger().logger,
-    })
-    await reader.refresh()
-    const hype = reader.listMarkets().find((m) => m.symbol === 'HYPE/USDC')
-    const lick = reader.listMarkets().find((m) => m.symbol === 'LICK/USDC')
-    expect(hype?.markPrice).toBe(44.34)
-    expect(hype?.volume24h).toBe(141305310)
-    expect(lick?.markPrice).toBe(0.00005)
+    // No spot rows at all — and none of the spot symbols (raw or canonicalized).
+    expect(markets.filter((m) => m.marketType === 'spot')).toHaveLength(0)
+    for (const symbol of ['BTC/USDC', 'UBTC/USDC', 'UNI/USDC', 'PURR/USDC']) {
+      expect(markets.some((m) => m.symbol === symbol)).toBe(false)
+    }
   })
 
   it('MKT-04: distinct HIP-3 dex markets are never collapsed (xyz:AAPL and flx:AAPL)', async () => {
@@ -552,7 +420,9 @@ describe('createHyperliquidMarketDataReader.listMarkets — multi-market-type', 
     expect(symbols).not.toContain('OLDIE-PERP')
     expect(symbols).not.toContain('DEADSPOT/USDC')
     expect(symbols).not.toContain('xyz:DEADHIP')
-    expect(symbols).toContain('GOOD/USDC')
+    // GOOD/USDC is a live spot market, but spot is excluded at the venue
+    // boundary (PRD-0008 D14), so it is not surfaced either.
+    expect(symbols).not.toContain('GOOD/USDC')
     expect(symbols).toContain('xyz:AAPL')
   })
 
@@ -610,8 +480,11 @@ describe('createHyperliquidMarketDataReader.listMarkets — multi-market-type', 
     resolveSpot()
     await refreshPromise
 
-    expect(reader.listMarkets().some((m) => m.symbol === 'HYPE/USDC')).toBe(true)
-    // Initial sync emit ([]), then perp emit, then spot emit → ≥3 emissions.
+    // The spot source settled, but spot is excluded from the public list at the
+    // venue boundary (PRD-0008 D14), so HYPE/USDC never surfaces.
+    expect(reader.listMarkets().some((m) => m.symbol === 'HYPE/USDC')).toBe(false)
+    // Initial sync emit ([]), then perp emit, then the (spot-settled) emit whose
+    // filtered payload carries no spot → still ≥3 emissions.
     expect(emissions.length).toBeGreaterThanOrEqual(3)
   })
 

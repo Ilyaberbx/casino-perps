@@ -11,7 +11,6 @@ import {
   type AuthState,
 } from '../../../providers/auth-provider/auth-provider.context'
 import { OnboardingFlowContext } from '../../../providers/onboarding-flow-provider'
-import { AgentBalanceSheetProvider } from '@/modules/agent-balance'
 import { VenueProvider } from '@/modules/shared/providers/venue-provider'
 import { VenueOnboardingSheetProvider } from '@/modules/shared/providers/venue-onboarding-sheet-provider'
 import { makeVenue } from '@/modules/shared/providers/venue-provider/__fixtures__/venue'
@@ -102,9 +101,7 @@ function wrap(flow: OnboardingState) {
       <AuthContext.Provider value={authState}>
         <OnboardingFlowContext.Provider value={liveFlow}>
           <VenueProvider venue={venue}>
-            <VenueOnboardingSheetProvider>
-              <AgentBalanceSheetProvider>{children}</AgentBalanceSheetProvider>
-            </VenueOnboardingSheetProvider>
+            <VenueOnboardingSheetProvider>{children}</VenueOnboardingSheetProvider>
           </VenueProvider>
         </OnboardingFlowContext.Provider>
       </AuthContext.Provider>
@@ -115,11 +112,10 @@ function wrap(flow: OnboardingState) {
 const readyFlow: OnboardingState = { kind: 'ready', me: makeMe() }
 
 describe('<WalletsSection />', () => {
-  it('renders the Native + imported rows and a separated read-only Agent row', () => {
+  it('renders the Native + imported rows', () => {
     render(<WalletsSection />, { wrapper: wrap(readyFlow) })
     expect(screen.getByTestId('wallet-row-native')).toBeInTheDocument()
     expect(screen.getByTestId(`wallet-row-${IMPORTED}`)).toBeInTheDocument()
-    expect(screen.getByTestId('wallet-row-agent')).toBeInTheDocument()
     // The selected (Native) row carries the Selected badge.
     const native = screen.getByTestId('wallet-row-native')
     expect(within(native).getByText('Selected')).toBeInTheDocument()

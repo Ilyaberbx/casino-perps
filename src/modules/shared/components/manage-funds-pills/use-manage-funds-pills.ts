@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { useVenueOptional } from '../../providers/venue-provider'
 import { useManageFunds, DEFAULT_MANAGE_FUNDS_TAB } from '../../providers/manage-funds-provider'
-import { useIsSimpleMode } from '../../providers/trading-mode-provider'
 import { toast } from '../../services/toast'
 import { useIsSpectating } from '@/modules/spectate'
 import { MANAGE_FUNDS_PILLS, SPECTATE_FUNDS_TOAST_TITLE, SPECTATE_FUNDS_TOAST_DESCRIPTION } from './manage-funds-pills.constants'
@@ -28,7 +27,9 @@ import type { ManageFundsPillsContent } from './manage-funds-pills.types'
 export function useManageFundsPills(): ManageFundsPillsContent {
   const venue = useVenueOptional()
   const { open } = useManageFunds()
-  const isSimple = useIsSimpleMode()
+  // Pro mode is gone (PRD-0008 D7): every surface renders in its condensed
+  // (`simple`) form now.
+  const isSimple = true
   const isSpectating = useIsSpectating()
 
   const hasDeposit = venue?.deposit != null

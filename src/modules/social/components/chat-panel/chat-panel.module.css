@@ -1,0 +1,278 @@
+/* Casino palette with hard hex fallbacks, so the panel renders correctly whether
+   or not the design-tokens phase has defined the --bg-*/--accent-* variables yet. */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--bg-rail, #1e1720);
+  color: var(--text-primary, #f8f8f8);
+  font-family: var(--font-body, 'IBM Plex Sans', system-ui, sans-serif);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  flex: 1;
+  text-align: center;
+  margin: 0;
+  font-family: var(--font-display, 'Archivo', sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-primary, #f8f8f8);
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  background: var(--bg-surface, #292630);
+  color: var(--text-muted, #8a8695);
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.iconButton:hover {
+  color: var(--text-primary, #f8f8f8);
+  background: var(--bg-elevated, #272733);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Text message row */
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border-radius: 999px;
+  background: var(--bg-surface, #292630);
+  line-height: 1;
+}
+
+.messageBody {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.username {
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.text {
+  color: var(--text-primary, #f8f8f8);
+}
+
+.mention {
+  color: var(--accent-primary-bright, #50d7e9);
+  font-weight: 600;
+}
+
+/* Win-brag card */
+.winBrag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--bg-surface, #292630);
+  border: 1px solid var(--accent-action, #ce37dc);
+  box-shadow: 0 0 0 1px rgba(206, 55, 220, 0.15);
+}
+
+.winThumb {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, 'Archivo', sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.winCopy {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-primary, #f8f8f8);
+}
+
+.winName {
+  font-weight: 700;
+}
+
+.winMeta {
+  color: var(--text-muted, #8a8695);
+}
+
+.winMultiplier {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: var(--font-display, 'Archivo', sans-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ce37dc, #7d1f9c);
+}
+
+/* Tipped row */
+.tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  background: rgba(36, 136, 148, 0.12);
+  border: 1px solid var(--accent-primary, #248894);
+  color: var(--text-primary, #f8f8f8);
+}
+
+.tipIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: var(--accent-primary-bright, #50d7e9);
+}
+
+.tipAmount {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--accent-primary-bright, #50d7e9);
+}
+
+/* Composer */
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  flex-shrink: 0;
+}
+
+.inputWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--bg-surface, #292630);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-primary, #f8f8f8);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.input::placeholder {
+  color: var(--text-muted, #8a8695);
+}
+
+.emojiHint {
+  display: inline-flex;
+  color: var(--text-muted, #8a8695);
+}
+
+.sendButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--accent-action, #ce37dc);
+  transition: filter 120ms ease;
+}
+
+.sendButton:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  font-size: 11px;
+  color: var(--text-muted, #8a8695);
+  flex-shrink: 0;
+}
+
+.footerCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.onlineDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--win, #24ff96);
+}

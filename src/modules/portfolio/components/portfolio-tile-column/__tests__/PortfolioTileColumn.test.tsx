@@ -4,8 +4,6 @@ import type { ReactNode } from 'react'
 import { okAsync } from 'neverthrow'
 import { VenueContext } from '@/modules/shared/providers/venue-provider/venue-provider.context'
 import { AuthContext, type AuthState } from '@/modules/account'
-import { AgentBalanceSheetProvider } from '@/modules/agent-balance'
-import { TradingModeProvider } from '@/modules/shared/providers/trading-mode-provider'
 import { createApiClient } from '@/modules/shared/http'
 import { PortfolioTileColumn } from '../PortfolioTileColumn'
 import type { Venue } from '@/modules/shared/domain'
@@ -54,11 +52,7 @@ function makeWrapper(venue: Venue = minimalVenue, auth: Partial<AuthState> = {})
   const authValue = { ...baseAuthState, ...auth }
   return ({ children }: { children: ReactNode }) => (
     <AuthContext.Provider value={authValue}>
-      <TradingModeProvider>
-        <VenueContext.Provider value={venue}>
-          <AgentBalanceSheetProvider>{children}</AgentBalanceSheetProvider>
-        </VenueContext.Provider>
-      </TradingModeProvider>
+      <VenueContext.Provider value={venue}>{children}</VenueContext.Provider>
     </AuthContext.Provider>
   )
 }

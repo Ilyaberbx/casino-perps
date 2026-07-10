@@ -483,9 +483,17 @@ export function createHyperliquidMarketDataReader(
     return markets
   }
 
+  // Spot markets are removed from this client (PRD-0008 D14). We filter them out
+  // at the venue boundary — the public `listMarkets()` / `subscribeMarkets()`
+  // surface the market-selection UI reads — while leaving the internal `cached`
+  // universe intact so symbol/asset resolution stays correct. `hip3` IS a perp
+  // and stays.
+  const excludeSpot = (markets: Market[]): Market[] =>
+    markets.filter((m) => m.marketType !== 'spot')
+
   return {
     listMarkets(): Market[] {
-      return cached
+      return excludeSpot(cached)
     },
     resolveAssetInfo(symbol: string): HyperliquidAssetInfo | null {
       return assetInfoByKey.get(symbol) ?? null
@@ -509,10 +517,11 @@ export function createHyperliquidMarketDataReader(
       return activeTickerSymbol
     },
     subscribeMarkets(onChange: (markets: Market[]) => void): Unsubscribe {
-      marketListeners.add(onChange)
-      onChange(cached)
+      const listener = (markets: Market[]): void => onChange(excludeSpot(markets))
+      marketListeners.add(listener)
+      onChange(excludeSpot(cached))
       return () => {
-        marketListeners.delete(onChange)
+        marketListeners.delete(listener)
       }
     },
     subscribeOrderbook(

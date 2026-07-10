@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import type { Market } from '@/modules/shared/domain/domain.types'
-import type { PerpMarketStripStats } from '../top-bar.types'
 import { TopBar } from '../TopBar'
 
 // ---------------------------------------------------------------------------
@@ -82,19 +81,6 @@ function makeTopBarReturn(market: Market) {
     isFavorite: false,
     toggleFavorite: vi.fn(),
   }
-}
-
-const PERP_STATS: PerpMarketStripStats = {
-  marketType: 'perp',
-  markPriceText: '64,250.00',
-  change24hText: '+2.14%',
-  change24hDirection: 'up',
-  volume24hText: '$4.2M',
-  oraclePriceText: '64,248.00',
-  openInterestText: '$1.1M',
-  fundingRateText: '0.0120%',
-  fundingRateDirection: 'up',
-  fundingCountdownText: '06:12',
 }
 
 // ---------------------------------------------------------------------------
@@ -206,33 +192,6 @@ describe('TopBar — MarketSelectionWindow wiring', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Tests — mobile header layout (stacked price + secondary stat strip)
-// ---------------------------------------------------------------------------
-
-describe('TopBar — mobile header', () => {
-  it('renders the prominent mark price and 24h change when isMobile', () => {
-    mockedUseTopBar.mockReturnValue({
-      ...makeTopBarReturn(BTC_MARKET),
-      isMobile: true,
-      stats: PERP_STATS,
-    })
-    render(<TopBar />)
-
-    expect(screen.getByText('64,250.00')).toBeInTheDocument()
-    expect(screen.getByText('+2.14%')).toBeInTheDocument()
-  })
-
-  it('renders the secondary stat strip (Oracle / 24h Vol / OI / Funding) when isMobile', () => {
-    mockedUseTopBar.mockReturnValue({
-      ...makeTopBarReturn(BTC_MARKET),
-      isMobile: true,
-      stats: PERP_STATS,
-    })
-    render(<TopBar />)
-
-    expect(screen.getByText('Oracle')).toBeInTheDocument()
-    expect(screen.getByText('24h Vol')).toBeInTheDocument()
-    expect(screen.getByText('OI')).toBeInTheDocument()
-    expect(screen.getByText('Funding')).toBeInTheDocument()
-  })
-})
+// The mobile ticker strip (prominent mark price + Oracle/Vol/OI/Funding stats)
+// was removed with the pro/ticker surfaces (PRD-0008 §9.3), so its tests are
+// gone. TopBar mobile now renders only the market identity row.

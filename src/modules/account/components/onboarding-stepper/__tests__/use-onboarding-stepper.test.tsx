@@ -8,7 +8,6 @@ import type { OnboardingState } from '../../../hooks/onboarding-flow.types'
 import { createApiClient } from '@/modules/shared/http'
 import { FakeAppConfigProvider } from '@/modules/shared/providers/app-config-provider/__fixtures__/fake-app-config-provider'
 import { ThemeProvider } from '@/modules/shared/providers/theme-provider'
-import { TradingModeProvider } from '@/modules/shared/providers/trading-mode-provider'
 import { useOnboardingStepper } from '../use-onboarding-stepper'
 
 const sendCode = vi.fn().mockResolvedValue(undefined)
@@ -85,9 +84,7 @@ function wrap(auth: AuthState, flow: OnboardingState = { kind: 'idle' }) {
     <AuthContext.Provider value={auth}>
       <FakeAppConfigProvider>
         <ThemeProvider>
-          <TradingModeProvider>
-            <OnboardingFlowContext.Provider value={flow}>{children}</OnboardingFlowContext.Provider>
-          </TradingModeProvider>
+          <OnboardingFlowContext.Provider value={flow}>{children}</OnboardingFlowContext.Provider>
         </ThemeProvider>
       </FakeAppConfigProvider>
     </AuthContext.Provider>
@@ -234,24 +231,10 @@ describe('useOnboardingStepper — personalize step', () => {
     expect(result.current.stepNumber).toBe(5)
     if (result.current.step.kind === 'personalize') {
       expect(result.current.step.theme).toBe('dark')
-      expect(result.current.step.tradingMode).toBe('pro')
     }
     act(() => {
       if (result.current.step.kind === 'personalize') result.current.step.onDone()
     })
     expect(finishPersonalize).toHaveBeenCalledTimes(1)
-  })
-
-  it('onSelectTradingMode flips the persisted trading mode', () => {
-    const flow: OnboardingState = { kind: 'needs-personalize', finishPersonalize: vi.fn() }
-    const { result } = renderHook(() => useOnboardingStepper(), {
-      wrapper: wrap(buildAuth({ authenticated: true }), flow),
-    })
-    act(() => {
-      if (result.current.step.kind === 'personalize') result.current.step.onSelectTradingMode('simple')
-    })
-    if (result.current.step.kind === 'personalize') {
-      expect(result.current.step.tradingMode).toBe('simple')
-    }
   })
 })

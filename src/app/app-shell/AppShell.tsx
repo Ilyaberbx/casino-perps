@@ -1,18 +1,7 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Settings } from 'lucide-react'
-import { useAppShell } from './use-app-shell'
-import { VenueSwitcher } from '../venue-switcher'
-import {
-  AccountAvatarTrigger,
-  AccountModal,
-  AccountModalProvider,
-  QuickWalletSwitcher,
-  useAuth,
-  useIsWalletConnected,
-} from '@/modules/account'
-import { SpectateLauncher, SpectateBanner } from '@/modules/spectate'
-import { HotMarketsTicker } from '@/modules/trading'
-import { useIsMobile } from '@/modules/shared/hooks/use-is-mobile'
+import { Outlet } from 'react-router-dom'
+import { AccountModal, AccountModalProvider } from '@/modules/account'
+import { LiveWinsTicker } from '@/modules/social'
+import { MobileBottomNav } from '@/modules/trading'
 import { ConnectionBanner } from '@/modules/shared/components/connection-banner'
 import { VenueOnboardingBanner } from '@/modules/shared/components/VenueOnboardingBanner'
 import { VenueOnboardingSheet } from '@/modules/shared/components/VenueOnboardingSheet'
@@ -20,146 +9,80 @@ import { DepositSheet } from '@/modules/shared/components/deposit-sheet'
 import { TransferSheet } from '@/modules/shared/components/transfer-sheet'
 import { ManageFundsModal } from '@/modules/shared/components/manage-funds-modal'
 import { SettingsModal } from '@/modules/shared/components/settings-modal'
-import { useSettings } from '@/modules/shared/providers/settings-provider'
-import { AgentWalletSurface } from '@/modules/agent-balance'
-import { useVenueOnboardingSheet } from '@/modules/shared/providers/venue-onboarding-sheet-provider'
-import { useDepositSheet } from '@/modules/shared/providers/deposit-sheet-provider'
+import { useAppShell } from './use-app-shell'
+import { LeftRail } from './left-rail'
+import { ChatColumn } from './chat-column/ChatColumn'
+import { CenterTopBar } from './center-top-bar/CenterTopBar'
+import { MobileTopBar } from './mobile-top-bar/MobileTopBar'
+import { MobileMenuDrawer } from './mobile-menu-drawer/MobileMenuDrawer'
+import { MobileChatSheet } from './mobile-chat-sheet/MobileChatSheet'
+import { SearchOverlay } from './search-overlay/SearchOverlay'
 import styles from './app-shell.module.css'
-import { navLinkClassName } from './app-shell.utils'
 import type { AppShellOutletContext } from './app-shell.types'
 
-// `Sheet` actions for CTAs the shared module can't reach (wallet, network,
-// reload). Slice 5 only emits the generic `retry` CTA so none of these are
-// actually invoked yet, but `<VenueOnboardingSheet>` requires the full
-// `actions` surface. Slice 6 widens the error taxonomy and starts driving
-// these handlers from real per-error CTAs.
-const APP_SHELL_SHEET_ACTIONS = {
-  reconnectWallet: () => {
-    // openConnectModal is wired below at render time
-  },
-  switchChain: () => undefined,
-  reload: () => {
-    window.location.reload()
-  },
-  confirmReset: (message: string) => window.confirm(message),
-  openDeposit: () => {
-    // the onboarding-close + deposit-open pair is wired below at render time
-  },
-}
-
+/**
+ * The casino app shell (PRD 0008 §6, D8): a fixed left rail, a fluid scrolling
+ * center column topped by a LIVE WINS ticker, and a fixed right chat column,
+ * degrading to a mobile top bar + 4-tab bottom nav under 900px. Dumb — all
+ * state and actions come from {@link useAppShell}.
+ */
 export function AppShell() {
-  const { tradeTo, portfolioTo, logoSrc } = useAppShell()
-  const { authenticated, openConnectModal, loginWithWallet } = useAuth()
-  const isConnected = authenticated
-  const isWalletConnected = useIsWalletConnected()
-  const location = useLocation()
-  const isMobile = useIsMobile()
-  const sheet = useVenueOnboardingSheet()
-  const depositSheet = useDepositSheet()
-  const settings = useSettings()
-  // Both the trade and portfolio pages carry the mobile footer (MobileTradeDock)
-  // for nav + Account, so the full desktop header is redundant there on mobile.
-  // Instead of hiding it entirely (which stranded the venue switcher + spectate),
-  // swap in a slim mobile bar that keeps those two app-level controls reachable.
-  const isTradeRoute = location.pathname.startsWith('/trade')
-  const isPortfolioRoute = location.pathname.startsWith('/portfolio')
-  const isMobileChrome = isMobile && (isTradeRoute || isPortfolioRoute)
-
-  const sheetActions = {
-    ...APP_SHELL_SHEET_ACTIONS,
-    // Fix 3 (ADR-0061): the user is already authenticated; the selected wallet is
-    // linked-but-not-connected, so resolving the grant means CONNECTING that wallet
-    // into the live Privy session (`loginWithWallet` → Privy connect/loginOrLink),
-    // not re-opening the login modal. Once connected it enters `useWallets()` →
-    // becomes connectable → `masterAddress` resolves to it → the grant signs as the
-    // selected wallet. Errors surface through Privy's own UI; the CTA is fire-and-forget.
-    reconnectWallet: () => {
-      void loginWithWallet()
-    },
-    // Sibling sheets must not stack: close onboarding, then open deposit. The
-    // user funds in a focused sub-task and re-opens onboarding from the banner.
-    openDeposit: () => {
-      sheet.close()
-      depositSheet.open()
-    },
-  }
-
-  // On mobile chrome routes the full header is dropped; the venue switcher +
-  // spectate launcher (composition-root concerns) are handed to the page via
-  // Outlet context so each page renders them inside its OWN header row instead
-  // of a second stacked bar. Null on desktop / non-chrome routes.
-  const mobileHeaderControls: AppShellOutletContext['mobileHeaderControls'] = isMobileChrome ? (
-    <>
-      <SpectateLauncher isWalletConnected={isWalletConnected} />
-      <QuickWalletSwitcher />
-      <VenueSwitcher />
-    </>
-  ) : null
+  const shell = useAppShell()
 
   return (
     <AccountModalProvider>
-    <div className={styles.shell}>
-      {isMobileChrome ? null : (
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <img className={styles.logo} src={logoSrc} alt="Invader" />
-          <nav className={styles.nav}>
-            <NavLink to={tradeTo} className={navLinkClassName}>
-              Trade
-            </NavLink>
-            <NavLink to={portfolioTo} className={navLinkClassName}>
-              Portfolio
-            </NavLink>
-          </nav>
+      <div className={styles.shell}>
+        <MobileTopBar onAddCash={shell.handleAddCash} onOpenMenu={shell.openMenu} />
+
+        <aside className={styles.rail}>
+          <LeftRail onAddCash={shell.handleAddCash} onCollapse={shell.handleCollapse} />
+        </aside>
+
+        <div className={styles.center}>
+          <CenterTopBar
+            authenticated={shell.authenticated}
+            onOpenSearch={shell.openSearch}
+            onLogIn={shell.handleLogIn}
+            onCreateAccount={shell.handleCreateAccount}
+          />
+          <div className={styles.centerScroll}>
+            <LiveWinsTicker />
+            <VenueOnboardingBanner isWalletConnected={shell.isWalletConnected} />
+            <ConnectionBanner />
+            <main className={styles.outletWrap}>
+              <Outlet context={{ mobileHeaderControls: null } satisfies AppShellOutletContext} />
+            </main>
+          </div>
         </div>
-        <div className={styles.headerRight}>
-          <SpectateLauncher isWalletConnected={isWalletConnected} />
-          {isConnected ? (
-            <AccountAvatarTrigger />
-          ) : (
-            <button
-              type="button"
-              className={styles.toggleButton}
-              onClick={() => openConnectModal?.()}
-              data-testid="connect-wallet-button"
-            >
-              Connect Wallet
-            </button>
-          )}
-          <QuickWalletSwitcher />
-          <VenueSwitcher />
-          <button
-            type="button"
-            className={styles.toggleButton}
-            onClick={() => settings.open('appearance')}
-            aria-label="Open settings"
-            data-testid="settings-button"
-          >
-            <Settings size={16} aria-hidden="true" />
-            <span className={styles.toggleLabel}>Settings</span>
-          </button>
-        </div>
-      </header>
-      )}
-      {isMobileChrome ? null : <HotMarketsTicker />}
-      <SpectateBanner />
-      <VenueOnboardingBanner isWalletConnected={isWalletConnected} />
-      <main className={styles.outlet}>
-        <Outlet context={{ mobileHeaderControls } satisfies AppShellOutletContext} />
-      </main>
-      <ConnectionBanner />
-      <VenueOnboardingSheet
-        isOpen={sheet.isOpen}
-        onClose={sheet.close}
-        actions={sheetActions}
-      />
-      <DepositSheet />
-      <TransferSheet />
-      <ManageFundsModal />
-      <SettingsModal />
-      <AgentWalletSurface />
-      <AccountModal />
-    </div>
+
+        <aside className={styles.chat}>
+          <ChatColumn />
+        </aside>
+
+        <MobileBottomNav onOpenSearch={shell.openSearch} onOpenChat={shell.openChat} />
+
+        <SearchOverlay isOpen={shell.isSearchOpen} onClose={shell.closeSearch} />
+        <MobileMenuDrawer
+          isOpen={shell.isMenuOpen}
+          onClose={shell.closeMenu}
+          authenticated={shell.authenticated}
+          onAddCash={shell.handleAddCash}
+          onLogIn={shell.handleLogIn}
+          onCreateAccount={shell.handleCreateAccount}
+        />
+        <MobileChatSheet isOpen={shell.isChatOpen} onClose={shell.closeChat} />
+
+        <VenueOnboardingSheet
+          isOpen={shell.isOnboardingSheetOpen}
+          onClose={shell.closeOnboardingSheet}
+          actions={shell.onboardingSheetActions}
+        />
+        <DepositSheet />
+        <TransferSheet />
+        <ManageFundsModal />
+        <SettingsModal />
+        <AccountModal />
+      </div>
     </AccountModalProvider>
   )
 }

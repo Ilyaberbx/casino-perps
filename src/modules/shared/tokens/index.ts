@@ -12,6 +12,21 @@ export const tokens = {
   accent: 'var(--accent)',
   accentHover: 'var(--accent-hover)',
   accentSoft: 'var(--accent-soft)',
+  // Casino two-accent system (PRD 0008 §5.1): teal = safety/primary, magenta =
+  // commitment (never a non-committing action), bright cyan = active/glow.
+  accentPrimary: 'var(--accent-primary)',
+  accentPrimaryBright: 'var(--accent-primary-bright)',
+  accentAction: 'var(--accent-action)',
+  // Casino surface ladder + literal win/loss + text names.
+  bgBase: 'var(--bg-base)',
+  bgRail: 'var(--bg-rail)',
+  bgSurface: 'var(--bg-surface)',
+  bgElevated: 'var(--bg-elevated)',
+  win: 'var(--win)',
+  loss: 'var(--loss)',
+  // Type faces.
+  fontDisplay: 'var(--font-display)',
+  fontBody: 'var(--font-body)',
   directionUp: 'var(--directionUp)',
   directionUpSoft: 'var(--directionUp-soft)',
   directionDown: 'var(--directionDown)',

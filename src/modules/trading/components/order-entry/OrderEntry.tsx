@@ -49,7 +49,6 @@ function OrderEntryActive() {
     markPrice,
     availableToTrade,
     availableUnit,
-    isSpot,
     isHip3,
     minOrderValueHint,
     slippageHint,
@@ -91,21 +90,21 @@ function OrderEntryActive() {
   const showsLimitPrice = isLimitMode || isStopLimitMode
   const isMarketMode = form.orderType === 'market'
   const isSubmitDisabled = !validation.canSubmit || isSubmitting
-  const showsLiquidation = isMarketMode && !isSpot
+  const showsLiquidation = isMarketMode
   const slippageControl = isMarketMode
     ? { value: form.slippageInput, onChange: setSlippageInput }
     : null
 
   return (
     <div className={styles.container}>
-      <SideToggle side={form.side} isSpot={isSpot} onSideChange={setSide} />
+      <SideToggle side={form.side} onSideChange={setSide} />
       <OrderTypeControl
         orderType={form.orderType}
-        supportsStopOrders={!isSpot && supportsStopOrders}
-        supportsTwap={!isSpot && supportsTwap}
+        supportsStopOrders={supportsStopOrders}
+        supportsTwap={supportsTwap}
         onOrderTypeChange={setOrderType}
       />
-      {isSpot ? null : <LeverageMargin />}
+      <LeverageMargin />
       <OrderInfoRows
         availableToTrade={availableToTrade}
         availableUnit={availableUnit}
@@ -156,7 +155,7 @@ function OrderEntryActive() {
         <div className={styles.errorMessage}>{minOrderValueHint}</div>
       ) : null}
       <OrderOptions
-        showReduceOnly={!isSpot}
+        showReduceOnly
         reduceOnly={form.reduceOnly}
         onReduceOnlyChange={setReduceOnly}
         isLimit={isLimitMode}

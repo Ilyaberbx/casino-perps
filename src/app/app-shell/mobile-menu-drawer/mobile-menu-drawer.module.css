@@ -1,0 +1,44 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  width: min(88vw, 300px);
+  height: 100%;
+}
+
+.authRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 14px 6px;
+}
+
+.railSlot {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.logIn {
+  flex: 1 1 0;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.createAccount {
+  flex: 1 1 0;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: var(--accent-action);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}

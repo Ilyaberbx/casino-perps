@@ -1,10 +1,8 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useAuth } from '../../providers/auth-provider'
 import { useOnboardingFlow } from '../../hooks/use-onboarding-flow'
 import { useWalletMutations } from '../../hooks/use-wallet-mutations'
-import { useWalletExport } from '../../hooks/use-wallet-export'
 import { formatWalletAddress } from '@/modules/shared/utils/format-wallet-address'
-import { useAgentBalance } from '@/modules/agent-balance'
 import type { Wallet } from '../../domain/types'
 import { MAX_USER_WALLETS, MAX_IMPORTED_WALLETS, WALLET_SOURCE_LABEL } from './account-modal.constants'
 import { resolveConnectorIcon } from './account-modal.utils'
@@ -22,8 +20,6 @@ export function useWalletsSection(): WalletsSectionView {
   const { externalWallets, exportableAddresses } = useAuth()
   const flow = useOnboardingFlow()
   const mutations = useWalletMutations()
-  const agentBalance = useAgentBalance()
-  const { onExport } = useWalletExport()
 
   const serverWallets = useMemo<ReadonlyArray<Wallet>>(
     () => (flow.kind === 'ready' ? flow.me.wallets : []),
@@ -56,20 +52,6 @@ export function useWalletsSection(): WalletsSectionView {
     [serverWallets, mutations.selectedAddress, connectorIconByAddress, exportableSet],
   )
 
-  // The Agent Wallet is user-owned by construction (ADR-0078: a client-created
-  // embedded wallet Privy holds the key for), so the export affordance gates on
-  // plain session membership — its address being in `useAuth().exportableAddresses`
-  // (the Privy-managed set). No server ownership marker; once the wallet is in the
-  // live session its key is exportable like any other embedded wallet.
-  const agentAddress = agentBalance.agentWalletAddress
-  const hasAgentAddress = agentAddress !== null
-  const isAgentExportable =
-    hasAgentAddress && exportableSet.has(agentAddress.toLowerCase())
-  const onAgentExport = useCallback(() => {
-    if (agentAddress === null) return
-    void onExport(agentAddress)
-  }, [agentAddress, onExport])
-
   return {
     isReady: flow.kind === 'ready',
     rows,
@@ -80,12 +62,6 @@ export function useWalletsSection(): WalletsSectionView {
     isImportAtCap: mutations.isImportAtCap,
     importHint: mutations.importHint,
     isImporting: mutations.isImporting,
-    agent: {
-      truncatedAddress: agentAddress === null ? null : formatWalletAddress(agentAddress),
-      balanceDisplay: agentBalance.display,
-      isExportable: isAgentExportable,
-      onExport: onAgentExport,
-    },
     onSelect: mutations.onSelect,
     onImport: mutations.onImport,
     onRemove: mutations.onRemove,

@@ -1,6 +1,4 @@
 export interface UseMobileTradeDockReturn {
-  /** Opens the AI suggestion sheet (footer's Ask AI cell). */
-  openAskAi: () => void
   /** Opens the account modal when connected, else the connect-wallet flow
    * (footer's Account cell). */
   openAccount: () => void

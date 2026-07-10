@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter, Navigate, useParams } from 'react-router-dom'
 import { AppShell } from './app-shell'
 import { AccountSessionRoot } from './app-shell/AccountSessionRoot'
 import { RouteErrorBoundary } from './error-boundary'
@@ -8,10 +8,27 @@ import {
   SelectedMarketProvider,
   LeverageMarginProvider,
   OrderIntentProvider,
-  PerpSuggestionSheetProvider,
-  SuggestionPreviewProvider,
   TradingPage,
+  DEFAULT_SELECTED_MARKET,
 } from '@/modules/trading'
+import { LobbyPage } from '@/modules/lobby'
+import { ComingSoon } from '@/modules/shared/components/coming-soon'
+
+// The `/trade/:symbol` screen (PRD 0008 D15). The path `:symbol` (already URL-
+// decoded by the router) seeds `SelectedMarketProvider`, which then owns the
+// selected market from the path instead of the legacy `?market=` query.
+function TradeRoute() {
+  const { symbol } = useParams<{ symbol: string }>()
+  return (
+    <SelectedMarketProvider initialSymbol={symbol}>
+      <OrderIntentProvider>
+        <LeverageMarginProvider>
+          <TradingPage />
+        </LeverageMarginProvider>
+      </OrderIntentProvider>
+    </SelectedMarketProvider>
+  )
+}
 
 // DEV-ONLY: a reachable route that triggers the error boundary on demand, so
 // the crash screen can be previewed without editing source. Statically dropped
@@ -32,30 +49,21 @@ export const router = createBrowserRouter([
       {
         element: <AppShell />,
         children: [
-          { index: true, element: <Navigate to="/trade" replace /> },
+          // `/` is the lobby (PRD 0008 D15); the old `/ → /trade` redirect is gone.
+          { index: true, element: <LobbyPage /> },
+          // Bare `/trade` resolves to the default market's trade screen.
           {
             path: 'trade',
-            element: (
-              <SelectedMarketProvider>
-                <OrderIntentProvider>
-                  <LeverageMarginProvider>
-                    <PerpSuggestionSheetProvider>
-                      <SuggestionPreviewProvider>
-                        <TradingPage />
-                      </SuggestionPreviewProvider>
-                    </PerpSuggestionSheetProvider>
-                  </LeverageMarginProvider>
-                </OrderIntentProvider>
-              </SelectedMarketProvider>
-            ),
+            element: <Navigate to={`/trade/${DEFAULT_SELECTED_MARKET}`} replace />,
           },
+          { path: 'trade/:symbol', element: <TradeRoute /> },
           {
-            path: 'portfolio',
-            // Code-split: chart.js + react-chartjs-2 (portfolio-only) load on
-            // navigation, not in the initial/trade chunk. react-router-dom v7
-            // route-level lazy keeps the composition root clean.
-            lazy: async () => ({ Component: (await import('@/modules/portfolio')).PortfolioPage }),
+            path: 'my-bets',
+            // Code-split: the My Bets page loads on navigation, keeping it out of
+            // the initial/lobby chunk. react-router-dom v7 route-level lazy.
+            lazy: async () => ({ Component: (await import('@/modules/my-bets')).MyBetsPage }),
           },
+          { path: 'leaderboard', element: <ComingSoon title="Leaderboard" /> },
         ],
       },
     ],

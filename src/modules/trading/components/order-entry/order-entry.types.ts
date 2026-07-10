@@ -357,8 +357,6 @@ export interface StopPriceInputProps {
 
 export interface SideToggleProps {
   side: Side
-  /** Spot relabels Long/Short → Buy/Sell (the domain `Side` stays buy|sell). */
-  isSpot: boolean
   onSideChange: (side: Side) => void
 }
 

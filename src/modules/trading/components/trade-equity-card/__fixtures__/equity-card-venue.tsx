@@ -11,10 +11,12 @@ import { AuthContext, type AuthState } from '@/modules/account'
 import { createApiClient } from '@/modules/shared/http'
 import { VenueProvider } from '@/modules/shared/providers/venue-provider'
 import { ManageFundsProvider } from '@/modules/shared/providers/manage-funds-provider'
-import { TradingModeProvider } from '@/modules/shared/providers/trading-mode-provider'
-import type { TradingMode } from '@/modules/shared/providers/trading-mode-provider'
-import { TRADING_MODE_STORAGE_KEY } from '@/modules/shared/providers/trading-mode-provider/trading-mode.constants'
 import { SpectateProvider } from '@/modules/spectate'
+
+// Pro mode is gone (PRD-0008 D7): the equity card always renders its condensed
+// (`simple`) form. The `_mode` params are kept ignored so existing call sites
+// still compile without a signature churn across the test files.
+type LegacyTradingMode = 'pro' | 'simple'
 import {
   buildFakeDepositCapability,
   buildFakeTransferCapability,
@@ -117,17 +119,13 @@ export const CONNECTED_AUTH: AuthState = {
   removeAgentSigner: async () => true,
 }
 
-export function wrapEquityCard(venue: Venue, mode: TradingMode) {
-  // The provider hydrates from localStorage; set the mode there before render.
-  localStorage.setItem(TRADING_MODE_STORAGE_KEY, mode)
+export function wrapEquityCard(venue: Venue, _mode?: LegacyTradingMode) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <AuthContext.Provider value={CONNECTED_AUTH}>
-        <TradingModeProvider>
-          <VenueProvider venue={venue}>
-            <ManageFundsProvider>{children}</ManageFundsProvider>
-          </VenueProvider>
-        </TradingModeProvider>
+        <VenueProvider venue={venue}>
+          <ManageFundsProvider>{children}</ManageFundsProvider>
+        </VenueProvider>
       </AuthContext.Provider>
     )
   }
@@ -136,19 +134,16 @@ export function wrapEquityCard(venue: Venue, mode: TradingMode) {
 // Same composition as `wrapEquityCard`, plus a real `SpectateProvider` (inside
 // a `MemoryRouter`, since spectate state is URL-driven) so a test can toggle
 // `isSpectating` via `useSpectate().startSpectating()` / `stopSpectating()`.
-export function wrapEquityCardWithSpectate(venue: Venue, mode: TradingMode) {
-  localStorage.setItem(TRADING_MODE_STORAGE_KEY, mode)
+export function wrapEquityCardWithSpectate(venue: Venue, _mode?: LegacyTradingMode) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <MemoryRouter>
         <AuthContext.Provider value={CONNECTED_AUTH}>
-          <TradingModeProvider>
-            <VenueProvider venue={venue}>
-              <ManageFundsProvider>
-                <SpectateProvider>{children}</SpectateProvider>
-              </ManageFundsProvider>
-            </VenueProvider>
-          </TradingModeProvider>
+          <VenueProvider venue={venue}>
+            <ManageFundsProvider>
+              <SpectateProvider>{children}</SpectateProvider>
+            </ManageFundsProvider>
+          </VenueProvider>
         </AuthContext.Provider>
       </MemoryRouter>
     )

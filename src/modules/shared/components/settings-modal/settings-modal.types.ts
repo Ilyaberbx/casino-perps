@@ -1,7 +1,6 @@
 import type { FC } from 'react'
 import type { SettingsSection } from '../../providers/settings-provider'
 import type { AccentColor, AccentColorId, ThemeVariant } from '../../providers/theme-provider'
-import type { TradingMode } from '../../providers/trading-mode-provider'
 
 /** One nav entry: id, label, and lucide icon. */
 export interface SettingsNavSection {
@@ -22,8 +21,6 @@ export interface SettingsModalContent {
   readonly colors: ReadonlyArray<AccentColor>
   readonly selectedColorId: AccentColorId
   onSelectColor(id: AccentColorId): void
-  readonly tradingMode: TradingMode
-  onSelectTradingMode(mode: TradingMode): void
 }
 
 export interface SettingsNavProps {
@@ -40,8 +37,6 @@ export interface SettingsPaneProps {
   readonly colors: ReadonlyArray<AccentColor>
   readonly selectedColorId: AccentColorId
   onSelectColor(id: AccentColorId): void
-  readonly tradingMode: TradingMode
-  onSelectTradingMode(mode: TradingMode): void
 }
 
 export interface AppearancePaneProps {
@@ -50,9 +45,4 @@ export interface AppearancePaneProps {
   readonly colors: ReadonlyArray<AccentColor>
   readonly selectedColorId: AccentColorId
   onSelectColor(id: AccentColorId): void
-}
-
-export interface TradingPaneProps {
-  readonly tradingMode: TradingMode
-  onSelectTradingMode(mode: TradingMode): void
 }

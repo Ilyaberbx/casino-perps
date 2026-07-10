@@ -1,0 +1,33 @@
+/* The YEET wordmark, rendered as text — never an image, and never yeet's own logo
+   SVG (PRD 0008 D10). Fixed brand geometry: display face (Archivo), weight 900,
+   Expanded width, uppercase, tight tracking, and a manual -8deg shear that stands
+   in for the wide-italic Aeonik slant (PRD §5.2). */
+.wordmark {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-stretch: 125%; /* Archivo Expanded — the wide grotesque look */
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text-primary);
+  transform: skewX(-8deg);
+  transform-origin: left center;
+  /* The shear pushes the top-right corner past the box; a hair of trailing space
+     keeps the final glyph from clipping against a tight container. */
+  padding-right: 0.08em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sizeSm {
+  font-size: 20px;
+}
+
+.sizeMd {
+  font-size: 28px;
+}
+
+.sizeLg {
+  font-size: 40px;
+}

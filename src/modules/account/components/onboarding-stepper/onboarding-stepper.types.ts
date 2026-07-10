@@ -1,5 +1,4 @@
 import type { ThemeVariant } from '@/modules/shared/providers/theme-provider'
-import type { TradingMode } from '@/modules/shared/providers/trading-mode-provider'
 
 export type HandleAvailability = 'idle' | 'checking' | 'available' | 'taken'
 
@@ -56,13 +55,11 @@ export interface MfaStepView {
   onSkip: () => void
 }
 
-/** Final new-account step: pick the theme + mobile trading layout, then finish. */
+/** Final new-account step: pick the theme, then finish. */
 export interface PersonalizeStepView {
   kind: 'personalize'
   theme: ThemeVariant
   onSelectTheme: (theme: ThemeVariant) => void
-  tradingMode: TradingMode
-  onSelectTradingMode: (mode: TradingMode) => void
   onDone: () => void
 }
 

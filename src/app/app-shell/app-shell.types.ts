@@ -1,21 +1,41 @@
-import type { To } from 'react-router-dom'
 import type { ReactNode } from 'react'
+import type { VenueOnboardingSheetActions } from '@/modules/shared/components/VenueOnboardingSheet'
 
-/** Passed to route pages via `<Outlet context>`. On mobile chrome routes it
- * carries the app-level header controls (venue switcher + spectate launcher) so
- * each page renders them in its own header row instead of a second stacked bar;
- * `null` on desktop / non-chrome routes. */
+/** Passed to route pages via `<Outlet context>`. The casino shell owns the
+ * mobile chrome globally, so app-level header controls are no longer injected
+ * per page — the slot stays for the existing trade page's compat but is `null`. */
 export interface AppShellOutletContext {
   mobileHeaderControls: ReactNode
 }
 
 export interface UseAppShellReturn {
-  tradeTo: To
-  portfolioTo: To
-  /** Header mascot, swapped per theme so it stays legible on both backgrounds. */
-  logoSrc: string
-}
+  authenticated: boolean
+  isWalletConnected: boolean
 
-export interface NavLinkClassNameArgs {
-  isActive: boolean
+  /** Market-search overlay (center magnifier + mobile "Markets" tab). */
+  isSearchOpen: boolean
+  openSearch: () => void
+  closeSearch: () => void
+
+  /** Mobile rail drawer (hamburger). */
+  isMenuOpen: boolean
+  openMenu: () => void
+  closeMenu: () => void
+
+  /** Mobile chat sheet (bottom-nav "Chat" tab). */
+  isChatOpen: boolean
+  openChat: () => void
+  closeChat: () => void
+
+  /** Opens Add Cash (deposit) and dismisses any open mobile drawer. */
+  handleAddCash: () => void
+  handleLogIn: () => void
+  handleCreateAccount: () => void
+  /** Rail collapse — decorative today. */
+  handleCollapse: () => void
+
+  /** Venue-onboarding sheet (funding / silent agent-wallet flow) plumbing. */
+  isOnboardingSheetOpen: boolean
+  closeOnboardingSheet: () => void
+  onboardingSheetActions: VenueOnboardingSheetActions
 }

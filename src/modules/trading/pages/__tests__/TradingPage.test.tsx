@@ -18,15 +18,6 @@ vi.mock('../../components/chart', () => ({
   Chart: () => <div data-testid="mock-chart" />,
   LazyChart: () => <div data-testid="mock-chart" />,
 }))
-vi.mock('../../components/book-trades-panel', () => ({
-  BookTradesPanel: () => <div data-testid="mock-book-trades-panel" />,
-}))
-vi.mock('../../components/mobile-tab-panel', () => ({
-  MobileTabPanel: () => <div data-testid="mock-mobile-tab-panel" />,
-}))
-vi.mock('../../components/mobile-simple-book', () => ({
-  MobileSimpleBook: () => <div data-testid="mock-mobile-simple-book" />,
-}))
 vi.mock('../../components/order-entry', () => ({
   OrderEntry: () => <div data-testid="mock-order-entry" />,
 }))
@@ -49,20 +40,6 @@ vi.mock('../../components/mobile-trade-dock', () => ({
     </div>
   ),
 }))
-vi.mock('../../components/perp-suggestion-sheet', () => ({
-  PerpSuggestionToggle: () => <div data-testid="mock-perp-suggestion-toggle" />,
-  PerpSuggestionSheet: () => <div data-testid="mock-perp-suggestion-sheet" />,
-}))
-vi.mock('../../components/suggestion-preview', () => ({
-  SuggestionPreviewSheet: () => <div data-testid="mock-suggestion-preview-sheet" />,
-}))
-
-// Drive the mobile pro/simple layout via a hoisted, per-test-mutable mode holder
-// so we don't need the real TradingModeProvider/localStorage in these renders.
-const tradingModeHolder = vi.hoisted(() => ({ mode: 'pro' as 'pro' | 'simple' }))
-vi.mock('@/modules/shared/providers/trading-mode-provider', () => ({
-  useTradingMode: () => ({ mode: tradingModeHolder.mode, setMode: () => {} }),
-}))
 
 describe('TradingPage — desktop shell', () => {
   it('renders a viewport-locked two-column shell with right rail = OrderEntry', () => {
@@ -81,7 +58,7 @@ describe('TradingPage — desktop shell', () => {
     expect(within(rightColumn).queryByTestId('mock-account-dock')).not.toBeInTheDocument()
   })
 
-  it('left column stacks chart card (with Chart + BookTradesPanel) on top and AccountDock below', () => {
+  it('left column stacks the chart card (TopBar + Chart) on top and AccountDock below', () => {
     render(
       <MemoryRouter>
         <TradingPage />
@@ -92,7 +69,6 @@ describe('TradingPage — desktop shell', () => {
     const chartCard = within(leftColumn).getByTestId('trading-chart-card')
     expect(within(chartCard).getByTestId('mock-top-bar')).toBeInTheDocument()
     expect(within(chartCard).getByTestId('mock-chart')).toBeInTheDocument()
-    expect(within(chartCard).getByTestId('mock-book-trades-panel')).toBeInTheDocument()
 
     const positionsCard = within(leftColumn).getByTestId('trading-positions-card')
     expect(within(positionsCard).getByTestId('mock-account-dock')).toBeInTheDocument()
@@ -115,12 +91,13 @@ describe('TradingPage — mobile shell', () => {
     )
 
     const shell = screen.getByTestId('trading-shell-mobile')
+    expect(shell).toHaveAttribute('data-mode', 'simple')
     expect(within(shell).getByTestId('trading-mobile-header')).toBeInTheDocument()
     expect(within(shell).getByTestId('trading-mobile-scroll-body')).toBeInTheDocument()
     expect(within(shell).getByTestId('trading-mobile-bottom-nav-slot')).toBeInTheDocument()
   })
 
-  it('mobile scroll body stacks the chart/book/trades tab panel and the positions card', () => {
+  it('mobile scroll body stacks a compact chart, the equity card, and the positions card', () => {
     render(
       <MemoryRouter>
         <TradingPage />
@@ -128,7 +105,9 @@ describe('TradingPage — mobile shell', () => {
     )
 
     const scrollBody = screen.getByTestId('trading-mobile-scroll-body')
-    expect(within(scrollBody).getByTestId('mock-mobile-tab-panel')).toBeInTheDocument()
+    const simpleChart = within(scrollBody).getByTestId('trading-mobile-simple-chart')
+    expect(within(simpleChart).getByTestId('mock-chart')).toBeInTheDocument()
+    expect(within(scrollBody).getByTestId('mock-trade-equity-card')).toBeInTheDocument()
     expect(within(scrollBody).getByTestId('mock-account-dock')).toBeInTheDocument()
     // Order entry is no longer an inline card — it opens in a header-triggered Sheet.
     expect(within(scrollBody).queryByTestId('mock-order-entry')).not.toBeInTheDocument()
@@ -148,7 +127,7 @@ describe('TradingPage — mobile shell', () => {
     expect(screen.getByTestId('mock-order-entry')).toBeInTheDocument()
   })
 
-  it('mounts the MobileTradeDock (footer + order/AI sheets) on mobile', () => {
+  it('mounts the MobileTradeDock (footer) on mobile', () => {
     render(
       <MemoryRouter>
         <TradingPage />
@@ -156,46 +135,5 @@ describe('TradingPage — mobile shell', () => {
     )
 
     expect(screen.getByTestId('mock-mobile-trade-dock')).toBeInTheDocument()
-  })
-})
-
-describe('TradingPage — mobile simple mode', () => {
-  beforeEach(() => {
-    vi.spyOn(useIsMobileModule, 'useIsMobile').mockReturnValue(true)
-    tradingModeHolder.mode = 'simple'
-  })
-  afterEach(() => {
-    vi.restoreAllMocks()
-    tradingModeHolder.mode = 'pro'
-  })
-
-  it('swaps the chart/book/trades tab terminal for a compact chart + combined book', () => {
-    render(
-      <MemoryRouter>
-        <TradingPage />
-      </MemoryRouter>,
-    )
-
-    const shell = screen.getByTestId('trading-shell-mobile')
-    expect(shell).toHaveAttribute('data-mode', 'simple')
-
-    const scrollBody = screen.getByTestId('trading-mobile-scroll-body')
-    const simpleChart = within(scrollBody).getByTestId('trading-mobile-simple-chart')
-    expect(within(simpleChart).getByTestId('mock-chart')).toBeInTheDocument()
-    const simpleBook = within(scrollBody).getByTestId('trading-mobile-simple-book')
-    expect(within(simpleBook).getByTestId('mock-mobile-simple-book')).toBeInTheDocument()
-    expect(within(scrollBody).queryByTestId('mock-mobile-tab-panel')).not.toBeInTheDocument()
-  })
-
-  it('keeps the equity card and account dock so positions stay reachable', () => {
-    render(
-      <MemoryRouter>
-        <TradingPage />
-      </MemoryRouter>,
-    )
-
-    const scrollBody = screen.getByTestId('trading-mobile-scroll-body')
-    expect(within(scrollBody).getByTestId('mock-trade-equity-card')).toBeInTheDocument()
-    expect(within(scrollBody).getByTestId('mock-account-dock')).toBeInTheDocument()
   })
 })

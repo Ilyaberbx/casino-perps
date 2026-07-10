@@ -1,4 +1,3 @@
-import { useIsSimpleMode } from '../../../shared/providers/trading-mode-provider'
 import type { PortfolioAccountScope, PortfolioWindow } from '../../../shared/domain'
 import { PERIOD_OPTIONS, SUMMARY_ROW_LABELS } from './portfolio-summary-card.constants'
 import { visibleScopeOptions } from './portfolio-summary-card.utils'
@@ -39,7 +38,8 @@ export function usePortfolioSummaryCard(
     isLoading,
     isSegregated,
   } = props
-  const isSimple = useIsSimpleMode()
+  // Pro mode is gone (PRD-0008 D7): everything renders in its condensed form.
+  const isSimple = true
 
   const pnl = isConnected ? (snapshot?.pnl[window] ?? null) : 0
   const volume = isConnected ? (snapshot?.volume[window] ?? null) : 0

@@ -50,9 +50,20 @@ function readMarketFromUrl(searchParams: URLSearchParams): MarketSymbol | null {
   return isMarketSymbol(parsed.coin) ? parsed.coin : null
 }
 
-export function useSelectedMarketProvider(): UseSelectedMarketProviderReturn {
+export function useSelectedMarketProvider(
+  initialSymbol?: string,
+): UseSelectedMarketProviderReturn {
   const [searchParams, setSearchParams] = useSearchParams()
+
+  // Path-driven mode (PRD 0008 D15): when a route `:symbol` is supplied, the
+  // path — owned by the router — is the URL source of truth. The provider then
+  // adopts inbound path changes and stops writing the legacy `?market=` query.
+  // Absent the prop, behaviour is unchanged (query-driven).
+  const isPathDriven = initialSymbol !== undefined
+  const pathSymbol = isPathDriven && isMarketSymbol(initialSymbol) ? initialSymbol : null
+
   const [selectedMarket, setSelectedMarketState] = useState<MarketSymbol>(() => {
+    if (pathSymbol !== null) return pathSymbol
     const fromUrl = readMarketFromUrl(searchParams)
     if (fromUrl !== null) return fromUrl
     const fromStorage = readMarketFromStorage()
@@ -63,22 +74,28 @@ export function useSelectedMarketProvider(): UseSelectedMarketProviderReturn {
     writeMarketToStorage(selectedMarket)
   }, [selectedMarket])
 
-  // Adopt an externally-changed `?market=` during render — React 19 idiom (no
-  // setState-in-effect; the React Compiler bails out the in-progress render once
-  // state agrees with the URL). A deep link, browser back/forward, or the global
-  // hot-markets ticker navigating to `/trade?market=…` updates `searchParams`;
-  // we reconcile it into state here. Guarded on inequality + validity so it
-  // never loops and an invalid/absent param is ignored (storage/default win).
+  // Path-driven: adopt an inbound path-symbol change during render (deep link,
+  // search-overlay/lobby navigation to `/trade/:symbol`). Same React 19 idiom as
+  // the query path below — guarded on inequality so it converges, never loops.
+  const shouldAdoptPathSymbol = pathSymbol !== null && pathSymbol !== selectedMarket
+  if (shouldAdoptPathSymbol) {
+    setSelectedMarketState(pathSymbol)
+  }
+
+  // Query-driven: adopt an externally-changed `?market=` during render — a deep
+  // link, browser back/forward, or the hot-markets ticker navigating to
+  // `/trade?market=…`. Skipped in path-driven mode (the router owns the URL).
   const inboundUrlMarket = readMarketFromUrl(searchParams)
-  if (inboundUrlMarket !== null && inboundUrlMarket !== selectedMarket) {
+  const shouldAdoptUrlMarket =
+    !isPathDriven && inboundUrlMarket !== null && inboundUrlMarket !== selectedMarket
+  if (shouldAdoptUrlMarket) {
     setSelectedMarketState(inboundUrlMarket)
   }
 
-  // Keep the URL in sync with state when it isn't already (mount hydration when
-  // `?market=` is absent, and after a local selection). When the URL holds a
-  // different valid market the render-time adoption above has already pulled it
-  // into state, so this effect finds them equal and no-ops — no write/adopt war.
+  // Keep the `?market=` query in sync with state (query-driven mode only). When
+  // path-driven the router owns the URL, so this is a no-op.
   useEffect(() => {
+    if (isPathDriven) return
     const urlMarket = readMarketFromUrl(searchParams)
     if (urlMarket === selectedMarket) return
     setSearchParams(
@@ -89,11 +106,12 @@ export function useSelectedMarketProvider(): UseSelectedMarketProviderReturn {
       },
       { replace: true },
     )
-  }, [selectedMarket, searchParams, setSearchParams])
+  }, [selectedMarket, searchParams, setSearchParams, isPathDriven])
 
   const setSelectedMarket = useCallback(
     (market: MarketSymbol) => {
       setSelectedMarketState(market)
+      if (isPathDriven) return
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev)
@@ -103,7 +121,7 @@ export function useSelectedMarketProvider(): UseSelectedMarketProviderReturn {
         { replace: true },
       )
     },
-    [setSearchParams],
+    [setSearchParams, isPathDriven],
   )
 
   const venue = useVenueOptional()

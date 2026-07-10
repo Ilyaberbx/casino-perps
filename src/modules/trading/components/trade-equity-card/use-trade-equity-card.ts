@@ -6,7 +6,6 @@ import {
   DEFAULT_MANAGE_FUNDS_TAB,
   MANAGE_FUNDS_SINGLE_LABEL,
 } from '@/modules/shared/providers/manage-funds-provider'
-import { useIsSimpleMode } from '@/modules/shared/providers/trading-mode-provider'
 import { useIsMobile } from '@/modules/shared/hooks/use-is-mobile'
 import { toast } from '@/modules/shared/services/toast'
 import { useIsSpectating } from '@/modules/spectate'
@@ -46,7 +45,8 @@ export function useTradeEquityCard(): TradeEquityCardContent {
   const { open } = useManageFunds()
   const isMobile = useIsMobile()
   const isSpectating = useIsSpectating()
-  const isSimple = useIsSimpleMode()
+  // Pro mode is gone (PRD-0008 D7): everything renders in its condensed form.
+  const isSimple = true
   const [isExpanded, setExpanded] = useState(false)
 
   const [snapshot, setSnapshot] = useState<PortfolioSnapshot | null>(null)

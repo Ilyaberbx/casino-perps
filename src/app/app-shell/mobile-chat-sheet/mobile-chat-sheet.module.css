@@ -1,0 +1,11 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  width: min(92vw, 380px);
+  height: 100%;
+}
+
+.body > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}

@@ -2,12 +2,7 @@ import { useMemo } from 'react'
 import { Outlet } from 'react-router-dom'
 import { OnboardingFlowProvider, OnboardingStepper, useAuth, useIsWalletConnected } from '@/modules/account'
 import { AgentWalletProvider, BuilderFeeProvider, DepositProvider } from '@/modules/hyperliquid'
-import { AgentBalanceSheetProvider } from '@/modules/agent-balance'
 import { SpectateProvider } from '@/modules/spectate'
-import {
-  SuggestionInboxProvider,
-  resolveDefaultGetSuggestionInbox,
-} from '@/modules/trading'
 import { useVenue } from '@/modules/shared/providers/venue-provider'
 import { VenueOnboardingSheetProvider } from '@/modules/shared/providers/venue-onboarding-sheet-provider'
 import { DepositSheetProvider } from '@/modules/shared/providers/deposit-sheet-provider'
@@ -28,14 +23,8 @@ export function AccountSessionRoot() {
   const isWalletConnected = useIsWalletConnected()
   const venue = useVenue()
   const seenStore = useMemo(() => createVenueOnboardingSeenStore({ logger }), [])
-  // The inbox reader is the actor's apiClient-bound `/inbox` poll feed (ADR-0073).
-  const getInbox = useMemo(
-    () => resolveDefaultGetSuggestionInbox(apiClient),
-    [apiClient],
-  )
   return (
     <VenueOnboardingSheetProvider>
-      <AgentBalanceSheetProvider>
       <DepositSheetProvider>
       <TransferSheetProvider>
       <ManageFundsProvider>
@@ -65,9 +54,7 @@ export function AccountSessionRoot() {
                   <VenueHip3AbstractionSession>
                     <SpectateProvider isWalletConnected={isWalletConnected}>
                       <SpectateBridge />
-                      <SuggestionInboxProvider enabled={authenticated} getInbox={getInbox}>
-                        <Outlet />
-                      </SuggestionInboxProvider>
+                      <Outlet />
                     </SpectateProvider>
                   </VenueHip3AbstractionSession>
                 </VenueOnboardingSession>
@@ -80,7 +67,6 @@ export function AccountSessionRoot() {
       </ManageFundsProvider>
       </TransferSheetProvider>
       </DepositSheetProvider>
-      </AgentBalanceSheetProvider>
     </VenueOnboardingSheetProvider>
   )
 }

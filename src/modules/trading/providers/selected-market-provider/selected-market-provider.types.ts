@@ -25,4 +25,12 @@ export interface UseSelectedMarketProviderReturn {
 
 export interface SelectedMarketProviderProps {
   children: ReactNode
+  /**
+   * Seed the selected market from the route path (`/trade/:symbol`, PRD 0008
+   * D15). When provided, the path becomes the URL source of truth: the provider
+   * adopts inbound path changes and STOPS managing the legacy `?market=` query.
+   * When omitted (undefined), the provider keeps its original query-driven
+   * behaviour unchanged — deep links, storage, and the default all still apply.
+   */
+  initialSymbol?: string
 }

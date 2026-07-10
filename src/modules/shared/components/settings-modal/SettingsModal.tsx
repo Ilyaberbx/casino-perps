@@ -25,8 +25,6 @@ export function SettingsModal() {
     colors,
     selectedColorId,
     onSelectColor,
-    tradingMode,
-    onSelectTradingMode,
   } = useSettingsModal()
 
   return (
@@ -51,8 +49,6 @@ export function SettingsModal() {
             colors={colors}
             selectedColorId={selectedColorId}
             onSelectColor={onSelectColor}
-            tradingMode={tradingMode}
-            onSelectTradingMode={onSelectTradingMode}
           />
         </section>
       </div>

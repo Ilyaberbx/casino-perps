@@ -9,7 +9,6 @@ import type { OnboardingState } from '../../../hooks/onboarding-flow.types'
 import { createApiClient } from '@/modules/shared/http'
 import { FakeAppConfigProvider } from '@/modules/shared/providers/app-config-provider/__fixtures__/fake-app-config-provider'
 import { ThemeProvider } from '@/modules/shared/providers/theme-provider'
-import { TradingModeProvider } from '@/modules/shared/providers/trading-mode-provider'
 import { OnboardingStepper } from '../OnboardingStepper'
 
 const sendCode = vi.fn().mockResolvedValue(undefined)
@@ -75,9 +74,7 @@ function wrap(auth: AuthState, flow: OnboardingState = { kind: 'idle' }) {
     <AuthContext.Provider value={auth}>
       <FakeAppConfigProvider>
         <ThemeProvider>
-          <TradingModeProvider>
-            <OnboardingFlowContext.Provider value={flow}>{children}</OnboardingFlowContext.Provider>
-          </TradingModeProvider>
+          <OnboardingFlowContext.Provider value={flow}>{children}</OnboardingFlowContext.Provider>
         </ThemeProvider>
       </FakeAppConfigProvider>
     </AuthContext.Provider>
@@ -141,7 +138,9 @@ describe('<OnboardingStepper />', () => {
     expect(screen.getByRole('button', { name: /skip/i })).toBeInTheDocument()
   })
 
-  it('renders the Personalize step (5) with theme + layout pickers and Done', async () => {
+  // The mobile trading-layout picker was removed with pro mode (PRD-0008 D7);
+  // the Personalize step now offers only the theme picker.
+  it('renders the Personalize step (5) with the theme picker and Done', async () => {
     const user = userEvent.setup()
     const finishPersonalize = vi.fn()
     const flow: OnboardingState = { kind: 'needs-personalize', finishPersonalize }
@@ -150,7 +149,6 @@ describe('<OnboardingStepper />', () => {
     })
     expect(screen.getByText(/step 5 of 5/i)).toBeInTheDocument()
     expect(screen.getByRole('group', { name: /^theme$/i })).toBeInTheDocument()
-    expect(screen.getByRole('group', { name: /mobile trading layout/i })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /done/i }))
     expect(finishPersonalize).toHaveBeenCalledTimes(1)
   })

@@ -5,9 +5,6 @@ import type { Venue } from '@/modules/shared/domain'
 import { AuthContext, type AuthState } from '@/modules/account'
 import { createApiClient } from '@/modules/shared/http'
 import { SpectateProvider } from '@/modules/spectate'
-import { TradingModeProvider } from '../../../providers/trading-mode-provider'
-import type { TradingMode } from '../../../providers/trading-mode-provider'
-import { TRADING_MODE_STORAGE_KEY } from '../../../providers/trading-mode-provider/trading-mode.constants'
 import { VenueProvider } from '../../../providers/venue-provider'
 import { ManageFundsProvider } from '../../../providers/manage-funds-provider'
 import {
@@ -69,23 +66,17 @@ const CONNECTED_AUTH: AuthState = {
 }
 
 interface WrapPillsOptions {
-  readonly mode?: TradingMode
   readonly connected?: boolean
 }
 
 export function wrapWithPillsVenue(venue: Venue, options: WrapPillsOptions = {}) {
-  const mode = options.mode ?? 'pro'
   const connected = options.connected ?? false
-  // The provider hydrates from localStorage; set the mode there before render.
-  localStorage.setItem(TRADING_MODE_STORAGE_KEY, mode)
 
   return function Wrapper({ children }: { children: ReactNode }) {
     const tree = (
-      <TradingModeProvider>
-        <VenueProvider venue={venue}>
-          <ManageFundsProvider>{children}</ManageFundsProvider>
-        </VenueProvider>
-      </TradingModeProvider>
+      <VenueProvider venue={venue}>
+        <ManageFundsProvider>{children}</ManageFundsProvider>
+      </VenueProvider>
     )
     if (!connected) return tree
     return <AuthContext.Provider value={CONNECTED_AUTH}>{tree}</AuthContext.Provider>
@@ -96,21 +87,16 @@ export function wrapWithPillsVenue(venue: Venue, options: WrapPillsOptions = {})
 // (inside a `MemoryRouter`, since spectate state is URL-driven) so a test can
 // toggle `isSpectating` via `useSpectate().startSpectating()` / `stopSpectating()`.
 // Always connected — spectating requires a connected wallet.
-export function wrapWithPillsVenueAndSpectate(venue: Venue, options: WrapPillsOptions = {}) {
-  const mode = options.mode ?? 'pro'
-  localStorage.setItem(TRADING_MODE_STORAGE_KEY, mode)
-
+export function wrapWithPillsVenueAndSpectate(venue: Venue) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <MemoryRouter>
         <AuthContext.Provider value={CONNECTED_AUTH}>
-          <TradingModeProvider>
-            <VenueProvider venue={venue}>
-              <ManageFundsProvider>
-                <SpectateProvider>{children}</SpectateProvider>
-              </ManageFundsProvider>
-            </VenueProvider>
-          </TradingModeProvider>
+          <VenueProvider venue={venue}>
+            <ManageFundsProvider>
+              <SpectateProvider>{children}</SpectateProvider>
+            </ManageFundsProvider>
+          </VenueProvider>
         </AuthContext.Provider>
       </MemoryRouter>
     )

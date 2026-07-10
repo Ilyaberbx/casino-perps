@@ -63,23 +63,6 @@ export interface WalletRowView {
   readonly connectorIconUrl: string | null
 }
 
-/** The read-only, uncounted Agent Wallet row (G-6). */
-export interface AgentWalletRowView {
-  /** `null` until the agent-wallet address resolves. */
-  readonly truncatedAddress: string | null
-  /** Live Agent Balance (USDC), pre-formatted (`$0.00` when empty/disconnected). */
-  readonly balanceDisplay: string
-  /**
-   * Whether the Agent Wallet is owner-exportable right now (ADR-0076 D-5): `true`
-   * iff its address is in `exportableAddresses` — i.e. the Agent Wallet has been
-   * migrated to user-owned and is a Privy-managed wallet. Stays `false` (export
-   * affordance disabled) while it is still app-owned.
-   */
-  readonly isExportable: boolean
-  /** MFA-gated owner-only export of the Agent Wallet's private key. */
-  onExport(): void
-}
-
 export interface WalletsSectionView {
   /** `false` until the onboarding flow resolves `Me` — the section renders nothing. */
   readonly isReady: boolean
@@ -97,7 +80,6 @@ export interface WalletsSectionView {
   readonly importHint: string
   /** `true` while a link→import round-trip is in flight (button shows pending). */
   readonly isImporting: boolean
-  readonly agent: AgentWalletRowView
   onSelect(address: string): void
   /** Opens Privy `linkWallet` → `POST /api/account/wallets/import` (UI-5). */
   onImport(): void
@@ -135,10 +117,6 @@ export interface WalletRowProps {
   readonly row: WalletRowView
   onSelect(address: string): void
   onRemove(address: string): void
-}
-
-export interface AgentWalletRowProps {
-  readonly agent: AgentWalletRowView
 }
 
 /**

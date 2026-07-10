@@ -10,7 +10,6 @@ import {
   type AuthState,
 } from '../../../providers/auth-provider/auth-provider.context'
 import { OnboardingFlowContext } from '../../../providers/onboarding-flow-provider'
-import { AgentBalanceSheetProvider } from '@/modules/agent-balance'
 import type { OnboardingState } from '../../../hooks/onboarding-flow.types'
 import type { Me } from '../../../domain/types'
 import { useWalletsSection } from '../use-wallets-section'
@@ -110,9 +109,7 @@ function meWithExternals(count: number): Me {
 function wrap(flow: OnboardingState, auth: AuthState = authState) {
   return ({ children }: { children: ReactNode }) => (
     <AuthContext.Provider value={auth}>
-      <OnboardingFlowContext.Provider value={flow}>
-        <AgentBalanceSheetProvider>{children}</AgentBalanceSheetProvider>
-      </OnboardingFlowContext.Provider>
+      <OnboardingFlowContext.Provider value={flow}>{children}</OnboardingFlowContext.Provider>
     </AuthContext.Provider>
   )
 }
@@ -128,9 +125,7 @@ function wrapLive(initialMe: Me, auth: AuthState = authState) {
     const flow: OnboardingState = { kind: 'ready', me, applyMe: setMe, refreshMe: () => okAsync(me) }
     return (
       <AuthContext.Provider value={auth}>
-        <OnboardingFlowContext.Provider value={flow}>
-          <AgentBalanceSheetProvider>{children}</AgentBalanceSheetProvider>
-        </OnboardingFlowContext.Provider>
+        <OnboardingFlowContext.Provider value={flow}>{children}</OnboardingFlowContext.Provider>
       </AuthContext.Provider>
     )
   }
@@ -222,12 +217,6 @@ describe('useWalletsSection', () => {
     expect(native?.isSelected).toBe(true)
     const imported = result.current.rows.find((r) => r.address === IMPORTED)
     expect(imported?.isSelected).toBe(false)
-  })
-
-  it('exposes the live Agent Balance display from the reused agent-balance hook', () => {
-    const { result } = renderHook(() => useWalletsSection(), { wrapper: wrap(readyFlow) })
-    // The agent balance display comes from the reused agent-balance hook.
-    expect(typeof result.current.agent.balanceDisplay).toBe('string')
   })
 })
 
@@ -333,29 +322,6 @@ describe('useWalletsSection remove flow', () => {
     expect(toastShow).toHaveBeenCalledWith(
       expect.objectContaining({ variant: 'success' }),
     )
-  })
-})
-
-describe('useWalletsSection agent export gate (ADR-0078)', () => {
-  it('hides the Agent export when the Agent Wallet is not in the live session', async () => {
-    const { result } = renderHook(() => useWalletsSection(), { wrapper: wrap(readyFlow) })
-    // The agent address resolves from the server read, but it is not in the
-    // session's exportable set, so the export affordance stays hidden.
-    await waitFor(() =>
-      expect(result.current.agent.truncatedAddress).not.toBeNull(),
-    )
-    expect(result.current.agent.isExportable).toBe(false)
-  })
-
-  it('lights up the Agent export when the Agent Wallet is in the exportable session set', async () => {
-    const auth: AuthState = {
-      ...authState,
-      exportableAddresses: [AGENT.toLowerCase()],
-    }
-    const { result } = renderHook(() => useWalletsSection(), {
-      wrapper: wrap(readyFlow, auth),
-    })
-    await waitFor(() => expect(result.current.agent.isExportable).toBe(true))
   })
 })
 

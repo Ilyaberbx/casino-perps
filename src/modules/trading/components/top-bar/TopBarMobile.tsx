@@ -1,7 +1,6 @@
 import { FavoriteStar } from './FavoriteStar'
 import { MarketDropdownButton } from './MarketDropdownButton'
 import { MarketSelectionWindow } from '../market-selection-window'
-import { MobileTickerStrip } from './MobileTickerStrip'
 import { AssetIcon } from '@/modules/shared/components/asset-icon'
 import type { TopBarViewProps } from './top-bar.types'
 import styles from './top-bar.module.css'
@@ -15,8 +14,6 @@ export function TopBarMobile({
   openWindow,
   closeWindow,
   handleSelectMarket,
-  stats,
-  markFlash,
   isFavorite,
   toggleFavorite,
   mobileAction,
@@ -44,7 +41,6 @@ export function TopBarMobile({
         />
         {mobileAction ? <div className={styles.mobileIdentityAction}>{mobileAction}</div> : null}
       </div>
-      <MobileTickerStrip stats={stats} markFlash={markFlash} />
     </div>
   )
 }

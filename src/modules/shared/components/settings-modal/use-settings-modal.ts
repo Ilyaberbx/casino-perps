@@ -2,7 +2,6 @@ import { useCallback } from 'react'
 import { useSettings, SETTINGS_SECTIONS } from '../../providers/settings-provider'
 import { useThemeContext } from '../../providers/theme-provider'
 import type { ThemeVariant } from '../../providers/theme-provider'
-import { useTradingMode } from '../../providers/trading-mode-provider'
 import { useIsMobile } from '../../hooks/use-is-mobile'
 import { SETTINGS_SECTION_ICONS } from './settings-modal.constants'
 import type { SettingsModalContent, SettingsNavSection } from './settings-modal.types'
@@ -10,15 +9,13 @@ import type { SettingsModalContent, SettingsNavSection } from './settings-modal.
 /**
  * Smart hook for `<SettingsModal>`. Reads the open/active-section controller
  * (`useSettings`), the theme state (`useThemeContext`, which owns the theme +
- * accent color), and the global Trading Mode (`useTradingMode`), and projects the
- * nav rail + each section's data. The Appearance section owns the Theme switch +
- * Accent Color picker; the Trading section owns the Pro/Simple toggle. Dumb
- * components below consume only prop slices.
+ * accent color), and projects the nav rail + each section's data. The Appearance
+ * section owns the Theme switch + Accent Color picker. Dumb components below
+ * consume only prop slices.
  */
 export function useSettingsModal(): SettingsModalContent {
   const { isOpen, activeSection, close, setActiveSection } = useSettings()
   const { theme, toggleTheme, accentColorId, accentColors, setAccentColor } = useThemeContext()
-  const { mode: tradingMode, setMode: setTradingMode } = useTradingMode()
   const isMobile = useIsMobile()
 
   // Theme has exactly two variants, so selecting the other one is a toggle.
@@ -47,7 +44,5 @@ export function useSettingsModal(): SettingsModalContent {
     colors: accentColors,
     selectedColorId: accentColorId,
     onSelectColor: setAccentColor,
-    tradingMode,
-    onSelectTradingMode: setTradingMode,
   }
 }

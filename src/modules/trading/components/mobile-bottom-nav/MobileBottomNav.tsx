@@ -1,33 +1,29 @@
 import { NavLink } from 'react-router-dom'
-import { AiMascot } from '@/modules/shared/components/ai-marker'
 import { useMobileBottomNav } from './use-mobile-bottom-nav'
 import type { MobileBottomNavProps, NavIcon } from './mobile-bottom-nav.types'
 import styles from './mobile-bottom-nav.module.css'
 
-const ICON_PX = 18
+const ICON_PX = 20
 
-/** The cell glyph: the brand AI mascot for Ask AI, a Lucide line icon otherwise.
- * Both paint in `currentColor`, so they track the cell's muted/active color. */
+/** The cell glyph: a Lucide line icon in `currentColor`, tracking the cell's
+ * muted/active color. */
 function NavCellIcon({ icon }: { icon: NavIcon }) {
-  if (icon.kind === 'ai') {
-    return <AiMascot size={ICON_PX} className={styles.icon} />
-  }
   const Icon = icon.Icon
   return <Icon size={ICON_PX} strokeWidth={2} className={styles.icon} aria-hidden="true" />
 }
 
 /**
- * The mobile footer: two route cells (Trade, Portfolio) plus three action cells
- * (Ask AI, Account, Settings). Ask AI opens the suggestion sheet; Account opens
- * the account modal (or the connect-wallet flow when disconnected); Settings
- * opens the Settings modal. Action handlers are injected by the page so the nav
- * stays dumb and testable in isolation.
+ * The casino mobile bottom tab bar (PRD 0008 §6, D8): exactly four tabs —
+ * Browse, Markets, My Bets, Chat. Browse and My Bets navigate; Markets and Chat
+ * open the search overlay and chat sheet via injected handlers. Fixed to the
+ * viewport bottom and shown only under 900px (the shell owns it). Dumb — state
+ * comes from {@link useMobileBottomNav}.
  */
-export function MobileBottomNav({ onAskAi, onAccount, onSettings }: MobileBottomNavProps) {
-  const { cells } = useMobileBottomNav({ onAskAi, onAccount, onSettings })
+export function MobileBottomNav({ onOpenSearch, onOpenChat }: MobileBottomNavProps) {
+  const { cells } = useMobileBottomNav({ onOpenSearch, onOpenChat })
 
   return (
-    <nav className={styles.nav} aria-label="Primary">
+    <nav className={styles.nav} aria-label="Primary" data-testid="mobile-bottom-nav">
       {cells.map((cell) => {
         const iconSlot = (
           <span className={styles.iconSlot} aria-hidden="true">

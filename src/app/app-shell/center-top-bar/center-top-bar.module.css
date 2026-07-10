@@ -1,0 +1,102 @@
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 60px;
+  padding: 0 20px;
+  background-color: var(--bg-base);
+  border-bottom: 1px solid var(--border);
+}
+
+.search {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  min-width: 220px;
+  max-width: 420px;
+  flex: 1 1 320px;
+  padding: 0 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out-quart),
+    color var(--dur-fast) var(--ease-out-quart);
+}
+
+.search:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.searchLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.logIn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.logIn:hover {
+  border-color: var(--border-strong);
+  background-color: var(--bg-elevated);
+}
+
+/* Create Account — the magenta commit button (PRD §5.1: magenta = commitment). */
+.createAccount {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background-color: var(--accent-action);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(206, 55, 220, 0.35);
+  transition:
+    filter var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-fast) var(--ease-out-quart);
+}
+
+.createAccount:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 0 26px rgba(206, 55, 220, 0.5);
+}
+
+@media (max-width: 899.98px) {
+  .bar {
+    display: none;
+  }
+}

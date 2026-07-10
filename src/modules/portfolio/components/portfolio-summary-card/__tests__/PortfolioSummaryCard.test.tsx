@@ -4,9 +4,11 @@ import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { PortfolioSummaryCard } from '../PortfolioSummaryCard'
 import type { PortfolioSnapshot } from '../../../../shared/domain'
-import { TradingModeProvider } from '../../../../shared/providers/trading-mode-provider'
-import type { TradingMode } from '../../../../shared/providers/trading-mode-provider'
-import { TRADING_MODE_STORAGE_KEY } from '../../../../shared/providers/trading-mode-provider/trading-mode.constants'
+
+// Pro mode is gone (PRD-0008 D7): the card always renders its condensed
+// (`simple`) form. The `_mode` params are kept ignored so existing call sites
+// still compile without a signature churn.
+type LegacyTradingMode = 'pro' | 'simple'
 
 const baseSnapshot: PortfolioSnapshot = {
   accountValue: 10_000,
@@ -21,18 +23,13 @@ const baseSnapshot: PortfolioSnapshot = {
   timestamp: 1,
 }
 
-// The provider hydrates from localStorage; set the mode there before render
-// (`defaultMode` is only the storage-unreadable fallback).
-function wrapMode(mode: TradingMode) {
-  localStorage.setItem(TRADING_MODE_STORAGE_KEY, mode)
-  return ({ children }: { children: ReactNode }) => (
-    <TradingModeProvider>{children}</TradingModeProvider>
-  )
+function wrapMode(_mode?: LegacyTradingMode) {
+  return ({ children }: { children: ReactNode }) => <>{children}</>
 }
 
 function renderCard(
   overrides: Partial<Parameters<typeof PortfolioSummaryCard>[0]> = {},
-  mode: TradingMode = 'pro',
+  mode?: LegacyTradingMode,
 ) {
   const props = {
     snapshot: baseSnapshot,
@@ -51,37 +48,9 @@ function renderCard(
 describe('PortfolioSummaryCard', () => {
   beforeEach(() => localStorage.clear())
 
-  it('renders Accounts and Period switcher groups (Pro segmented)', () => {
-    renderCard()
-    expect(screen.getByRole('group', { name: /accounts scope/i })).toBeInTheDocument()
-    expect(screen.getByRole('group', { name: /period selector/i })).toBeInTheDocument()
-  })
-
-  it('marks the active scope button as pressed', () => {
-    renderCard({ scope: 'all' })
-    const allBtn = screen.getByRole('button', { name: /^all$/i })
-    expect(allBtn).toHaveAttribute('aria-pressed', 'true')
-  })
-
-  it('marks the active window button as pressed', () => {
-    renderCard({ window: '7D' })
-    const sevenDayBtn = screen.getByRole('button', { name: /7 days/i })
-    expect(sevenDayBtn).toHaveAttribute('aria-pressed', 'true')
-  })
-
-  it('calls onScopeChange when a scope button is clicked', async () => {
-    const onScopeChange = vi.fn()
-    renderCard({ onScopeChange })
-    await userEvent.click(screen.getByRole('button', { name: /only perps/i }))
-    expect(onScopeChange).toHaveBeenCalledWith('perps')
-  })
-
-  it('calls onWindowChange when a period button is clicked', async () => {
-    const onWindowChange = vi.fn()
-    renderCard({ onWindowChange })
-    await userEvent.click(screen.getByRole('button', { name: /30 days/i }))
-    expect(onWindowChange).toHaveBeenCalledWith('30D')
-  })
+  // Pro mode is gone (PRD-0008 D7): the scope/period controls are always the
+  // condensed dropdowns, covered by the "Simple mode" block below (the Pro
+  // segmented-button variant was removed).
 
   it('shows PNL and Volume from snapshot when connected', () => {
     renderCard({ isConnected: true })
@@ -141,22 +110,6 @@ describe('PortfolioSummaryCard', () => {
     renderCard({ snapshot: null, isConnected: true, isLoading: true })
     expect(screen.getAllByRole('status').length).toBeGreaterThan(0)
     expect(screen.queryByText('+$200.00')).not.toBeInTheDocument()
-  })
-
-  it('renders All-Time period option', () => {
-    renderCard()
-    expect(screen.getByRole('button', { name: /all-time/i })).toBeInTheDocument()
-  })
-
-  it('renders the Only Perps scope option when segregated', () => {
-    renderCard({ isSegregated: true })
-    expect(screen.getByRole('button', { name: /only perps/i })).toBeInTheDocument()
-  })
-
-  it('hides the Only Perps scope option when not segregated (unified)', () => {
-    renderCard({ isSegregated: false })
-    expect(screen.queryByRole('button', { name: /only perps/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^all$/i })).toBeInTheDocument()
   })
 
   describe('Simple mode (#276)', () => {

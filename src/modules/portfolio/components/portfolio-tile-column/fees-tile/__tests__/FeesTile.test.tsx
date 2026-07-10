@@ -5,10 +5,12 @@ import type { ReactNode } from 'react'
 import { okAsync } from 'neverthrow'
 import { VenueContext } from '@/modules/shared/providers/venue-provider/venue-provider.context'
 import { AuthContext, type AuthState } from '@/modules/account'
-import { TradingModeProvider } from '@/modules/shared/providers/trading-mode-provider'
-import type { TradingMode } from '@/modules/shared/providers/trading-mode-provider'
-import { TRADING_MODE_STORAGE_KEY } from '@/modules/shared/providers/trading-mode-provider/trading-mode.constants'
 import { createApiClient } from '@/modules/shared/http'
+
+// Pro mode is gone (PRD-0008 D7): the fees tile always renders its condensed
+// (`simple`) form. The `_mode` param is kept ignored so existing call sites
+// still compile.
+type LegacyTradingMode = 'pro' | 'simple'
 import { FeesTile } from '../FeesTile'
 import {
   buildVenueWithFeeSchedule,
@@ -51,16 +53,11 @@ const baseAuthState: AuthState = {
   removeAgentSigner: async () => true,
 }
 
-// `defaultMode` is only a fallback when storage is unreadable; the provider
-// hydrates from localStorage, so the mode is set there before render.
-function makeWrapper(venue: Venue, mode: TradingMode = 'pro', auth: Partial<AuthState> = {}) {
-  localStorage.setItem(TRADING_MODE_STORAGE_KEY, mode)
+function makeWrapper(venue: Venue, _mode?: LegacyTradingMode, auth: Partial<AuthState> = {}) {
   const authValue = { ...baseAuthState, ...auth }
   return ({ children }: { children: ReactNode }) => (
     <AuthContext.Provider value={authValue}>
-      <TradingModeProvider>
-        <VenueContext.Provider value={venue}>{children}</VenueContext.Provider>
-      </TradingModeProvider>
+      <VenueContext.Provider value={venue}>{children}</VenueContext.Provider>
     </AuthContext.Provider>
   )
 }
@@ -79,11 +76,9 @@ describe('FeesTile', () => {
     expect(screen.getByText(/0\.025% \/ 0\.005%/i)).toBeInTheDocument()
   })
 
-  it('renders Spot row with trimmed taker and maker percentage in happy path', () => {
-    render(<FeesTile />, { wrapper: makeWrapper(buildVenueWithFeeSchedule(PERPS_SPOT_FEE_SCHEDULE)) })
-    expect(screen.getByText(/spot/i)).toBeInTheDocument()
-    expect(screen.getByText(/0\.03% \/ 0\.01%/i)).toBeInTheDocument()
-  })
+  // Pro mode is gone (PRD-0008 D7): the tile always renders its condensed form
+  // (a Perps/Spot selector + a single line), so the standalone Pro Spot row is
+  // covered by the selector-switch test below instead.
 
   it('renders View Fee Schedule link affordance', () => {
     render(<FeesTile />, { wrapper: makeWrapper(buildVenueWithFeeSchedule(PERPS_SPOT_FEE_SCHEDULE)) })

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useVenue } from '@/modules/shared/providers/venue-provider'
-import { useIsSimpleMode } from '@/modules/shared/providers/trading-mode-provider'
 import type { FeeSchedule } from '@/modules/shared/domain'
 import { DEFAULT_FEES_MARKET } from './fees-tile.constants'
 import { formatFeePercent } from './fees-tile.utils'
@@ -14,7 +13,8 @@ function isFeesMarket(value: string): value is FeesMarket {
 export function useFeesTile(): UseFeesTileReturn {
   const venue = useVenue()
   const feeScheduleCap = venue.capabilities.feeSchedule
-  const isSimple = useIsSimpleMode()
+  // Pro mode is gone (PRD-0008 D7): everything renders in its condensed form.
+  const isSimple = true
 
   const [schedule, setSchedule] = useState<FeeSchedule | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)

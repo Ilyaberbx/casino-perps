@@ -1,21 +1,22 @@
-import { ChartCandlestick, Wallet } from 'lucide-react'
+import { Compass, Ticket } from 'lucide-react'
 import type { NavLinkSpec } from './mobile-bottom-nav.types'
 
-/** The two real routes the footer exposes; action cells (Ask AI, Place Order) are
- * appended in the hook since they carry runtime handlers, not static routes. */
-export const LINK_CELLS: readonly NavLinkSpec[] = [
-  {
-    key: 'trade',
-    label: 'Trade',
-    to: '/trade',
-    matchPrefix: '/trade',
-    icon: { kind: 'lucide', Icon: ChartCandlestick },
-  },
-  {
-    key: 'portfolio',
-    label: 'Portfolio',
-    to: '/portfolio',
-    matchPrefix: '/portfolio',
-    icon: { kind: 'lucide', Icon: Wallet },
-  },
-] as const
+/** The two route cells (Browse → lobby, My Bets). The Markets and Chat cells are
+ * actions (they open overlays), appended in the hook since they carry runtime
+ * handlers, not routes. Order in the bar: Browse, Markets, My Bets, Chat
+ * (PRD 0008 §6). */
+export const BROWSE_CELL: NavLinkSpec = {
+  key: 'browse',
+  label: 'Browse',
+  to: '/',
+  match: 'exact',
+  icon: { kind: 'lucide', Icon: Compass },
+}
+
+export const MY_BETS_CELL: NavLinkSpec = {
+  key: 'my-bets',
+  label: 'My Bets',
+  to: '/my-bets',
+  match: 'prefix',
+  icon: { kind: 'lucide', Icon: Ticket },
+}

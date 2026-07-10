@@ -10,10 +10,10 @@ export const MANAGE_FUNDS_TABS: ReadonlyArray<{
   readonly id: ManageFundsTab
   readonly label: string
 }> = [
-  { id: 'deposit', label: 'Deposit' },
+  { id: 'deposit', label: 'Add Cash' },
   { id: 'transfer', label: 'Perps⇄Spot' },
   { id: 'send', label: 'Send' },
-  { id: 'withdraw', label: 'Withdraw' },
+  { id: 'withdraw', label: 'Cash Out to Wallet' },
   { id: 'evm-core', label: 'EVM⇄Core' },
 ] as const
 

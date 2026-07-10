@@ -1,0 +1,143 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-body, 'IBM Plex Sans'), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted, #8a8695);
+}
+
+.empty {
+  margin: 0;
+  padding: 20px 18px;
+  border-radius: 10px;
+  background: var(--bg-surface, #292630);
+  font-family: var(--font-body, 'IBM Plex Sans'), system-ui, sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-muted, #8a8695);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--bg-surface, #292630);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.win {
+  color: var(--win, #24ff96);
+}
+
+.loss {
+  color: var(--loss, #ff4d6a);
+}
+
+.dot.win {
+  background: var(--win, #24ff96);
+}
+
+.dot.loss {
+  background: var(--loss, #ff4d6a);
+}
+
+.ticker {
+  font-family: var(--font-display, 'Archivo'), system-ui, sans-serif;
+  font-style: italic;
+  font-stretch: 115%;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--text-primary, #f8f8f8);
+}
+
+.meta {
+  font-family: var(--font-body, 'IBM Plex Sans'), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted, #8a8695);
+}
+
+.profit {
+  margin-left: auto;
+  font-family: var(--font-body, 'IBM Plex Sans'), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.liquidation {
+  margin: 0;
+  font-family: var(--font-body, 'IBM Plex Sans'), system-ui, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--text-muted, #8a8695);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cashOut {
+  padding: 8px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--accent-primary, #248894);
+  background: transparent;
+  color: var(--accent-primary-bright, #50d7e9);
+  font-family: var(--font-body, 'IBM Plex Sans'), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 150ms ease-out, filter 150ms ease-out;
+}
+
+.cashOut:hover:not(:disabled),
+.cashOut:focus-visible:not(:disabled) {
+  background: var(--bg-elevated, #272733);
+  outline: none;
+}
+
+.cashOut:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cashOut {
+    transition: none;
+  }
+}

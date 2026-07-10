@@ -35,7 +35,7 @@ export const CODE_COPY: Record<KnownServerErrorCode, ErrorCopy> = {
 export const KIND_COPY: Record<HttpErrorKind, ErrorCopy> = {
   'session-expired': {
     title: 'Session expired',
-    description: 'Please sign in again to continue.',
+    description: 'Please log in again to continue.',
   },
   network: {
     title: 'Connection problem',

@@ -1,0 +1,49 @@
+.banner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 200px;
+  padding: 32px 36px;
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    radial-gradient(130% 150% at 100% 0%, rgba(80, 215, 233, 0.32), transparent 58%),
+    linear-gradient(120deg, var(--accent-primary) 0%, #1c6f79 100%);
+  color: var(--text-primary);
+}
+
+.headline {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-style: italic;
+  font-stretch: 115%;
+  font-size: clamp(30px, 4.4vw, 52px);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+/* The single magenta-highlighted phrase (task: one phrase per hero). */
+.accent {
+  color: var(--accent-action);
+}
+
+.subline {
+  margin: 0;
+  max-width: 42ch;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(248, 248, 248, 0.86);
+}
+
+@media (max-width: 599.98px) {
+  .banner {
+    min-height: 160px;
+    padding: 24px 22px;
+  }
+}

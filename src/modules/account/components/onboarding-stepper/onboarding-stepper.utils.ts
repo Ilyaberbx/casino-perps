@@ -36,7 +36,7 @@ export function submitErrorToast(error: HttpError): { title: string; description
     description: 'Something went wrong. Please try again.',
   }
   if (error.kind === 'session-expired') {
-    return { title: 'Session expired', description: 'Please sign in again to continue.' }
+    return { title: 'Session expired', description: 'Please log in again to continue.' }
   }
   if (error.kind === 'network') {
     return {

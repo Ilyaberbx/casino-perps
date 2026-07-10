@@ -1,10 +1,6 @@
 import { MarketSelectionWindow } from '@/modules/trading'
 import { useSearchOverlay } from './use-search-overlay'
-
-export interface SearchOverlayProps {
-  isOpen: boolean
-  onClose: () => void
-}
+import type { SearchOverlayProps } from './search-overlay.types'
 
 /**
  * The market-search overlay (PRD 0008 D15). The former primary-nav

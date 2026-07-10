@@ -17,10 +17,10 @@ function renderBody(overrides: Partial<WithdrawFlowState> = {}): void {
 describe('WithdrawFlow body — per phase', () => {
   it('renders the form with the title, available line, and fee/min summary', () => {
     renderBody({ phase: 'form', withdrawable: 80 })
-    expect(screen.getByText('Withdraw to Arbitrum')).toBeInTheDocument()
-    expect(screen.getByText(/Available to withdraw/i)).toBeInTheDocument()
+    expect(screen.getByText('Cash Out to Wallet')).toBeInTheDocument()
+    expect(screen.getByText(/Available to cash out/i)).toBeInTheDocument()
     expect(screen.getByText('80 USDC')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Review withdrawal/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Review cash-out/i })).toBeInTheDocument()
   })
 
   it('shows the "your wallet" hint when the destination is unedited', () => {
@@ -30,26 +30,26 @@ describe('WithdrawFlow body — per phase', () => {
 
   it('renders the irreversible warning + confirm checkbox once the destination is edited', () => {
     renderBody({ phase: 'form', isDestinationEdited: true, destination: OTHER })
-    expect(screen.getByText(/Withdrawals are irreversible/i)).toBeInTheDocument()
+    expect(screen.getByText(/Cash-outs are irreversible/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/I understand this withdrawal is irreversible/i),
+      screen.getByText(/I understand this cash-out is irreversible/i),
     ).toBeInTheDocument()
   })
 
   it('disables the review CTA until canReview is true', () => {
     renderBody({ phase: 'form', canReview: false })
-    expect(screen.getByRole('button', { name: /Review withdrawal/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /Review cash-out/i })).toBeDisabled()
   })
 
   it('enables the review CTA when canReview is true', () => {
     renderBody({ phase: 'form', canReview: true })
-    expect(screen.getByRole('button', { name: /Review withdrawal/i })).toBeEnabled()
+    expect(screen.getByRole('button', { name: /Review cash-out/i })).toBeEnabled()
   })
 
   it('renders the review step with Back + Sign and a copyable destination', () => {
     renderBody({ phase: 'review', amount: '40', destination: OTHER })
     expect(screen.getByRole('button', { name: /Back/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Sign withdrawal/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirm cash-out/i })).toBeInTheDocument()
     expect(screen.getByLabelText('Copy address')).toBeInTheDocument()
   })
 
@@ -61,7 +61,7 @@ describe('WithdrawFlow body — per phase', () => {
 
   it('renders the arrival track with a Done button on sent', () => {
     renderBody({ phase: 'sent' })
-    expect(screen.getByText(/Withdrawal signed/i)).toBeInTheDocument()
+    expect(screen.getByText(/Cash-out sent/i)).toBeInTheDocument()
     expect(screen.getByText(/Arriving on Arbitrum/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Done/i })).toBeInTheDocument()
   })
@@ -78,7 +78,7 @@ describe('WithdrawFlow body — wiring', () => {
     const user = userEvent.setup()
     const value = buildWithdrawFlowContext({ phase: 'form', canReview: true })
     render(createElement(WithdrawFlowContext.Provider, { value }, createElement(WithdrawFlow)))
-    await user.click(screen.getByRole('button', { name: /Review withdrawal/i }))
+    await user.click(screen.getByRole('button', { name: /Review cash-out/i }))
     expect(value.flow.review).toHaveBeenCalledOnce()
   })
 
@@ -86,7 +86,7 @@ describe('WithdrawFlow body — wiring', () => {
     const user = userEvent.setup()
     const value = buildWithdrawFlowContext({ phase: 'review', amount: '40', destination: OTHER })
     render(createElement(WithdrawFlowContext.Provider, { value }, createElement(WithdrawFlow)))
-    await user.click(screen.getByRole('button', { name: /Sign withdrawal/i }))
+    await user.click(screen.getByRole('button', { name: /Confirm cash-out/i }))
     expect(value.flow.submit).toHaveBeenCalledOnce()
   })
 

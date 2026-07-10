@@ -1,34 +1,13 @@
-import { createBrowserRouter, Navigate, useParams } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from './app-shell'
 import { AccountSessionRoot } from './app-shell/AccountSessionRoot'
 import { RouteErrorBoundary } from './error-boundary'
 import { DevCrashPage } from './error-boundary/DevCrashPage'
+import { TradeRoute } from './TradeRoute'
 import type { RouteObject } from 'react-router-dom'
-import {
-  SelectedMarketProvider,
-  LeverageMarginProvider,
-  OrderIntentProvider,
-  TradingPage,
-  DEFAULT_SELECTED_MARKET,
-} from '@/modules/trading'
+import { DEFAULT_SELECTED_MARKET } from '@/modules/trading'
 import { LobbyPage } from '@/modules/lobby'
 import { ComingSoon } from '@/modules/shared/components/coming-soon'
-
-// The `/trade/:symbol` screen (PRD 0008 D15). The path `:symbol` (already URL-
-// decoded by the router) seeds `SelectedMarketProvider`, which then owns the
-// selected market from the path instead of the legacy `?market=` query.
-function TradeRoute() {
-  const { symbol } = useParams<{ symbol: string }>()
-  return (
-    <SelectedMarketProvider initialSymbol={symbol}>
-      <OrderIntentProvider>
-        <LeverageMarginProvider>
-          <TradingPage />
-        </LeverageMarginProvider>
-      </OrderIntentProvider>
-    </SelectedMarketProvider>
-  )
-}
 
 // DEV-ONLY: a reachable route that triggers the error boundary on demand, so
 // the crash screen can be previewed without editing source. Statically dropped

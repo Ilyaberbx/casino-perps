@@ -57,7 +57,7 @@ describe('DepositSheet', () => {
     renderInRoot(<DepositSheet />, wrapper)
 
     expect(screen.getByTestId('deposit-body')).toHaveTextContent(DEPOSIT_BODY_TEXT)
-    expect(screen.getByRole('dialog', { name: 'Deposit funds' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Add cash' })).toBeInTheDocument()
   })
 
   it('renders nothing when the active venue has no deposit capability', () => {

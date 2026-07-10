@@ -488,8 +488,23 @@ export function createHyperliquidMarketDataReader(
   // surface the market-selection UI reads — while leaving the internal `cached`
   // universe intact so symbol/asset resolution stays correct. `hip3` IS a perp
   // and stays.
-  const excludeSpot = (markets: Market[]): Market[] =>
-    markets.filter((m) => m.marketType !== 'spot')
+  //
+  // The result is memoized on the SOURCE ARRAY'S IDENTITY. `listMarkets()` is the
+  // `getSnapshot` of a `useSyncExternalStore` (see `use-market-selection-window`),
+  // which requires a referentially stable snapshot until the store actually
+  // changes. A bare `.filter()` allocates a new array on every call, so React
+  // re-renders, re-reads the snapshot, sees a new reference, and re-renders again
+  // — "Maximum update depth exceeded" (React #185) on boot. `cached` is
+  // reassigned wholesale on refresh, so identity is a sound cache key.
+  let perpsView: Market[] = []
+  let perpsViewSource: Market[] | null = null
+  const excludeSpot = (markets: Market[]): Market[] => {
+    const isCacheHit = perpsViewSource === markets
+    if (isCacheHit) return perpsView
+    perpsViewSource = markets
+    perpsView = markets.filter((m) => m.marketType !== 'spot')
+    return perpsView
+  }
 
   return {
     listMarkets(): Market[] {

@@ -54,6 +54,7 @@ const HOOK_PROPS = {
   isOpen: true,
   onClose: () => undefined,
   onSelectMarket: () => undefined,
+  selectedMarket: '',
 }
 
 describe('useMarketSelectionWindow', () => {

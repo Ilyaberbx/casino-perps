@@ -44,7 +44,7 @@ export function buildAgentReplaceSelect(
   return {
     kind: 'select',
     id: HYPERLIQUID_REPLACE_AGENT_INPUT_ID,
-    label: 'Agent to replace',
+    label: 'Table to replace',
     options: existingAgents.map((agent) => ({
       value: agent.name,
       label: `${agent.name} — expires ${formatValidUntilDate(agent.validUntil)}`,

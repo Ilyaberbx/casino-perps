@@ -20,9 +20,6 @@ importers:
       axios:
         specifier: ^1.16.0
         version: 1.18.1
-      chart.js:
-        specifier: ^4.5.1
-        version: 4.5.1
       http-status-codes:
         specifier: ^2.3.0
         version: 2.3.0
@@ -44,9 +41,6 @@ importers:
       react:
         specifier: ^19.2.5
         version: 19.2.7
-      react-chartjs-2:
-        specifier: ^5.3.1
-        version: 5.3.1(chart.js@4.5.1)(react@19.2.7)
       react-dom:
         specifier: ^19.2.5
         version: 19.2.7(react@19.2.7)
@@ -919,9 +913,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
-
-  '@kurkle/color@0.3.4':
-    resolution: {integrity: sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w==}
 
   '@lit-labs/ssr-dom-shim@1.6.0':
     resolution: {integrity: sha512-VHb0ALPMTlgKjM6yIxxoQNnpKyUKLD04VzeQdsiXkMqkvYlAHxq9glGLmgbb889/1GsohSOAjvQYoiBppXFqrQ==}
@@ -2613,10 +2604,6 @@ packages:
   charenc@0.0.2:
     resolution: {integrity: sha512-yrLQ/yVUFXkzg7EDQsPieE/53+0RlaWTs+wBrvW36cyilJ2SaDWfl4Yj7MtLTXleV9uEKefbAGUPv2/iWSooRA==}
 
-  chart.js@4.5.1:
-    resolution: {integrity: sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==}
-    engines: {pnpm: '>=8'}
-
   chokidar@5.0.0:
     resolution: {integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==}
     engines: {node: '>= 20.19.0'}
@@ -4134,12 +4121,6 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-
-  react-chartjs-2@5.3.1:
-    resolution: {integrity: sha512-h5IPXKg9EXpjoBzUfyWJvllMjG2mQ4EiuHQFhms/AjUm0XSZHhyRy2xVmLXHKrtcdrPO4mnGqRtYoD0vp95A0A==}
-    peerDependencies:
-      chart.js: ^4.1.1
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-device-detect@2.2.3:
     resolution: {integrity: sha512-buYY3qrCnQVlIFHrC5UcUoAj7iANs/+srdkwsnNjI7anr3Tt7UY6MqNxtMLlr0tMBied0O49UZVK8XKs3ZIiPw==}
@@ -5937,8 +5918,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@kurkle/color@0.3.4': {}
 
   '@lit-labs/ssr-dom-shim@1.6.0': {}
 
@@ -9192,10 +9171,6 @@ snapshots:
 
   charenc@0.0.2: {}
 
-  chart.js@4.5.1:
-    dependencies:
-      '@kurkle/color': 0.3.4
-
   chokidar@5.0.0:
     dependencies:
       readdirp: 5.0.0
@@ -10865,11 +10840,6 @@ snapshots:
       react-dom: 19.2.7(react@19.2.7)
       react-stately: 3.48.0(react@19.2.7)
       use-sync-external-store: 1.6.0(react@19.2.7)
-
-  react-chartjs-2@5.3.1(chart.js@4.5.1)(react@19.2.7):
-    dependencies:
-      chart.js: 4.5.1
-      react: 19.2.7
 
   react-device-detect@2.2.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:

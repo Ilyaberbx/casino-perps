@@ -1,0 +1,256 @@
+/* Casino-Mode trade screen (PRD §8). Palette vars from app/index.css. */
+
+/* ── Market header ─────────────────────────────────────────────── */
+.marketHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 4px 2px 12px;
+}
+
+.marketIdentity {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.marketDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent-primary-bright);
+  box-shadow: 0 0 10px var(--accent-primary-bright);
+}
+
+.marketTicker {
+  font-family: var(--font-display, inherit);
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.marketPrice {
+  font-family: var(--font-display, inherit);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-left: auto;
+}
+
+.marketChange {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.changeUp {
+  color: var(--win);
+}
+
+.changeDown {
+  color: var(--loss);
+}
+
+/* ── Bet amount chips ──────────────────────────────────────────── */
+.sectionLabel {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 20px 2px 10px;
+}
+
+.chipRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.chip {
+  min-height: 48px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--text-muted) 40%, transparent);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-display, inherit);
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: border-color 120ms ease, transform 80ms ease, background 120ms ease;
+}
+
+.chip:hover {
+  border-color: var(--accent-primary-bright);
+}
+
+.chip:active {
+  transform: scale(0.96);
+}
+
+.chipActive {
+  border-color: var(--accent-primary-bright);
+  background: color-mix(in srgb, var(--accent-primary-bright) 16%, var(--bg-surface));
+  box-shadow: 0 0 0 1px var(--accent-primary-bright);
+}
+
+.chipMax {
+  color: var(--accent-primary-bright);
+}
+
+/* ── Multiplier ────────────────────────────────────────────────── */
+.multiplier {
+  margin-top: 20px;
+}
+
+.multiplierHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.multiplierLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.multiplierValue {
+  font-family: var(--font-display, inherit);
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: var(--accent-primary-bright);
+}
+
+.multiplierSlider {
+  width: 100%;
+  accent-color: var(--accent-primary-bright);
+  cursor: pointer;
+}
+
+/* ── Direction buttons ─────────────────────────────────────────── */
+.directions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.directionButton {
+  min-height: 64px;
+  font-family: var(--font-display, inherit);
+  font-weight: 900;
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+}
+
+/* ── Confirm sheet ─────────────────────────────────────────────── */
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 4px 4px;
+}
+
+.confirmHeadline {
+  font-family: var(--font-display, inherit);
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+}
+
+.confirmAmount {
+  color: var(--accent-primary-bright);
+}
+
+.confirmMultiplier {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.confirmLiquidation {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.placeBet {
+  margin-top: 8px;
+  min-height: 64px;
+  border-radius: 10px;
+  border: 1px solid var(--accent-action);
+  background: var(--accent-action);
+  color: var(--text-primary);
+  font-family: var(--font-display, inherit);
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: filter 120ms ease, transform 80ms ease;
+}
+
+.placeBet:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.placeBet:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.placeBet:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* ── Live bet row ──────────────────────────────────────────────── */
+.liveBet {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  margin-top: 8px;
+  border-radius: 10px;
+  background: var(--bg-surface);
+  border: 1px solid color-mix(in srgb, var(--text-muted) 24%, transparent);
+}
+
+.liveBetMain {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.liveBetDirection {
+  font-family: var(--font-display, inherit);
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+.liveBetMultiplier {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.liveBetProfit {
+  margin-left: auto;
+  font-family: var(--font-display, inherit);
+  font-weight: 900;
+  font-size: 1.2rem;
+}
+
+.liveBetLiquidation {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}

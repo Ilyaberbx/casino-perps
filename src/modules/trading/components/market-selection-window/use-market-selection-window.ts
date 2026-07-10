@@ -10,7 +10,6 @@ import {
 } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useCapability } from '../../../shared/providers/venue-provider'
-import { useSelectedMarketContext } from '../../providers/selected-market-provider'
 import { useFavorites } from '../../providers/favorites-provider'
 import { iconWarmCache } from '@/modules/shared/services/icon-warm-cache'
 import {
@@ -38,6 +37,14 @@ interface UseMarketSelectionWindowProps {
   isOpen: boolean
   onClose: () => void
   onSelectMarket: (symbol: MarketSymbol) => void
+  /**
+   * The currently-open market, highlighted in the list. Passed in rather than read
+   * from `useSelectedMarketContext` so the window can also be rendered by the app
+   * shell's `SearchOverlay`, which lives *above* the `/trade/:symbol` route where
+   * that provider is mounted (PRD 0008 D15). Committing the selection is likewise
+   * the parent's job, via `onSelectMarket`.
+   */
+  selectedMarket: MarketSymbol
 }
 
 /**
@@ -53,8 +60,8 @@ export function useMarketSelectionWindow({
   isOpen,
   onClose,
   onSelectMarket,
+  selectedMarket,
 }: UseMarketSelectionWindowProps): UseMarketSelectionWindowReturn {
-  const { selectedMarket, setSelectedMarket } = useSelectedMarketContext()
   const marketDataCap = useCapability('marketData')
 
   const subscribeMarkets = useCallback(
@@ -151,11 +158,10 @@ export function useMarketSelectionWindow({
 
   const handleSelectMarket = useCallback(
     (symbol: MarketSymbol) => {
-      setSelectedMarket(symbol)
       onSelectMarket(symbol)
       onClose()
     },
-    [setSelectedMarket, onSelectMarket, onClose],
+    [onSelectMarket, onClose],
   )
 
   // Ref forwarded to the ScrollArea viewport — the actual scrolling element

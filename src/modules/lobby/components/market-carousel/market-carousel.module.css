@@ -1,0 +1,136 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.icon {
+  flex: none;
+  color: var(--accent-primary-bright);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 110%;
+  font-size: clamp(16px, 2vw, 20px);
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.seeAll {
+  flex: none;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text-muted);
+  transition: color 120ms ease-out;
+}
+
+.seeAll:hover,
+.seeAll:focus-visible {
+  color: var(--accent-primary-bright);
+  outline: none;
+}
+
+.arrows {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 120ms ease-out, color 120ms ease-out, opacity 120ms ease-out;
+}
+
+.arrow:hover:not(:disabled),
+.arrow:focus-visible:not(:disabled) {
+  background: var(--bg-elevated);
+  color: var(--accent-primary-bright);
+  outline: none;
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.viewport {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 150px;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 2px;
+  padding-bottom: 4px;
+  /* Firefox thin scrollbar; WebKit styled below. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated) transparent;
+}
+
+.viewport::-webkit-scrollbar {
+  height: 6px;
+}
+
+.viewport::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 999px;
+}
+
+.cell {
+  display: block;
+  scroll-snap-align: start;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--accent-primary-bright);
+  outline-offset: 2px;
+}
+
+.empty {
+  margin: 0;
+  padding: 28px 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+@media (min-width: 600px) {
+  .viewport {
+    grid-auto-columns: 168px;
+  }
+}

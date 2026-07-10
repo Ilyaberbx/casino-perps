@@ -1,7 +1,7 @@
 import { Sheet } from '../Sheet'
 import { useDepositSheetContent } from './use-deposit-sheet-content'
 
-const ARIA_LABEL = 'Deposit funds'
+const ARIA_LABEL = 'Add cash'
 
 /**
  * Generic, venue-agnostic deposit sheet shell (the host chrome). Wraps the

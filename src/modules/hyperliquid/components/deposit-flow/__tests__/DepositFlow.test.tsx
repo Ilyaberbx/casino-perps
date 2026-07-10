@@ -60,7 +60,7 @@ function renderBody(state: DepositFlowState): void {
 describe('DepositFlow body', () => {
   it('renders the receive QR + self-custody warning in needs-funding', () => {
     renderBody(buildDepositFlowState({ phase: 'needs-funding', walletUsdc: 1.5 }))
-    expect(screen.getByText(/Deposit only from a wallet you control/i)).toBeInTheDocument()
+    expect(screen.getByText(/Add cash only from a wallet you control/i)).toBeInTheDocument()
     expect(screen.getByText('$1.50')).toBeInTheDocument()
     expect(screen.getByLabelText('Copy address')).toBeInTheDocument()
   })
@@ -92,7 +92,7 @@ describe('DepositFlow body', () => {
       buildDepositFlowState({ phase: 'ready', amount: '50', isAmountValid: true }),
     )
     expect(screen.getByLabelText('Amount (USDC)')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Deposit to Hyperliquid' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Add Cash' })).toBeEnabled()
   })
 
   it('shows the soft gas warning in no-gas but keeps the button enabled', () => {
@@ -100,7 +100,7 @@ describe('DepositFlow body', () => {
       buildDepositFlowState({ phase: 'no-gas', amount: '50', isAmountValid: true }),
     )
     expect(screen.getByText(/need a little ETH on Arbitrum/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Deposit to Hyperliquid' })).toBeEnabled()
+    expect(screen.getByRole('button', { name: 'Add Cash' })).toBeEnabled()
   })
 
   it('busies the button and changes copy in signing', () => {

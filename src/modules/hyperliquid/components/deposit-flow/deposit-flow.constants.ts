@@ -8,15 +8,15 @@
 export const DEPOSIT_QR_SIZE = 160
 
 export const DEPOSIT_COPY = {
-  title: 'Deposit to Hyperliquid',
+  title: 'Add Cash',
   checking: 'Reading wallet…',
   selfCustodyLabel: 'Warning',
   selfCustodyProse:
-    'Deposit only from a wallet you control. Funds sent from an exchange will be lost.',
+    'Add cash only from a wallet you control. Funds sent from an exchange will be lost.',
   noGasLabel: 'Heads up',
   noGasProse: "You'll need a little ETH on Arbitrum to cover gas.",
   switchChainCta: 'Switch to Arbitrum',
-  depositCta: 'Deposit to Hyperliquid',
+  depositCta: 'Add Cash',
   signingCta: 'Confirm in your wallet…',
   amountLabel: 'Amount (USDC)',
   sentLabel: 'Sent from wallet',

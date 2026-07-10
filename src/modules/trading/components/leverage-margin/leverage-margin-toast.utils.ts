@@ -10,15 +10,15 @@ function marginModeLabel(mode: MarginMode): string {
 export function buildLeverageAppliedToast(symbol: string, leverage: number): ToastPayload {
   return {
     variant: 'success',
-    title: 'Leverage updated',
-    description: `${formatMarketDisplaySymbol(symbol)} set to ${leverage}×`,
+    title: 'Multiplier updated',
+    description: `${formatMarketDisplaySymbol(symbol)} set to ${leverage}x`,
   }
 }
 
 export function buildLeverageErrorToast(error: SetLeverageError): ToastPayload {
   return {
     variant: 'error',
-    title: 'Leverage not updated',
+    title: 'Multiplier not updated',
     description: formatVenueErrorMessage(error.message),
   }
 }

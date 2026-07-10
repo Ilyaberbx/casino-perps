@@ -23,7 +23,7 @@ describe('useTradeEquityCard — spectate transition', () => {
     // total equity across the toggle instead of showing a loading state while
     // the fresh tick for the new address is in flight.
     const { result } = renderHook(useCombined, {
-      wrapper: wrapEquityCardWithSpectate(buildEquityCardVenue(true), 'pro'),
+      wrapper: wrapEquityCardWithSpectate(buildEquityCardVenue(true)),
     })
 
     expect(result.current.card.isLoading).toBe(false)

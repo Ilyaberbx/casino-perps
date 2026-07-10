@@ -1,5 +1,5 @@
 /* Casino palette with hard hex fallbacks — renders correctly with or without the
-   design-tokens phase's --bg-*/--accent-*/--win variables. */
+   design-tokens phase's background, accent and win custom properties. */
 
 .ticker {
   display: flex;

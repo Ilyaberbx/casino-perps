@@ -1,25 +1,38 @@
+import { Flame, LayoutGrid, Sparkles } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import { HeroBanner } from '../components/hero-banner'
+import { MarketCarousel } from '../components/market-carousel'
+import { useLobby } from '../hooks/use-lobby'
+import type { LobbySectionId } from '../lobby.types'
 import styles from './lobby-page.module.css'
 
+const SECTION_ICON: Record<LobbySectionId, LucideIcon> = {
+  hot: Flame,
+  new: Sparkles,
+  all: LayoutGrid,
+}
+
 /**
- * Lobby stub (PRD 0008 D15, build order step 5).
- *
- * The `/` route. The real lobby — LIVE WINS ticker, hero banner, and poster-card
- * carousels (`Hot Markets` / `New Listings` / `All Markets`) — is built by the
- * lobby phase on top of the existing `market-card` component and gradient
- * generator. This placeholder keeps the route mountable and the app shell
- * demoable until then. The shell owns the LIVE WINS ticker above this outlet, so
- * this page renders only the carousel region.
+ * The `/` lobby (PRD 0008 D15): hero banner over the Hot Markets / New Listings
+ * / All Markets carousels. Smart data comes from `useLobby` (venue `marketData`
+ * port); the shell renders the LIVE WINS ticker above this outlet, so the page
+ * never mounts one itself.
  */
 export function LobbyPage() {
+  const { isLoading, sections } = useLobby()
+
   return (
     <div className={styles.page} data-testid="lobby-page">
-      <section className={styles.hero} aria-label="Welcome">
-        <h1 className={styles.heroTitle}>Pick a market. Place a bet.</h1>
-        <p className={styles.heroSubtitle}>
-          Tap a game, choose your amount, and go UP or DOWN.
-        </p>
-      </section>
-      <p className={styles.placeholder}>Games load here soon.</p>
+      <HeroBanner />
+      {sections.map((section) => (
+        <MarketCarousel
+          key={section.id}
+          title={section.title}
+          icon={SECTION_ICON[section.id]}
+          markets={section.markets}
+          isLoading={isLoading}
+        />
+      ))}
     </div>
   )
 }

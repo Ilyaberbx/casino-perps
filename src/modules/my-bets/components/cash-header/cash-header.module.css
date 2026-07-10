@@ -1,0 +1,77 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px;
+  border-radius: 10px;
+  background: var(--bg-elevated, #272733);
+}
+
+.label {
+  font-family: var(--font-body, 'IBM Plex Sans'), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #8a8695);
+}
+
+.amount {
+  font-family: var(--font-display, 'Archivo'), system-ui, sans-serif;
+  font-style: italic;
+  font-stretch: 115%;
+  font-weight: 800;
+  font-size: clamp(2rem, 6vw, 3.25rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--text-primary, #f8f8f8);
+  font-variant-numeric: tabular-nums;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.primary,
+.ghost {
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-family: var(--font-body, 'IBM Plex Sans'), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: filter 150ms ease-out, background 150ms ease-out;
+}
+
+.primary {
+  border: none;
+  background: var(--accent-primary, #248894);
+  color: var(--text-primary, #f8f8f8);
+}
+
+.primary:hover,
+.primary:focus-visible {
+  filter: brightness(1.12);
+  outline: none;
+}
+
+.ghost {
+  border: 1px solid var(--bg-surface, #292630);
+  background: transparent;
+  color: var(--text-primary, #f8f8f8);
+}
+
+.ghost:hover,
+.ghost:focus-visible {
+  background: var(--bg-surface, #292630);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary,
+  .ghost {
+    transition: none;
+  }
+}

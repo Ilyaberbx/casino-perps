@@ -1,19 +1,29 @@
 import styles from './my-bets-page.module.css'
+import { useMyBetsPage } from './use-my-bets-page'
+import { CashHeader } from '../components/cash-header/CashHeader'
+import { LiveBetsSection } from '../components/live-bets/LiveBetsSection'
+import { SettledBetsSection } from '../components/settled-bets/SettledBetsSection'
 
 /**
- * My Bets stub (PRD 0008 D11 + D15, build order step 7).
- *
- * The `/my-bets` route. Replaces the old `/portfolio` page: a cash balance,
- * live bets, and settled history rebuilt in casino vocabulary with `chart.js`
- * dropped. That rebuild is the "My Bets" phase; this placeholder keeps the lazy
- * route mountable until then. Kept in its own module so the code-split boundary
- * the router relies on (`lazy: () => import('@/modules/my-bets')`) stays valid.
+ * My Bets (PRD 0008 D11) — the casino re-skin of the old portfolio page. Cash
+ * balance on top, then the live bets the user can Cash Out, then the settled
+ * history. All numbers, vocabulary, and money-movement flow through
+ * `useMyBetsPage`; this page is pure composition.
  */
 export function MyBetsPage() {
+  const { cashLabel, isConnected, onAddCash, onWithdraw, liveBets, onCashOut, settledBets } =
+    useMyBetsPage()
+
   return (
     <div className={styles.page} data-testid="my-bets-page">
-      <h1 className={styles.title}>My Bets</h1>
-      <p className={styles.placeholder}>Your bets and cash balance load here soon.</p>
+      <CashHeader
+        cashLabel={cashLabel}
+        isConnected={isConnected}
+        onAddCash={onAddCash}
+        onWithdraw={onWithdraw}
+      />
+      <LiveBetsSection bets={liveBets} onCashOut={onCashOut} />
+      <SettledBetsSection bets={settledBets} />
     </div>
   )
 }

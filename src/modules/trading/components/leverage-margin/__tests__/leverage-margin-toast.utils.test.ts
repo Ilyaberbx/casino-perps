@@ -11,7 +11,8 @@ describe('leverage-margin toast builders', () => {
   it('builds a success toast for an applied leverage (display symbol stripped of -PERP)', () => {
     const payload = buildLeverageAppliedToast('BTC-PERP', 10)
     expect(payload.variant).toBe('success')
-    expect(payload.description).toContain('10×')
+    expect(payload.title).toBe('Multiplier updated')
+    expect(payload.description).toContain('10x')
     expect(payload.description).toContain('BTC')
     expect(payload.description).not.toContain('BTC-PERP')
   })

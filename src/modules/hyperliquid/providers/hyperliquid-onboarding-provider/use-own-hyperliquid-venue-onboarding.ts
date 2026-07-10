@@ -101,7 +101,7 @@ export function useOwnHyperliquidVenueOnboarding(
       {
         kind: 'text',
         id: HYPERLIQUID_AGENT_NAME_INPUT_ID,
-        label: 'Agent label',
+        label: 'Table name',
         minLength: AGENT_NAME_MIN_LENGTH,
         maxLength: AGENT_NAME_MAX_LENGTH,
         defaultValue: defaultAgentName,
@@ -126,14 +126,14 @@ export function useOwnHyperliquidVenueOnboarding(
       // needs-deposit projects to an error-status so StepRow renders the open-deposit CTA (HIGH-1).
       {
         id: HYPERLIQUID_STEP_DEPOSIT_ID,
-        label: 'Deposit funds',
-        description: 'Deposit USDC to Hyperliquid before setting up trading.',
+        label: 'Add cash',
+        description: 'Add cash before you can place bets.',
         status: depositStepStatus,
       },
       {
         id: HYPERLIQUID_STEP_AGENT_ID,
-        label: 'Agent wallet',
-        description: 'Creates a trading-only key stored in your browser.',
+        label: 'Set up your table',
+        description: 'Gets your table ready to place bets. Kept in your browser.',
         capability: 'sign-actions',
         status: agentStepStatus,
         inputs: agentStepInputs,

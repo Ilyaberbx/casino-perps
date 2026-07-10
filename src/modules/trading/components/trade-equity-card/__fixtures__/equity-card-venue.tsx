@@ -16,7 +16,6 @@ import { SpectateProvider } from '@/modules/spectate'
 // Pro mode is gone (PRD-0008 D7): the equity card always renders its condensed
 // (`simple`) form. The `_mode` params are kept ignored so existing call sites
 // still compile without a signature churn across the test files.
-type LegacyTradingMode = 'pro' | 'simple'
 import {
   buildFakeDepositCapability,
   buildFakeTransferCapability,
@@ -119,7 +118,7 @@ export const CONNECTED_AUTH: AuthState = {
   removeAgentSigner: async () => true,
 }
 
-export function wrapEquityCard(venue: Venue, _mode?: LegacyTradingMode) {
+export function wrapEquityCard(venue: Venue) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <AuthContext.Provider value={CONNECTED_AUTH}>
@@ -134,7 +133,7 @@ export function wrapEquityCard(venue: Venue, _mode?: LegacyTradingMode) {
 // Same composition as `wrapEquityCard`, plus a real `SpectateProvider` (inside
 // a `MemoryRouter`, since spectate state is URL-driven) so a test can toggle
 // `isSpectating` via `useSpectate().startSpectating()` / `stopSpectating()`.
-export function wrapEquityCardWithSpectate(venue: Venue, _mode?: LegacyTradingMode) {
+export function wrapEquityCardWithSpectate(venue: Venue) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <MemoryRouter>

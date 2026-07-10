@@ -69,7 +69,7 @@ export function useAuthValue(input: UseAuthValueInput): AuthState {
     toast.show({
       variant: 'error',
       title: 'Session expired',
-      description: 'Sign in again to continue',
+      description: 'Log in again to continue',
       durationMs: Number.POSITIVE_INFINITY,
       id: 'session-expired',
     })

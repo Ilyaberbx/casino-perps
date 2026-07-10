@@ -1,11 +1,7 @@
 import { Sheet } from '@/modules/shared/components/Sheet'
 import { ChatColumn } from '../chat-column/ChatColumn'
 import styles from './mobile-chat-sheet.module.css'
-
-export interface MobileChatSheetProps {
-  isOpen: boolean
-  onClose: () => void
-}
+import type { MobileChatSheetProps } from './mobile-chat-sheet.types'
 
 /**
  * The mobile Chat tab surface (< 1280px, where the chat column is dropped). The

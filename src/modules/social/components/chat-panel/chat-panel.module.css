@@ -1,5 +1,6 @@
 /* Casino palette with hard hex fallbacks, so the panel renders correctly whether
-   or not the design-tokens phase has defined the --bg-*/--accent-* variables yet. */
+   or not the design-tokens phase has defined the background and accent custom
+   properties yet. */
 
 .panel {
   display: flex;

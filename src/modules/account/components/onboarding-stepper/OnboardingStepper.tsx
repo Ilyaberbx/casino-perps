@@ -25,7 +25,7 @@ export function OnboardingStepper() {
 function OnboardingStepperContent() {
   const view = useOnboardingStepper()
   return (
-    <Modal isOpen onClose={view.onClose} ariaLabel="Sign in" title="Sign in">
+    <Modal isOpen onClose={view.onClose} ariaLabel="Log In" title="Log In">
       <div className={styles.body} data-testid="onboarding-stepper">
         <StepIndicator current={view.stepNumber} total={view.totalSteps} />
         <StepBody step={view.step} />

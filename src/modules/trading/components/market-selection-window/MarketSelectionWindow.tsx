@@ -73,7 +73,7 @@ export function MarketSelectionWindow({
     handleToggleFavorite,
     scrollAreaRef,
     virtualizer,
-  } = useMarketSelectionWindow({ isOpen, onClose, onSelectMarket })
+  } = useMarketSelectionWindow({ isOpen, onClose, onSelectMarket, selectedMarket })
 
   // Render the body only while open. The Modal stays `keepMounted` (its hidden
   // shell), and this component is always mounted by TopBar, so the hook above

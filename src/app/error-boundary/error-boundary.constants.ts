@@ -8,12 +8,11 @@ export const ERROR_COPY = {
   reload: 'Reload app',
   goHome: 'Back to trading',
   helpTitle: 'Caught a bug?',
-  helpSubtitle: 'Copy the log and open a ticket in our Discord, or reach us on X.',
-  discordCta: 'Report on Discord',
-  xCta: 'Contact on X',
+  helpSubtitle: 'Copy the log and email it to support so we can dig in.',
+  supportCta: 'Email support',
   detailsSummary: 'Technical details',
   copyIdle: 'Copy error log',
-  copyDone: 'Copied — paste it in Discord',
+  copyDone: 'Copied — paste it into the email',
   requestIdLabel: 'Request ID',
 } as const
 

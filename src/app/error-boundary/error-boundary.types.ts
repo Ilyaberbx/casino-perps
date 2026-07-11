@@ -34,8 +34,8 @@ export interface UseErrorFallbackResult {
   copied: boolean
   /** Clipboard is unavailable in insecure contexts — hide the affordance then. */
   isClipboardSupported: boolean
-  discordInviteUrl: string
-  xUrl: string
+  /** `mailto:` deep link for the one real support channel (brand inbox). */
+  supportMailto: string
   copyReport: () => void
   reload: () => void
   goHome: () => void

@@ -14,12 +14,13 @@ export const LEGACY_ACCENT_COLOR_STORAGE_KEY = 'perps-dex-primary-color'
 export const DEFAULT_ACCENT_COLOR_ID: AccentColorId = 'cyan'
 
 /**
- * Favicon mascot per theme. The white mascot reads on the dark theme; the
- * black one reads on the light ('white') theme. Served from `public/`.
+ * Favicon per theme. The casino brand has a single dark-only YEET tile
+ * (`public/favicon.svg`), so both theme keys resolve to it — the map shape is
+ * kept because `use-theme-provider` swaps by theme key.
  */
 export const FAVICON_HREF_BY_THEME = {
-  dark: '/whitejaw.gif',
-  white: '/blackjaw.gif',
+  dark: '/favicon.svg',
+  white: '/favicon.svg',
 } as const
 
 /**

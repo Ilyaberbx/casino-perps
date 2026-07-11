@@ -1,6 +1,5 @@
+import { Mail } from 'lucide-react'
 import { PixelButton } from '@/modules/shared/components/pixel-button'
-import { DiscordGlyph } from './DiscordGlyph'
-import { XGlyph } from './XGlyph'
 import { FaultGlyph } from './FaultGlyph'
 import { ErrorDetails } from './ErrorDetails'
 import { useErrorFallback } from './use-error-fallback'
@@ -20,8 +19,7 @@ export function ErrorFallback({ error }: ErrorFallbackProps) {
     report,
     copied,
     isClipboardSupported,
-    discordInviteUrl,
-    xUrl,
+    supportMailto,
     copyReport,
     reload,
     goHome,
@@ -57,28 +55,9 @@ export function ErrorFallback({ error }: ErrorFallbackProps) {
               </PixelButton>
             ) : null}
 
-            <PixelButton
-              as="a"
-              href={discordInviteUrl}
-              target="_blank"
-              rel="noreferrer"
-              variant="accent"
-              size="md"
-            >
-              <DiscordGlyph />
-              {ERROR_COPY.discordCta}
-            </PixelButton>
-
-            <PixelButton
-              as="a"
-              href={xUrl}
-              target="_blank"
-              rel="noreferrer"
-              variant="default"
-              size="md"
-            >
-              <XGlyph />
-              {ERROR_COPY.xCta}
+            <PixelButton as="a" href={supportMailto} variant="accent" size="md">
+              <Mail size={14} strokeWidth={2} aria-hidden="true" />
+              {ERROR_COPY.supportCta}
             </PixelButton>
           </div>
         </div>

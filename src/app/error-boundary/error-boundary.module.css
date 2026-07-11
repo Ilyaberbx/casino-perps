@@ -84,7 +84,7 @@
 
 .title {
   margin: 0 0 14px;
-  font-family: var(--font-pixel-display); /* hero label — sanctioned pixel face */
+  font-family: var(--font-display);
   font-size: 30px;
   line-height: 1.1;
   letter-spacing: 0.01em;
@@ -200,7 +200,7 @@
 
 .requestIdValue {
   padding: 2px 7px;
-  font-family: var(--font-pixel-display);
+  font-family: var(--font-display);
   font-size: 11px;
   color: var(--accent);
   background: var(--background);
@@ -213,7 +213,7 @@
   margin: 0;
   padding: 12px 14px;
   overflow: auto;
-  font-family: var(--font-pixel-display);
+  font-family: var(--font-display);
   font-size: 11px;
   line-height: 1.55;
   white-space: pre-wrap;

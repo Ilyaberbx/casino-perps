@@ -83,25 +83,6 @@
     U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-/* Monocraft — the pixel/Minecraft-style face. Retained as a deliberate,
-   opt-in-only brand-accent (--font-pixel-display); never used by casino chrome,
-   labels, or data. Kept so any lingering opt-in consumer still resolves. */
-@font-face {
-  font-family: 'Monocraft';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/Monocraft.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Monocraft';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/Monocraft-Bold.woff2') format('woff2');
-}
-
 :root {
   /*
    * Casino type tokens (PRD 0008 §5.2). Archivo = display, IBM Plex Sans = body.
@@ -115,7 +96,6 @@
   --font-core: var(--font-body); /* app chrome & identity */
   --font-trading: var(--font-body); /* all trading & account data */
   --font-pixel: var(--font-body); /* LEGACY alias → body workhorse */
-  --font-pixel-display: 'Monocraft', ui-monospace, monospace; /* opt-in pixel accent only */
 
   --radius-pixel: 0; /* explicit-square: dense data surfaces */
   /* Casino radii (PRD §5.3): 8px cards, 10px buttons, 999px pills. */
@@ -328,11 +308,6 @@
   --pnl-short-glow: rgba(255, 77, 106, 0.5);
   --pnl-glow-positive: 0 0 2px rgba(36, 255, 150, 0.7), 0 0 22px rgba(36, 255, 150, 0.35);
   --pnl-glow-negative: 0 0 2px rgba(255, 77, 106, 0.7), 0 0 22px rgba(255, 77, 106, 0.35);
-
-  /* Spectate ghost icon — silhouette mask, theme-driven paint. */
-  --ghost-icon-mask: url('../assets/whiteghost.png');
-  --ghost-color: var(--text);
-  --ghost-color-matched: var(--accent);
 
   color-scheme: dark;
 }

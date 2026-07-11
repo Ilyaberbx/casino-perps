@@ -52,19 +52,14 @@ describe('AppErrorBoundary', () => {
     )
   })
 
-  it('offers the Discord and X report CTAs as external links', () => {
+  it('offers the email-support CTA as a mailto link', () => {
     render(
       <AppErrorBoundary>
         <Boom />
       </AppErrorBoundary>,
     )
 
-    const discord = screen.getByRole('link', { name: /report on discord/i })
-    expect(discord).toHaveAttribute('href', expect.stringContaining('discord.gg'))
-    expect(discord).toHaveAttribute('target', '_blank')
-
-    const x = screen.getByRole('link', { name: /contact on x/i })
-    expect(x).toHaveAttribute('href', expect.stringContaining('x.com/invaderstrade'))
-    expect(x).toHaveAttribute('target', '_blank')
+    const support = screen.getByRole('link', { name: /email support/i })
+    expect(support).toHaveAttribute('href', expect.stringContaining('mailto:support@yeet.bet'))
   })
 })

@@ -31,11 +31,19 @@ export function AppShell() {
 
   return (
     <AccountModalProvider>
-      <div className={styles.shell}>
+      <div
+        className={
+          shell.isRailCollapsed ? `${styles.shell} ${styles.shellRailCollapsed}` : styles.shell
+        }
+      >
         <MobileTopBar onAddCash={shell.handleAddCash} onOpenMenu={shell.openMenu} />
 
         <aside className={styles.rail}>
-          <LeftRail onAddCash={shell.handleAddCash} onCollapse={shell.handleCollapse} />
+          <LeftRail
+            collapsed={shell.isRailCollapsed}
+            onAddCash={shell.handleAddCash}
+            onCollapse={shell.handleCollapse}
+          />
         </aside>
 
         <div className={styles.center}>

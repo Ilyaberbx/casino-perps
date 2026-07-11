@@ -31,7 +31,8 @@ export interface UseAppShellReturn {
   handleAddCash: () => void
   handleLogIn: () => void
   handleCreateAccount: () => void
-  /** Rail collapse — decorative today. */
+  /** Desktop rail collapse — icon-only 76px rail when true. */
+  isRailCollapsed: boolean
   handleCollapse: () => void
 
   /** Venue-onboarding sheet (funding / silent agent-wallet flow) plumbing. */

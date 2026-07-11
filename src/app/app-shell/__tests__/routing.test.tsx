@@ -69,7 +69,6 @@ function harness(initialPath: string) {
           <Route path="trade" element={<Navigate to="/trade/BTC-PERP" replace />} />
           <Route path="trade/:symbol" element={<div>TRADE_PAGE</div>} />
           <Route path="my-bets" element={<div>MY_BETS_PAGE</div>} />
-          <Route path="leaderboard" element={<div>LEADERBOARD_PAGE</div>} />
         </Route>
         <Route path="*" element={<div>NO_MATCH</div>} />
       </Routes>
@@ -101,11 +100,6 @@ describe('AppShell casino routing', () => {
   it('renders My Bets at /my-bets', () => {
     render(harness('/my-bets'))
     expect(screen.getByText('MY_BETS_PAGE')).toBeInTheDocument()
-  })
-
-  it('renders the Leaderboard stub at /leaderboard', () => {
-    render(harness('/leaderboard'))
-    expect(screen.getByText('LEADERBOARD_PAGE')).toBeInTheDocument()
   })
 
   it('does not match an unknown route', () => {

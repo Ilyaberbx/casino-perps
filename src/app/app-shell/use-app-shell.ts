@@ -20,6 +20,7 @@ export function useAppShell(): UseAppShellReturn {
   const [isSearchOpen, setSearchOpen] = useState(false)
   const [isMenuOpen, setMenuOpen] = useState(false)
   const [isChatOpen, setChatOpen] = useState(false)
+  const [isRailCollapsed, setRailCollapsed] = useState(false)
 
   const openSearch = useCallback(() => setSearchOpen(true), [])
   const closeSearch = useCallback(() => setSearchOpen(false), [])
@@ -44,7 +45,7 @@ export function useAppShell(): UseAppShellReturn {
   }, [openConnectModal])
 
   const handleCollapse = useCallback(() => {
-    // Decorative in this phase; the callback exists so the rail button is wired.
+    setRailCollapsed((collapsed) => !collapsed)
   }, [])
 
   const onboardingSheetActions = useMemo<VenueOnboardingSheetActions>(
@@ -84,6 +85,7 @@ export function useAppShell(): UseAppShellReturn {
     handleAddCash,
     handleLogIn,
     handleCreateAccount,
+    isRailCollapsed,
     handleCollapse,
     isOnboardingSheetOpen: onboardingSheet.isOpen,
     closeOnboardingSheet: onboardingSheet.close,

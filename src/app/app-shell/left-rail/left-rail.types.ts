@@ -11,7 +11,7 @@ export interface RailLobbyItem {
   view: 'favorites' | 'recent' | 'hot' | 'new' | 'all'
 }
 
-/** A rail item that navigates to a first-class route (My Bets, Leaderboard). */
+/** A rail item that navigates to a first-class route (My Bets). */
 export interface RailRouteItem {
   kind: 'route'
   key: string
@@ -52,9 +52,11 @@ export interface ResolvedRailGroup {
 }
 
 export interface LeftRailProps {
+  /** Icon-only 76px rendering — labels, segments, and the wordmark hide. */
+  collapsed: boolean
   /** Opens the Add Cash (deposit) flow. */
   onAddCash: () => void
-  /** Collapses the rail (decorative today; the callback lets the shell react). */
+  /** Toggles the shell's collapsed rail state. */
   onCollapse: () => void
 }
 

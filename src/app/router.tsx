@@ -7,7 +7,6 @@ import { TradeRoute } from './TradeRoute'
 import type { RouteObject } from 'react-router-dom'
 import { DEFAULT_SELECTED_MARKET } from '@/modules/trading'
 import { LobbyPage } from '@/modules/lobby'
-import { ComingSoon } from '@/modules/shared/components/coming-soon'
 
 // DEV-ONLY: a reachable route that triggers the error boundary on demand, so
 // the crash screen can be previewed without editing source. Statically dropped
@@ -42,7 +41,6 @@ export const router = createBrowserRouter([
             // the initial/lobby chunk. react-router-dom v7 route-level lazy.
             lazy: async () => ({ Component: (await import('@/modules/my-bets')).MyBetsPage }),
           },
-          { path: 'leaderboard', element: <ComingSoon title="Leaderboard" /> },
         ],
       },
     ],

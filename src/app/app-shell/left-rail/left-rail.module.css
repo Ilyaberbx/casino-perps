@@ -10,6 +10,39 @@
   overscroll-behavior: contain;
 }
 
+/* Icon-only collapsed variant — the shell narrows --rail-w to 76px. */
+.railCollapsed {
+  padding: 18px 10px 16px;
+}
+
+.railCollapsed .navItem {
+  justify-content: center;
+  padding: 0;
+  gap: 0;
+}
+
+.railCollapsed .navLabel {
+  display: none;
+}
+
+.railCollapsed .group:not(:first-child) {
+  padding-top: 10px;
+}
+
+.railCollapsed .footer {
+  align-items: center;
+}
+
+.railCollapsed .collapseButton {
+  align-self: center;
+}
+
+.railCollapsed .addCash {
+  width: 44px;
+  padding: 0;
+  gap: 0;
+}
+
 .header {
   display: flex;
   align-items: center;

@@ -12,6 +12,11 @@
   font-family: var(--font-body);
 }
 
+/* Collapsed desktop rail — icon-only column (matches yeet's collapse). */
+.shellRailCollapsed {
+  --rail-w: 76px;
+}
+
 .rail {
   position: fixed;
   top: 0;

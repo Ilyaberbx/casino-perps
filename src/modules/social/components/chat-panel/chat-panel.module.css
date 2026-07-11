@@ -127,11 +127,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   font-family: var(--font-display, 'Archivo', sans-serif);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: #ffffff;
+}
+
+.winThumbIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
 }
 
 .winCopy {

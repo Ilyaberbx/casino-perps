@@ -26,6 +26,7 @@ The smart hooks (`useChat`, `useLiveWins`) and all sub-components are **private*
 
 - `@/modules/shared/hooks/use-prefers-reduced-motion` — the only cross-module import. Chat auto-scroll degrades from `smooth` to an instant jump under reduced motion; the live-wins hook stops rotation and the CSS marquee is disabled (`@media (prefers-reduced-motion: reduce)`).
 - `lucide-react` — icons (`Settings`, `PanelRightClose`, `Gift`, `Send`, `Smile`).
+- `shared` icon plumbing — `iconCandidatesForSymbol` + `useIconLadder` resolve the real token icon on LIVE WINS tiles and chat win-brag thumbs (monogram fallback when the ladder exhausts).
 - The casino palette CSS variables (`--bg-*`, `--accent-*`, `--win`, `--text-*`) with **hard hex fallbacks** (`var(--accent-action, #cf38dd)`), so the module renders correctly whether or not the design-tokens phase has defined them yet.
 
 ## Cross-app contract

@@ -15,7 +15,7 @@ Everything else — `useLobby`, `HeroBanner`, `MarketCarousel`, the `market-card
 ## Owns
 
 - **`market-card/`** — the poster card (`MarketCard`, `MarketCardSkeleton`) and its gradient/ticker/logo derivations. 3:4 neon poster with a deterministic gradient, centered token logo (initials fallback), ticker, and win/loss 24h chip.
-- **`utils/`** — pure, unit-tested helpers: `symbol-gradient` (deterministic neon gradient), `symbol-ticker` (display ticker + initials), `symbol-logo-url` (HL coin icon URL), `format-change-pct`, `build-lobby-sections` (universe → Hot/New/All buckets), `carousel-paging` (arrow availability + page-scroll math), `trade-href` (the `/trade/:symbol` route href).
+- **`utils/`** — pure, unit-tested helpers: `symbol-gradient` (deterministic neon gradient), `symbol-ticker` (display ticker + initials), `symbol-logo-url` (`symbolLogoCandidates` — the shared icon-URL ladder for a symbol), `format-change-pct`, `build-lobby-sections` (universe → Hot/New/All buckets), `carousel-paging` (arrow availability + page-scroll math), `trade-href` (the `/trade/:symbol` route href).
 - **Section policy** (`lobby.constants.ts`): Hot = top 12 by 24h volume; New = newest 12 by listing-order proxy (see gotchas); All = the rest. `build-lobby-sections` guarantees the three buckets are **disjoint**.
 - No DB tables, no API routes, no ports/adapters, no providers — a leaf UI module.
 

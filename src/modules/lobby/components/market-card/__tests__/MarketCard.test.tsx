@@ -52,10 +52,20 @@ describe('MarketCard — token logo', () => {
     expect(screen.getByRole('img')).toHaveAttribute('src', `${HL_BASE}/BTC.svg`)
   })
 
-  it('falls back to the first-three-letters initials once the logo fails to load', () => {
+  it('advances down the shared icon ladder on a load error', () => {
     render(<MarketCard symbol="DOGE" changePct={1} logoUrl="https://cdn.example/broken.png" />)
-    const img = screen.getByRole('img')
-    fireEvent.error(img)
+    fireEvent.error(screen.getByRole('img'))
+    expect(screen.getByRole('img')).toHaveAttribute('src', `${HL_BASE}/DOGE.svg`)
+  })
+
+  it('falls back to the first-three-letters initials once every ladder rung fails', () => {
+    render(<MarketCard symbol="DOGE" changePct={1} logoUrl="https://cdn.example/broken.png" />)
+    const MAX_RUNGS = 8
+    for (let rung = 0; rung < MAX_RUNGS; rung += 1) {
+      const img = screen.queryByRole('img')
+      if (img === null) break
+      fireEvent.error(img)
+    }
     expect(screen.queryByRole('img')).toBeNull()
     expect(screen.getByText('DOG')).toBeInTheDocument()
   })

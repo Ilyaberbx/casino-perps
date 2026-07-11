@@ -1,27 +1,26 @@
-import { useState } from 'react'
+import { useIconLadder } from '@/modules/shared/hooks/use-icon-ladder'
 import { symbolGradient } from '../../utils/symbol-gradient'
 import { displayTicker, symbolInitials } from '../../utils/symbol-ticker'
-import { symbolLogoUrl } from '../../utils/symbol-logo-url'
+import { symbolLogoCandidates } from '../../utils/symbol-logo-url'
 import { formatChangePct } from '../../utils/format-change-pct'
 import type { MarketCardProps, UseMarketCardResult } from './market-card.types'
 
 /**
- * Smart hook for the poster card — owns the only piece of state (logo load
- * failure) and all derived presentation values, so `MarketCard` stays a pure
- * render. The effective logo URL prefers the caller-supplied `logoUrl`, else the
- * shared-plumbing lookup from the symbol; a load error clears it so the dumb
- * component swaps to the initials placeholder.
+ * Smart hook for the poster card — owns the icon-ladder state and all derived
+ * presentation values, so `MarketCard` stays a pure render. The candidate list
+ * prefers the caller-supplied `logoUrl`, then walks the full shared icon ladder
+ * (HL CDN → TradingView → spot bare) via `useIconLadder`; exhausting it swaps
+ * the dumb component to the initials placeholder.
  */
 export function useMarketCard({
   symbol,
   changePct,
   logoUrl,
 }: MarketCardProps): UseMarketCardResult {
-  const [hasLogoError, setHasLogoError] = useState(false)
+  const ladder = symbolLogoCandidates(symbol)
+  const candidates = logoUrl ? [logoUrl, ...ladder.filter((url) => url !== logoUrl)] : ladder
 
-  const resolvedLogoUrl = logoUrl ?? symbolLogoUrl(symbol)
-  const hasUsableLogo = resolvedLogoUrl !== null && !hasLogoError
-  const logoSrc = hasUsableLogo ? resolvedLogoUrl : null
+  const { src: logoSrc, onError: onLogoError } = useIconLadder(symbol, candidates)
 
   const isUp = changePct >= 0
 
@@ -32,6 +31,6 @@ export function useMarketCard({
     ticker: displayTicker(symbol),
     isUp,
     changeLabel: formatChangePct(changePct),
-    onLogoError: () => setHasLogoError(true),
+    onLogoError,
   }
 }

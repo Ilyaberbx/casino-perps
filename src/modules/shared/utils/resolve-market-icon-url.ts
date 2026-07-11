@@ -198,3 +198,42 @@ export function resolveSpotBareIconUrl(market: Market): string | null {
   if (base.length === 0) return null
   return `${HL_CDN_BASE}/${base}.svg`
 }
+
+/**
+ * The full ordered icon-URL ladder for a market, best source first —
+ * class-aware. Callers walk the list with an `<img>`: each `onError` advances
+ * one rung; running off the end renders a letter/monogram placeholder.
+ *
+ * - **crypto (perp/spot)**: Hyperliquid CDN first (coin-correct), then the
+ *   TradingView logoid, then the spot bare `{BASE}.svg`.
+ * - **HIP-3**: TradingView logoid first (HL has no equity/commodity icon).
+ *
+ * Crypto leads with HL because TV's `crypto/XTVC{SYM}` namespace collides
+ * across same-ticker projects and would otherwise load a wrong-but-valid icon
+ * (it never errors, so the ladder never advances to the correct HL icon).
+ * Duplicates are dropped. Shared by `AssetIcon`, the lobby poster cards, and
+ * the live-wins tiles so every surface resolves the same icon the same way.
+ * See `docs/adr/0068-tradingview-first-icon-sourcing.md` (amended).
+ */
+export function buildIconCandidateUrls(market: Market): string[] {
+  const tvUrl = resolveTvIconUrl(market)
+  const hlFallbackUrl = resolveHlFallbackUrl(market)
+  const spotBareUrl = resolveSpotBareIconUrl(market)
+
+  const ordered = isCryptoMarket(market)
+    ? [hlFallbackUrl, tvUrl, spotBareUrl]
+    : [tvUrl, hlFallbackUrl, spotBareUrl]
+
+  const present = ordered.filter((url): url is string => url !== null)
+  return present.filter((url, index) => present.indexOf(url) === index)
+}
+
+/**
+ * The icon-URL ladder for a raw venue symbol string (`'BTC'`, `'xyz:NVDA'`,
+ * `'PURR/USDC'`) — `buildIconCandidateUrls` over the icon-only market derived
+ * by `buildIconMarketFromSymbol`. The common entry point for surfaces that
+ * carry only a symbol (poster cards, live-wins tiles).
+ */
+export function iconCandidatesForSymbol(symbol: string): string[] {
+  return buildIconCandidateUrls(buildIconMarketFromSymbol(symbol))
+}

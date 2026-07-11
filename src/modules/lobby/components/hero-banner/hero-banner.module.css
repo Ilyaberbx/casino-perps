@@ -1,4 +1,5 @@
 .banner {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -10,8 +11,30 @@
   overflow: hidden;
   background:
     radial-gradient(130% 150% at 100% 0%, rgba(80, 215, 233, 0.32), transparent 58%),
-    linear-gradient(120deg, var(--accent-primary) 0%, #1c6f79 100%);
+    linear-gradient(120deg, var(--accent-primary) 0%, #14424b 100%);
   color: var(--text-primary);
+}
+
+/* Synthwave SVG scene — decorative layer behind the copy, faded out toward the
+   left so the headline keeps its clean panel. */
+.scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent 6%, #000 38%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 6%, #000 38%);
+}
+
+.sceneSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.headline,
+.subline {
+  position: relative;
+  z-index: 1;
 }
 
 .headline {

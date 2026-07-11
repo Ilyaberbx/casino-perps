@@ -1,18 +1,24 @@
 import { describe, it, expect } from 'vitest'
-import { symbolLogoUrl } from '../symbol-logo-url'
+import { symbolLogoCandidates } from '../symbol-logo-url'
 
 const HL_BASE = 'https://app.hyperliquid.xyz/coins'
 
-describe('symbolLogoUrl', () => {
-  it('resolves a crypto perp symbol to the Hyperliquid CDN url', () => {
-    expect(symbolLogoUrl('BTC')).toBe(`${HL_BASE}/BTC.svg`)
+describe('symbolLogoCandidates', () => {
+  it('leads with the Hyperliquid CDN url for a crypto perp symbol', () => {
+    expect(symbolLogoCandidates('BTC')[0]).toBe(`${HL_BASE}/BTC.svg`)
   })
 
   it('strips a -PERP suffix before resolving', () => {
-    expect(symbolLogoUrl('ETH-PERP')).toBe(`${HL_BASE}/ETH.svg`)
+    expect(symbolLogoCandidates('ETH-PERP')[0]).toBe(`${HL_BASE}/ETH.svg`)
   })
 
-  it('returns null when nothing resolves (unmapped HIP-3 symbol)', () => {
-    expect(symbolLogoUrl('xyz:NOPE')).toBeNull()
+  it('includes a TradingView fallback rung after the HL primary for mapped coins', () => {
+    const candidates = symbolLogoCandidates('BTC')
+    expect(candidates.length).toBeGreaterThan(1)
+    expect(candidates[1]).toContain('s3-symbol-logo.tradingview.com')
+  })
+
+  it('returns an empty ladder when nothing resolves (unmapped HIP-3 symbol)', () => {
+    expect(symbolLogoCandidates('xyz:NOPE')).toEqual([])
   })
 })

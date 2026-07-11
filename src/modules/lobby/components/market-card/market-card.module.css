@@ -19,7 +19,23 @@
   outline: none;
 }
 
-/* Token logo, centered at ~40% of the card width. */
+/* Corner brand tag — yeet poster cards carry the brand mark top-right. */
+.brandTag {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 1;
+  font-family: var(--font-display, 'Archivo'), system-ui, sans-serif;
+  font-style: italic;
+  font-stretch: 125%;
+  font-weight: 800;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.78);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+}
+
+/* Token logo, centered at half the card width over a radial spotlight. */
 .logoWrap {
   position: absolute;
   inset: 0;
@@ -28,11 +44,22 @@
   justify-content: center;
 }
 
+/* Spotlight halo behind the logo — the "game art" read. */
+.logoWrap::before {
+  content: '';
+  position: absolute;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0) 68%);
+}
+
 .logo {
-  width: 40%;
+  position: relative;
+  width: 50%;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 18px rgba(255, 255, 255, 0.28));
 }
 
 /* Display-face initials fallback when no logo resolves. */
@@ -54,7 +81,7 @@
   position: absolute;
   inset: auto 0 0 0;
   height: 55%;
-  background: linear-gradient(to top, rgba(23, 22, 30, 0.85) 0%, rgba(23, 22, 30, 0) 100%);
+  background: linear-gradient(to top, rgba(16, 14, 18, 0.88) 0%, rgba(16, 14, 18, 0) 100%);
   pointer-events: none;
 }
 
@@ -93,7 +120,7 @@
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   line-height: 1;
-  background: rgba(23, 22, 30, 0.6);
+  background: rgba(16, 14, 18, 0.6);
   backdrop-filter: blur(4px);
 }
 

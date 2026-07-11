@@ -19,6 +19,9 @@ export function MarketCard(props: MarketCardProps) {
 
   return (
     <article className={styles.card} style={{ background: gradient }} aria-label={ticker}>
+      <span className={styles.brandTag} aria-hidden="true">
+        YEET
+      </span>
       <div className={styles.logoWrap}>
         {logoSrc ? (
           <img

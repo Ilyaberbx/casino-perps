@@ -112,7 +112,7 @@
   aspect-ratio: 3 / 4;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--bg-surface, #292630);
+  background: var(--bg-surface, #171319);
 }
 
 .skeletonLogo {
@@ -123,7 +123,7 @@
   aspect-ratio: 1;
   transform: translate(-50%, -60%);
   border-radius: 50%;
-  background: var(--bg-elevated, #272733);
+  background: var(--bg-elevated, #1e1b1e);
 }
 
 .skeletonFooter {
@@ -140,14 +140,14 @@
   width: 42%;
   height: 14px;
   border-radius: 4px;
-  background: var(--bg-elevated, #272733);
+  background: var(--bg-elevated, #1e1b1e);
 }
 
 .skeletonChip {
   width: 34px;
   height: 14px;
   border-radius: 999px;
-  background: var(--bg-elevated, #272733);
+  background: var(--bg-elevated, #1e1b1e);
 }
 
 .skeleton::after {

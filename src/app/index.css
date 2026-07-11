@@ -119,7 +119,7 @@
 
   --radius-pixel: 0; /* explicit-square: dense data surfaces */
   /* Casino radii (PRD §5.3): 8px cards, 10px buttons, 999px pills. */
-  --radius-sm: 10px; /* buttons, inputs, chips, tags, tabs, toasts, callouts, dropdowns, menus */
+  --radius-sm: 8px; /* buttons, inputs, chips, tags, tabs, toasts, callouts, dropdowns, menus (yeet buttons are 8px) */
   --radius-md: 8px; /* cards, panels, modals, sheets */
   --radius-pill: 999px; /* segmented pills, payment strip, chips */
   --border-pixel: 1px; /* hairline: refined to 0.5px on ≥2dppx (see @media below) */
@@ -182,18 +182,21 @@
  */
 :root,
 [data-theme='dark'] {
-  /* Casino surface ladder — literal PRD names */
-  --bg-base: #17161e; /* page background */
-  --bg-rail: #1e1720; /* left rail, chat column */
-  --bg-surface: #292630; /* card rows, ticker strip */
-  --bg-elevated: #272733; /* hero panel, modals */
+  /* Casino surface ladder — re-tinted 2026-07-11 to yeet's own shipped CSS values
+     (their restricted-page bundle defines --DarkCard: #171319 and
+     --StrokeRegular: #2e2b30 — purple-tinted blacks, darker than our first
+     screenshot-sampled pass). Page sits below the card tone. */
+  --bg-base: #100e12; /* page background */
+  --bg-rail: #141115; /* left rail, chat column */
+  --bg-surface: #171319; /* card rows, ticker strip (yeet --DarkCard) */
+  --bg-elevated: #1e1b1e; /* hero panel, modals */
 
   /* Engine surface aliases (existing consumers) */
   --background: var(--bg-base); /* near-black app page */
   --surface: var(--bg-surface); /* panel surface */
   --surface-elevated: var(--bg-elevated); /* raised elements, header, active chips */
-  --border: #322e3b; /* hairline dividers on the purple-grey surfaces */
-  --border-strong: #4a4553; /* contrast borders on active panels and buttons */
+  --border: #2e2b30; /* hairline dividers (yeet --StrokeRegular) */
+  --border-strong: #443f49; /* contrast borders on active panels and buttons */
   --chart-grid: rgba(255, 255, 255, 0.06); /* subtle neutral chart gridlines */
   --grid-line: rgba(255, 255, 255, 0.04); /* subtle page background grid */
 
@@ -209,7 +212,8 @@
   /* Two-accent system + active/glow accent */
   --accent-primary: #248894; /* TEAL — safe / primary / "Add Cash" / "Deposit" */
   --accent-primary-bright: #50d7e9; /* CYAN — active segment, glow, live */
-  --accent-action: #ce37dc; /* MAGENTA — the commit button ONLY ("Create Account", "Place Bet") */
+  --accent-action: #cf38dd; /* MAGENTA — the commit button ONLY ("Create Account", "Place Bet"); yeet's CTA fill */
+  --accent-action-hover: #e870f2; /* yeet's bright magenta — CTA hover */
 
   /* Engine --accent family = the bright-cyan active/glow accent (links, focus,
      live, tab marker, hover halos). Its RGB triplet feeds the glow tokens below. */
@@ -230,6 +234,25 @@
   --glow-accent-lg: 0 0 0 1px var(--accent), 0 0 32px rgba(var(--accent-rgb), 0.55);
   --accent-glow: var(--glow-accent-sm); /* live / active cyan ring + bounded halo */
   --text-glow-accent: none; /* live-data text aura stays off */
+
+  /* yeet's signature CTA treatment, lifted verbatim from their shipped CSS:
+     outer bloom + inset top highlight + inset bottom shade + inset deep bloom.
+     Pairs with --gradient-cta-shade over the flat accent fill. Static box-shadows
+     on chrome only — never on tick-updating data paths. */
+  --glow-cta-magenta:
+    0 0 10px rgba(191, 39, 205, 0.4),
+    inset 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 -1px rgba(0, 0, 0, 0.15),
+    inset 0 0 15px #9413a0;
+  --glow-cta-teal:
+    0 0 10px rgba(80, 215, 233, 0.35),
+    inset 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 -1px rgba(0, 0, 0, 0.15),
+    inset 0 0 15px #14606d;
+  --gradient-cta-shade: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)); /* yeet's CTA darkening overlay */
+  --glow-wordmark:
+    0 0 6px rgba(255, 255, 255, 0.45),
+    0 0 18px rgba(var(--accent-rgb), 0.4); /* neon text glow for the YEET wordmark */
 
   /* Gradient tokens — derived from accent/surface, no new hue. accent = cyan→teal
      CTA / hero fill; surface/glass = subtle cyan tint on calm panels. */
@@ -268,7 +291,7 @@
   --danger: var(--loss);
   --danger-soft: rgba(255, 77, 106, 0.14);
   --text-on-danger: #ffffff;
-  --scrim: rgba(23, 22, 30, 0.76); /* derived from --bg-base */
+  --scrim: rgba(16, 14, 18, 0.76); /* derived from --bg-base */
 
   --shadow-pixel-color: #000000;
   --shadow-pixel-color-soft: var(--accent-primary); /* teal offset shadow ties to palette */
@@ -297,8 +320,8 @@
    * gradient; the side colour appears only on the side pill + mascot, and the hero
    * number is tinted by its own profit/loss sign. Hues reuse the win/loss pair.
    */
-  --pnl-bg-1: #2a2533; /* lighter purple, top-left of the card field */
-  --pnl-bg-2: #17161e; /* deep base, bottom-right */
+  --pnl-bg-1: #262028; /* lighter purple, top-left of the card field */
+  --pnl-bg-2: #100e12; /* deep base, bottom-right */
   --pnl-long-accent: var(--directionUp); /* win green — long side pill + mascot */
   --pnl-long-glow: rgba(36, 255, 150, 0.5);
   --pnl-short-accent: var(--directionDown); /* loss red — short side pill + mascot */

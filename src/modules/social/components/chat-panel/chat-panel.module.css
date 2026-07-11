@@ -114,7 +114,9 @@
   border-radius: 10px;
   background: var(--bg-surface, #171319);
   border: 1px solid var(--accent-action, #cf38dd);
-  box-shadow: 0 0 0 1px rgba(206, 55, 220, 0.15);
+  box-shadow:
+    0 0 10px rgba(191, 39, 205, 0.3),
+    inset 0 0 12px rgba(148, 19, 160, 0.35);
 }
 
 .winThumb {
@@ -240,7 +242,8 @@
   font-size: 13px;
   font-weight: 700;
   color: #ffffff;
-  background: var(--accent-action, #cf38dd);
+  background: var(--gradient-cta-shade, none), var(--accent-action, #cf38dd);
+  box-shadow: var(--glow-cta-magenta, none);
   transition: filter 120ms ease;
 }
 

@@ -16,10 +16,10 @@
   padding: 4px 6px 16px;
 }
 
-/* Rail wordmark tints cyan with a soft glow — the "active/live" accent. */
+/* Rail wordmark — white neon with the layered white→cyan glow, like yeet's. */
 .wordmark {
-  color: var(--accent-primary-bright);
-  text-shadow: var(--glow-halo-soft);
+  color: var(--text-primary);
+  text-shadow: var(--glow-wordmark);
 }
 
 /* Segmented control — teal active, muted disabled "Soon". */
@@ -51,7 +51,8 @@
 
 .segmentActive {
   color: var(--text-primary);
-  background-color: var(--accent-primary);
+  background: var(--gradient-cta-shade), var(--accent-primary);
+  box-shadow: var(--glow-cta-teal);
 }
 
 .segmentDisabled {
@@ -177,20 +178,22 @@
   border: 1px solid var(--accent-primary);
   background-color: transparent;
   color: var(--accent-primary-bright);
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition:
     background-color var(--dur-fast) var(--ease-out-quart),
     border-color var(--dur-fast) var(--ease-out-quart),
-    color var(--dur-fast) var(--ease-out-quart);
+    color var(--dur-fast) var(--ease-out-quart),
+    box-shadow var(--dur-glow) var(--ease-out-quart);
 }
 
 .addCash:hover {
   border-color: var(--accent-primary-bright);
   background-color: var(--accent-soft);
   color: var(--text-primary);
+  box-shadow: var(--glow-cta-teal);
 }

@@ -9,7 +9,7 @@ export function DirectionButtons({ canBet, onPick }: DirectionButtonsProps) {
       <PixelButton
         variant="directionUp"
         fullWidth
-        className={styles.directionButton}
+        className={`${styles.directionButton} ${styles.up}`}
         disabled={!canBet}
         onClick={() => onPick('up')}
         data-testid="bet-up"
@@ -19,7 +19,7 @@ export function DirectionButtons({ canBet, onPick }: DirectionButtonsProps) {
       <PixelButton
         variant="directionDown"
         fullWidth
-        className={styles.directionButton}
+        className={`${styles.directionButton} ${styles.down}`}
         disabled={!canBet}
         onClick={() => onPick('down')}
         data-testid="bet-down"

@@ -95,7 +95,10 @@
 .chipActive {
   border-color: var(--accent-primary-bright);
   background: color-mix(in srgb, var(--accent-primary-bright) 16%, var(--bg-surface));
-  box-shadow: 0 0 0 1px var(--accent-primary-bright);
+  box-shadow:
+    0 0 0 1px var(--accent-primary-bright),
+    0 0 12px rgba(var(--accent-rgb), 0.35),
+    inset 0 1px rgba(255, 255, 255, 0.12);
 }
 
 .chipMax {
@@ -148,7 +151,36 @@
   font-family: var(--font-display, inherit);
   font-weight: 900;
   font-size: 1.35rem;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
+/* yeet's CTA recipe re-hued to the win/loss pair. Compound selectors so these
+   deterministically win over the PixelButton variant fills regardless of CSS
+   bundle order. */
+.directionButton.up:not(:disabled) {
+  background: var(--gradient-cta-shade), var(--win);
+  box-shadow:
+    0 0 10px rgba(36, 255, 150, 0.35),
+    inset 0 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px rgba(0, 0, 0, 0.15),
+    inset 0 0 15px rgba(10, 138, 78, 0.85);
+}
+
+.directionButton.down:not(:disabled) {
+  background: var(--gradient-cta-shade), var(--loss);
+  box-shadow:
+    0 0 10px rgba(255, 77, 106, 0.35),
+    inset 0 1px rgba(255, 255, 255, 0.25),
+    inset 0 -1px rgba(0, 0, 0, 0.15),
+    inset 0 0 15px rgba(160, 19, 49, 0.85);
+}
+
+.directionButton.up:not(:disabled):hover,
+.directionButton.down:not(:disabled):hover {
+  filter: brightness(1.06);
 }
 
 /* ── Confirm sheet ─────────────────────────────────────────────── */
@@ -188,20 +220,23 @@
 .placeBet {
   margin-top: 8px;
   min-height: 64px;
-  border-radius: 10px;
-  border: 1px solid var(--accent-action);
-  background: var(--accent-action);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--gradient-cta-shade), var(--accent-action);
   color: var(--text-primary);
   font-family: var(--font-display, inherit);
   font-weight: 900;
   font-size: 1.25rem;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: filter 120ms ease, transform 80ms ease;
+  box-shadow: var(--glow-cta-magenta);
+  transition: background-color 120ms ease, filter 120ms ease, transform 80ms ease;
 }
 
 .placeBet:hover:not(:disabled) {
-  filter: brightness(1.1);
+  background: var(--gradient-cta-shade), var(--accent-action-hover);
+  filter: brightness(1.04);
 }
 
 .placeBet:active:not(:disabled) {

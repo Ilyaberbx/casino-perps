@@ -72,27 +72,31 @@
   background-color: var(--bg-elevated);
 }
 
-/* Create Account — the magenta commit button (PRD §5.1: magenta = commitment). */
+/* Create Account — the magenta commit button (PRD §5.1: magenta = commitment).
+   Carries yeet's full CTA treatment: shade overlay + bloom/inset recipe,
+   display-face 900 uppercase tracked label. */
 .createAccount {
   height: 40px;
   padding: 0 18px;
   border-radius: var(--radius-sm);
   border: none;
-  background-color: var(--accent-action);
+  background: var(--gradient-cta-shade), var(--accent-action);
   color: var(--text-primary);
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  box-shadow: 0 0 18px rgba(206, 55, 220, 0.35);
+  box-shadow: var(--glow-cta-magenta);
   transition:
-    filter var(--dur-fast) var(--ease-out-quart),
-    box-shadow var(--dur-fast) var(--ease-out-quart);
+    background-color var(--dur-fast) var(--ease-out-quart),
+    filter var(--dur-fast) var(--ease-out-quart);
 }
 
 .createAccount:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 0 26px rgba(206, 55, 220, 0.5);
+  background: var(--gradient-cta-shade), var(--accent-action-hover);
+  filter: brightness(1.04);
 }
 
 @media (max-width: 899.98px) {

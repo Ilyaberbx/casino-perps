@@ -36,7 +36,11 @@ export function AppShell() {
           shell.isRailCollapsed ? `${styles.shell} ${styles.shellRailCollapsed}` : styles.shell
         }
       >
-        <MobileTopBar onAddCash={shell.handleAddCash} onOpenMenu={shell.openMenu} />
+        <MobileTopBar
+          equityLabel={shell.equityLabel}
+          onAddCash={shell.handleAddCash}
+          onOpenMenu={shell.openMenu}
+        />
 
         <aside className={styles.rail}>
           <LeftRail
@@ -49,6 +53,8 @@ export function AppShell() {
         <div className={styles.center}>
           <CenterTopBar
             authenticated={shell.authenticated}
+            equityLabel={shell.equityLabel}
+            isEquityLoading={shell.isEquityLoading}
             onOpenSearch={shell.openSearch}
             onLogIn={shell.handleLogIn}
             onCreateAccount={shell.handleCreateAccount}

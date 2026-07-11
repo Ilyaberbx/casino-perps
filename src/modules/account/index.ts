@@ -21,3 +21,4 @@ export type { User, PrivyId, Wallet, Me, OnboardingInput, AuthError, WalletSourc
 export { DisconnectedTablePlaceholder } from './components/disconnected-table-placeholder/DisconnectedTablePlaceholder'
 export { ConnectWalletGateButton } from './components/connect-wallet-gate-button/ConnectWalletGateButton'
 export { useIsWalletConnected } from './components/use-is-wallet-connected'
+export { useOwnEquity, type OwnEquityView } from './hooks/use-own-equity'

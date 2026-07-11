@@ -24,6 +24,8 @@ vi.mock('@/modules/account', () => ({
     loginWithWallet: () => {},
   }),
   useIsWalletConnected: () => false,
+  useOwnEquity: () => ({ equityUsd: 0, isConnected: false, isLoaded: false }),
+  useAccountModal: () => ({ isOpen: false, open: () => {}, close: () => {} }),
 }))
 
 vi.mock('@/modules/social', () => ({

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useAuth, useIsWalletConnected } from '@/modules/account'
+import { useAuth, useIsWalletConnected, useOwnEquity } from '@/modules/account'
+import { formatUsd } from '@/modules/shared/utils/format-number'
 import { useDepositSheet } from '@/modules/shared/providers/deposit-sheet-provider'
 import { useVenueOnboardingSheet } from '@/modules/shared/providers/venue-onboarding-sheet-provider'
 import type { VenueOnboardingSheetActions } from '@/modules/shared/components/VenueOnboardingSheet'
@@ -16,6 +17,13 @@ export function useAppShell(): UseAppShellReturn {
   const isWalletConnected = useIsWalletConnected()
   const depositSheet = useDepositSheet()
   const onboardingSheet = useVenueOnboardingSheet()
+
+  // Read-only header balance (perp equity). Label only when there is a live
+  // number to show; the loading flag drives the chip's shimmer.
+  const ownEquity = useOwnEquity()
+  const hasEquityToShow = authenticated && ownEquity.isConnected && ownEquity.isLoaded
+  const equityLabel = hasEquityToShow ? formatUsd(ownEquity.equityUsd) : null
+  const isEquityLoading = authenticated && ownEquity.isConnected && !ownEquity.isLoaded
 
   const [isSearchOpen, setSearchOpen] = useState(false)
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -73,6 +81,8 @@ export function useAppShell(): UseAppShellReturn {
   return {
     authenticated,
     isWalletConnected,
+    equityLabel,
+    isEquityLoading,
     isSearchOpen,
     openSearch,
     closeSearch,

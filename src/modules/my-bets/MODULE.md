@@ -13,7 +13,7 @@ The `/my-bets` **Page** — the casino re-skin of the deleted `portfolio/` page 
 ## Owns
 
 - Page composition (`pages/MyBetsPage.tsx`) and its orchestrating hook (`pages/use-my-bets-page.ts`), which composes three colocated single-consumer hooks:
-  - `pages/use-cash-balance.ts` — YOUR CASH from the own-account `PortfolioReader` snapshot (`accountValue`); disconnected ⇒ `0`.
+  - `pages/use-cash-balance.ts` — YOUR CASH as a thin casino-vocabulary alias over `account/`'s `useOwnEquity` (Acting-Address-keyed equity; disconnected ⇒ `0`); the app-shell balance chip reads the same hook.
   - `pages/use-live-bets.ts` — open bets from the own-account `PerpsPositionsSnapshotReader`, projected with each market's ticker + liquidation-price precision; owns the Cash Out (reduce-only full-size market close via the `Trader` port) and its per-symbol in-flight state.
   - `pages/use-settled-bets.ts` — settled history accumulated from the `FillsReader` (each close fill with a `closedPnl`), newest-first, capped at `SETTLED_BETS_LIMIT`.
 - Dumb components (not exported): `components/cash-header/`, `components/live-bets/` (`LiveBetsSection` + `LiveBetRow`), `components/settled-bets/` (`SettledBetsSection` + `SettledBetRow`).

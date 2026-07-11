@@ -12,6 +12,11 @@ export interface UseAppShellReturn {
   authenticated: boolean
   isWalletConnected: boolean
 
+  /** Formatted perp equity for the header chips, null when nothing to show. */
+  equityLabel: string | null
+  /** True while the first portfolio snapshot is in flight (chip shimmer). */
+  isEquityLoading: boolean
+
   /** Market-search overlay (center magnifier + mobile "Markets" tab). */
   isSearchOpen: boolean
   openSearch: () => void

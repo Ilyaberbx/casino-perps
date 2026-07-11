@@ -1,16 +1,20 @@
 import { Search } from 'lucide-react'
 import { AccountAvatarTrigger } from '@/modules/account'
+import { BalanceChip } from './BalanceChip'
 import styles from './center-top-bar.module.css'
 import type { CenterTopBarProps } from './center-top-bar.types'
 
 /**
  * The center column's top bar (desktop). A search magnifier that opens the
- * market-search overlay (PRD 0008 D15) plus the auth controls: the account
- * avatar when signed in, or Log In / Create Account when not. "Create Account"
- * is the magenta commit button (PRD §5.1). Dumb — handlers come from the shell.
+ * market-search overlay (PRD 0008 D15) plus the auth controls: the read-only
+ * perp-equity {@link BalanceChip} + account avatar when signed in, or
+ * Log In / Create Account when not. "Create Account" is the magenta commit
+ * button (PRD §5.1). Dumb — handlers and the equity label come from the shell.
  */
 export function CenterTopBar({
   authenticated,
+  equityLabel,
+  isEquityLoading,
   onOpenSearch,
   onLogIn,
   onCreateAccount,
@@ -30,7 +34,10 @@ export function CenterTopBar({
 
       <div className={styles.right}>
         {authenticated ? (
-          <AccountAvatarTrigger />
+          <>
+            <BalanceChip label={equityLabel} isLoading={isEquityLoading} />
+            <AccountAvatarTrigger />
+          </>
         ) : (
           <>
             <button

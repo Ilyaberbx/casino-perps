@@ -12,7 +12,7 @@
     "harvest:icons": "node scripts/harvest-tv-logoids.mjs",
     "typecheck": "tsc -b --noEmit",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
-    "deploy": "pnpm build && wrangler pages deploy dist"
+    "deploy:pages": "pnpm build && wrangler pages deploy"
   },
   "dependencies": {
     "@nktkas/hyperliquid": "^0.32.2",

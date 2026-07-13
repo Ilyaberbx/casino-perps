@@ -6,19 +6,54 @@ on:
   pull_request:
 
 jobs:
-  client:
+  verify:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: client
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: client/package-lock.json
-      - run: npm ci --legacy-peer-deps
-      - run: npm run lint
-      - run: npm test
-      - run: npm run build
+          node-version: '24'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  deploy:
+    # Only publish merged work; PRs stop at `verify`.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://casino-perps.pages.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+
+      # Vite bakes VITE_* in at build time, so these must be present HERE, not on
+      # the Pages project. A build with them missing still succeeds — it just ships
+      # a broken app (no Privy login, Hyperliquid venue hidden), so treat an empty
+      # secret as a deploy bug.
+      - run: pnpm build
+        env:
+          VITE_PRIVY_APP_ID: ${{ secrets.VITE_PRIVY_APP_ID }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_HYPERLIQUID_NETWORK: ${{ secrets.VITE_HYPERLIQUID_NETWORK }}
+          VITE_HYPERLIQUID_API_URL: ${{ secrets.VITE_HYPERLIQUID_API_URL }}
+          VITE_LANDING_URL: ${{ secrets.VITE_LANDING_URL }}
+
+      # Project name and output dir both come from wrangler.toml
+      # (name = "casino-perps", pages_build_output_dir = "dist").
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy --branch=main

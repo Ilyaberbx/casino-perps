@@ -332,12 +332,14 @@
   display: none;
 }
 
+/* The app shell scrolls with the document (fixed rail + chat, fluid center), so
+   the root boxes must be free to grow past the viewport. `min-height` keeps them
+   filling the screen when a page is short. */
 html,
 body,
 #root {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
 }
 
 body {

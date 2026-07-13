@@ -45,7 +45,13 @@ export function Sheet({
     const root = document.getElementById(ROOT_ELEMENT_ID)
     root?.setAttribute('inert', '')
 
+    // `inert` blocks interaction but not wheel/touch scrolling, so the page would
+    // scroll away behind an open sheet. Lock it, same as `Modal`.
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
     return () => {
+      document.body.style.overflow = previousOverflow
       root?.removeAttribute('inert')
       openerRef.current?.focus?.()
     }

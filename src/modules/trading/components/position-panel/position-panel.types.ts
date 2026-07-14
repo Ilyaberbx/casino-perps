@@ -66,6 +66,9 @@ export interface UsePositionPanelReturn {
   isExitTargetsOpen: boolean
   openExitTargets: () => void
   closeExitTargets: () => void
+  isReduceOpen: boolean
+  openReduce: () => void
+  closeReduce: () => void
   isClosing: boolean
   /** Market-closes the whole position (reduce-only, opposite side). */
   closePosition: () => void
@@ -81,6 +84,7 @@ export interface PositionCardProps {
   onClose: () => void
   /** Absent when the venue exposes no position-protection capability. */
   onSetExitTargets?: () => void
+  onReduce: () => void
 }
 
 export interface PositionOrdersListProps {
@@ -95,4 +99,32 @@ export interface PositionOrderRowProps {
   baseAsset: string
   isCancelling: boolean
   onCancel: (order: Order) => void
+}
+
+/** How a partial reduce executes: now at the mark, or resting at your price. */
+export type ReduceMode = 'market' | 'limit'
+
+export interface UseReducePositionReturn {
+  mode: ReduceMode
+  setMode: (mode: ReduceMode) => void
+  /** 0–1 portion of the open position to close. */
+  fraction: number
+  setFraction: (fraction: number) => void
+  /** Coin size the fraction resolves to, clamped to the open size. */
+  size: number
+  openSize: number
+  limitPriceInput: string
+  setLimitPriceInput: (value: string) => void
+  useMarkPrice: () => void
+  isPriceValid: boolean
+  canSubmit: boolean
+  isSubmitting: boolean
+  submit: () => void
+}
+
+export interface ReducePositionSheetProps {
+  isOpen: boolean
+  onClose: () => void
+  position: PerpPositionSnapshot
+  baseAsset: string
 }

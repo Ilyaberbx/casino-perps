@@ -37,6 +37,7 @@ export function usePositionPanel(): UsePositionPanelReturn {
   const [allOrders, setAllOrders] = useState<ReadonlyArray<Order>>([])
   const [isClosing, setIsClosing] = useState(false)
   const [isExitTargetsOpen, setExitTargetsOpen] = useState(false)
+  const [isReduceOpen, setReduceOpen] = useState(false)
   const [cancellingOrderIds, setCancellingOrderIds] = useState<ReadonlySet<string>>(
     () => new Set(),
   )
@@ -121,6 +122,8 @@ export function usePositionPanel(): UsePositionPanelReturn {
 
   const openExitTargets = useCallback(() => setExitTargetsOpen(true), [])
   const closeExitTargets = useCallback(() => setExitTargetsOpen(false), [])
+  const openReduce = useCallback(() => setReduceOpen(true), [])
+  const closeReduce = useCallback(() => setReduceOpen(false), [])
 
   return {
     position,
@@ -132,6 +135,9 @@ export function usePositionPanel(): UsePositionPanelReturn {
     isExitTargetsOpen,
     openExitTargets,
     closeExitTargets,
+    isReduceOpen,
+    openReduce,
+    closeReduce,
     liquidationPriceText: position
       ? liquidationPriceText(position.liquidationPrice, market)
       : null,

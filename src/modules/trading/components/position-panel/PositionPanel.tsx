@@ -2,6 +2,7 @@ import { usePositionPanel } from './use-position-panel'
 import { PositionCard } from './PositionCard'
 import { PositionOrdersList } from './PositionOrdersList'
 import { SetExitTargetsSheet } from './SetExitTargetsSheet'
+import { ReducePositionSheet } from './ReducePositionSheet'
 import styles from './position-panel.module.css'
 
 /**
@@ -26,6 +27,7 @@ export function PositionPanel() {
         isClosing={panel.isClosing}
         onClose={panel.closePosition}
         onSetExitTargets={panel.supportsExitTargets ? panel.openExitTargets : undefined}
+        onReduce={panel.openReduce}
       />
       {panel.showsOrders ? (
         <PositionOrdersList
@@ -43,6 +45,12 @@ export function PositionPanel() {
           liquidationPriceText={panel.liquidationPriceText}
         />
       ) : null}
+      <ReducePositionSheet
+        isOpen={panel.isReduceOpen}
+        onClose={panel.closeReduce}
+        position={panel.position}
+        baseAsset={panel.baseAsset}
+      />
     </div>
   )
 }

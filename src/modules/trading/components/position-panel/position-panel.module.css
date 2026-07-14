@@ -333,3 +333,55 @@
 .clearButton:hover:not(:disabled) {
   color: var(--directionDown);
 }
+
+.secondaryRow {
+  display: flex;
+  gap: 8px;
+}
+
+.secondaryRow > * {
+  flex: 1;
+}
+
+.presets {
+  display: flex;
+  gap: 6px;
+}
+
+.presetButton {
+  flex: 1;
+  padding: 7px 0;
+  color: var(--text-muted);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.presetButton:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.reduceSize {
+  color: var(--text);
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.midChip {
+  padding: 2px 8px;
+  color: var(--accent);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: transparent;
+  border: var(--border-pixel) solid var(--accent);
+  border-radius: var(--radius-pill);
+}

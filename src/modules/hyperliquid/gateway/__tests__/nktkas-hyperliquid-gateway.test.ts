@@ -62,39 +62,147 @@ describe('createNktkasHyperliquidGateway', () => {
     })
   })
 
-  describe('subscribeWebData2', () => {
-    it('forwards the SDK payload to the listener', async () => {
-      const httpTransport = fakeRequestTransport(() => Promise.reject(new Error('not used')))
-      let capturedListener: ((data: CustomEvent<unknown>) => void) | null = null
-      const { subscription } = makeFakeSubscription()
-      const subscriptionTransport = fakeSubscriptionTransport((_channel, _payload, listener) => {
-        capturedListener = listener
-        return Promise.resolve(subscription)
+  // Hyperliquid removed the `webData2` websocket subscription in the 2026-07
+  // network upgrade (the ws server rejects the frame; `webData3` lacks the
+  // payload). The gateway feeds the stream from a REST `/info webData2` poller
+  // behind the same `ReconnectableSubscription` contract instead.
+  describe('subscribeWebData2 (REST poller)', () => {
+    function buildPollerHarness(respond: (call: number) => Promise<unknown>) {
+      let fetchCount = 0
+      let wsSubscribeCount = 0
+      const httpTransport = fakeRequestTransport((payload) => {
+        expect(payload).toMatchObject({ type: 'webData2', user: ADDRESS })
+        fetchCount += 1
+        return respond(fetchCount)
       })
-      const gateway = createNktkasHyperliquidGateway({ isTestnet: true, httpTransport, subscriptionTransport, logger: buildFakeLogger().logger })
+      const subscriptionTransport = fakeSubscriptionTransport(() => {
+        wsSubscribeCount += 1
+        return Promise.resolve(makeFakeSubscription().subscription)
+      })
+      const pending: Array<() => void> = []
+      const gateway = createNktkasHyperliquidGateway({
+        isTestnet: true,
+        httpTransport,
+        subscriptionTransport,
+        logger: buildFakeLogger().logger,
+        setTimeout: (handler) => {
+          pending.push(handler)
+          return handler
+        },
+        clearTimeout: (handle) => {
+          const index = pending.indexOf(handle as () => void)
+          if (index !== -1) pending.splice(index, 1)
+        },
+      })
+      const flushMicrotasks = async () => {
+        await Promise.resolve()
+        await Promise.resolve()
+        await Promise.resolve()
+      }
+      const runNextPoll = async () => {
+        const handler = pending.shift()
+        handler?.()
+        await flushMicrotasks()
+      }
+      return {
+        gateway,
+        runNextPoll,
+        getFetchCount: () => fetchCount,
+        getWsSubscribeCount: () => wsSubscribeCount,
+        getPendingTimerCount: () => pending.length,
+      }
+    }
 
-      const seen: unknown[] = []
-      const subResult = await gateway.subscribeWebData2(ADDRESS, (data) => seen.push(data))
+    it('never issues a websocket subscribe (the ws webData2 type no longer exists server-side)', async () => {
+      const h = buildPollerHarness(() => Promise.resolve({ serverTime: 1 }))
+      const subResult = await h.gateway.subscribeWebData2(ADDRESS, () => {})
       expect(subResult.isOk()).toBe(true)
-      // Drive the SDK's listener with a synthetic CustomEvent (subscription-method
-      // listeners receive raw events, not custom events, in the real SDK; the
-      // SubscriptionClient handles unwrapping. Here we test that the gateway
-      // forwards whatever the client passes through.)
-      expect(capturedListener).not.toBeNull()
+      expect(h.getWsSubscribeCount()).toBe(0)
+      expect(h.getFetchCount()).toBe(1)
     })
 
-    it('exposes failureSignal that aborts when the SDK subscription fails to resubscribe', async () => {
-      const httpTransport = fakeRequestTransport(() => Promise.reject(new Error('not used')))
-      const { subscription, abortFailure } = makeFakeSubscription()
-      const subscriptionTransport = fakeSubscriptionTransport(() => Promise.resolve(subscription))
-      const gateway = createNktkasHyperliquidGateway({ isTestnet: true, httpTransport, subscriptionTransport, logger: buildFakeLogger().logger })
-      const subResult = await gateway.subscribeWebData2(ADDRESS, () => {})
+    it('first successful poll fans the payload to the listener and resolves the handle', async () => {
+      const h = buildPollerHarness((call) => Promise.resolve({ serverTime: call }))
+      const seen: unknown[] = []
+      const subResult = await h.gateway.subscribeWebData2(ADDRESS, (data) => seen.push(data))
+      expect(subResult.isOk()).toBe(true)
+      expect(seen).toEqual([{ serverTime: 1 }])
+    })
+
+    it('re-polls on the timer and fans subsequent payloads', async () => {
+      const h = buildPollerHarness((call) => Promise.resolve({ serverTime: call }))
+      const seen: unknown[] = []
+      const subResult = await h.gateway.subscribeWebData2(ADDRESS, (data) => seen.push(data))
+      expect(subResult.isOk()).toBe(true)
+      await h.runNextPoll()
+      await h.runNextPoll()
+      expect(seen).toEqual([{ serverTime: 1 }, { serverTime: 2 }, { serverTime: 3 }])
+    })
+
+    it('maps a first-fetch failure into the gateway error kind', async () => {
+      const h = buildPollerHarness(() =>
+        Promise.reject(new HttpRequestError({ response: new Response(null, { status: 429 }), message: 'rate limited' })),
+      )
+      const subResult = await h.gateway.subscribeWebData2(ADDRESS, () => {})
+      expect(subResult.isErr()).toBe(true)
+      if (subResult.isErr()) expect(subResult.error.kind).toBe('rate-limited')
+    })
+
+    it('keeps the subscription alive on a single poll failure', async () => {
+      const h = buildPollerHarness((call) =>
+        call === 2 ? Promise.reject(new Error('blip')) : Promise.resolve({ serverTime: call }),
+      )
+      const seen: unknown[] = []
+      const subResult = await h.gateway.subscribeWebData2(ADDRESS, (data) => seen.push(data))
       expect(subResult.isOk()).toBe(true)
       if (!subResult.isOk()) return
-      const sub = subResult.value
-      expect(sub.failureSignal.aborted).toBe(false)
-      abortFailure()
-      expect(sub.failureSignal.aborted).toBe(true)
+      await h.runNextPoll()
+      expect(subResult.value.failureSignal.aborted).toBe(false)
+      await h.runNextPoll()
+      expect(seen).toEqual([{ serverTime: 1 }, { serverTime: 3 }])
+    })
+
+    it('aborts failureSignal after the consecutive poll-failure limit', async () => {
+      const h = buildPollerHarness((call) =>
+        call === 1 ? Promise.resolve({ serverTime: call }) : Promise.reject(new Error('down')),
+      )
+      const subResult = await h.gateway.subscribeWebData2(ADDRESS, () => {})
+      expect(subResult.isOk()).toBe(true)
+      if (!subResult.isOk()) return
+      await h.runNextPoll()
+      await h.runNextPoll()
+      expect(subResult.value.failureSignal.aborted).toBe(false)
+      await h.runNextPoll()
+      // microtask: the multiplex bridge re-fires the abort in a .then().
+      await Promise.resolve()
+      expect(subResult.value.failureSignal.aborted).toBe(true)
+      // Terminal: no further poll was scheduled — recovery belongs to withReconnect.
+      expect(h.getPendingTimerCount()).toBe(0)
+    })
+
+    it('unsubscribe stops polling', async () => {
+      const h = buildPollerHarness((call) => Promise.resolve({ serverTime: call }))
+      const subResult = await h.gateway.subscribeWebData2(ADDRESS, () => {})
+      expect(subResult.isOk()).toBe(true)
+      if (!subResult.isOk()) return
+      await subResult.value.unsubscribe()
+      expect(h.getPendingTimerCount()).toBe(0)
+      expect(h.getFetchCount()).toBe(1)
+    })
+
+    it('two concurrent subscribes share one poller and tear down on the last unsubscribe', async () => {
+      const h = buildPollerHarness((call) => Promise.resolve({ serverTime: call }))
+      const [resA, resB] = await Promise.all([
+        h.gateway.subscribeWebData2(ADDRESS, () => {}),
+        h.gateway.subscribeWebData2(ADDRESS, () => {}),
+      ])
+      expect(resA.isOk() && resB.isOk()).toBe(true)
+      if (!(resA.isOk() && resB.isOk())) return
+      expect(h.getFetchCount()).toBe(1)
+      await resA.value.unsubscribe()
+      expect(h.getPendingTimerCount()).toBe(1)
+      await resB.value.unsubscribe()
+      expect(h.getPendingTimerCount()).toBe(0)
     })
   })
 

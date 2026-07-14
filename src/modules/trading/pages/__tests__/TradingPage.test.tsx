@@ -17,16 +17,20 @@ vi.mock('../../components/top-bar', () => ({
 vi.mock('../../components/order-entry', () => ({
   SimpleOrderTicket: () => <div data-testid="mock-order-ticket" />,
 }))
+vi.mock('../../components/position-panel', () => ({
+  PositionPanel: () => <div data-testid="mock-position-panel" />,
+}))
 vi.mock('../../providers/favorites-provider', () => ({
   FavoritesProvider: ({ children }: { children: import('react').ReactNode }) => <>{children}</>,
 }))
 
 describe('TradingPage', () => {
-  it('composes the market strip, the chart, and the order ticket', () => {
+  it('composes the market strip, the chart, the position panel, and the order ticket', () => {
     render(<TradingPage />)
     expect(screen.getByTestId('trading-shell')).toBeInTheDocument()
     expect(screen.getByTestId('mock-top-bar')).toBeInTheDocument()
     expect(screen.getByTestId('mock-chart')).toBeInTheDocument()
+    expect(screen.getByTestId('mock-position-panel')).toBeInTheDocument()
     expect(screen.getByTestId('mock-order-ticket')).toBeInTheDocument()
   })
 

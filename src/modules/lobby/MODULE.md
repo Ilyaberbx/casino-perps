@@ -32,7 +32,7 @@ None — client-only. All data flows through the venue `marketData` port; there 
 
 ## Gotchas
 
-- **The shell owns LIVE WINS.** The app shell renders `<LiveWinsTicker/>` above the router outlet. The lobby must **never** render a second `LiveWinsTicker` (or `ChatPanel`) — doing so duplicates the fixture's timer. `HeroBanner` is a plain teal panel, not a ticker.
+- **There is no LIVE WINS ticker.** It was removed when the trade page became a real trading surface (see `social/MODULE.md`). The lobby must not reintroduce one. `HeroBanner` is a plain teal panel, not a ticker. The lobby must also never render a second `ChatPanel` — the shell owns it.
 - **"New Listings" is a proxy, not a dated field.** The domain `Market` has no `listedAt`/`createdAt`, so there is nothing to sort "new" by. `listMarkets()` returns perps in Hyperliquid **universe-append order** (a newly listed asset is appended to the tail), so `build-lobby-sections` takes the *tail* of the native order (excluding Hot) as the newest signal. This is deliberately a listing-order proxy — it is **never** volume-sorted data relabelled as "new". If the venue later exposes a real listing timestamp, switch New Listings to sort by it. (Reported as a blocker for this build.)
 - **`change24hPct` is a fraction on `Market`, a percentage on the card.** `MarketCard` wants `2.4`; `Market.change24hPct` is `0.024`. `MarketCarousel` multiplies by 100 at the seam (`toChangePct`).
 - **"See all" points at `/trade`.** There is no per-category route; the trade screen hosts the full searchable market list, so it is the closest "see all" surface.

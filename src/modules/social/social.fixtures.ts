@@ -6,7 +6,7 @@
 // of this is DISCLOSURE_TEXT ("Chat and Live Wins are simulated.") in
 // social.constants.ts, which a later phase renders as a visible disclosure.
 
-import type { ChatUser, LiveWin, ScriptedChatMessage } from './social.types'
+import type { ChatUser, ScriptedChatMessage } from './social.types'
 
 // Per-user name colors. Teal/cyan are the brand safe accents; the warmer hues add
 // crowd variety. No color carries meaning here — it is purely per-user identity.
@@ -74,21 +74,3 @@ export const SCRIPTED_CHAT_REEL: readonly ScriptedChatMessage[] = [
   { kind: 'text', user: KOLAKINYL, text: 'gg' },
 ] as const
 
-/**
- * The LIVE WINS strip seed. The ticker hook rotates this window on a timer so a
- * fresh card scrolls in without the list length (or memory) changing.
- */
-export const LIVE_WINS_SEED: readonly Omit<LiveWin, 'id'>[] = [
-  { market: 'BTC', username: 'bj22', amountUsd: 26 },
-  { market: 'ETH', username: 'Cypher', amountUsd: 1 },
-  { market: 'SOL', username: 'maurinho', amountUsd: 4 },
-  { market: 'BTC', username: 'bj22', amountUsd: 26 },
-  { market: 'DOGE', username: 'softwarec', amountUsd: 72 },
-  { market: 'ETH', username: 'Cypher', amountUsd: 1 },
-  { market: 'BTC', username: 'bj22', amountUsd: 26 },
-  { market: 'HYPE', username: 'Waaad', amountUsd: 18 },
-  { market: 'SOL', username: 'Cypher', amountUsd: 9 },
-  { market: 'BTC', username: 'RockieRockie', amountUsd: 44 },
-  { market: 'AVAX', username: 'drporny', amountUsd: 5 },
-  { market: 'ETH', username: 'Leo5868', amountUsd: 61 },
-] as const

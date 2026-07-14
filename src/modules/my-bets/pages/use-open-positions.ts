@@ -6,27 +6,26 @@ import {
 } from '@/modules/shared/providers/venue-provider'
 import { toast } from '@/modules/shared/services/toast'
 import type { Market, PerpPositionSnapshot } from '@/modules/shared/domain'
-import { buildFullCloseRequest, projectLiveBet } from '../my-bets.utils'
-import type { LiveBet } from '../my-bets.types'
+import { buildFullCloseRequest, projectOpenPosition } from '../my-bets.utils'
+import type { OpenPositionRow } from '../my-bets.types'
 
 /**
- * The LIVE BETS surface: every open bet across all markets, plus a Cash Out that
- * market-closes the full position through the `Trader` port — the same
- * reduce-only market-close the trade screen uses. Positions come from the
- * Acting-Address-keyed snapshot reader (shows self even while Spectating);
- * markets (optional) supply each bet's display ticker + liquidation-price
- * precision for the D16 prose.
+ * Every open position across all markets, plus a Close that market-closes the
+ * full position through the `Trader` port — the same reduce-only market-close
+ * the trade screen uses. Positions come from the Acting-Address-keyed snapshot
+ * reader (shows self even while Spectating); markets (optional) supply each
+ * row's display ticker + liquidation-price precision.
  */
-export function useLiveBets(): {
-  liveBets: ReadonlyArray<LiveBet>
-  onCashOut(symbol: string): void
+export function useOpenPositions(): {
+  openPositions: ReadonlyArray<OpenPositionRow>
+  onClose(symbol: string): void
 } {
   const trader = useCapability('trader')
   const positionsCap = useOwnCapability('perpsPositionsSnapshot')
   const marketData = useCapabilityOptional('marketData')
   const [positions, setPositions] = useState<ReadonlyArray<PerpPositionSnapshot>>([])
   const [markets, setMarkets] = useState<ReadonlyArray<Market>>([])
-  const [cashingOut, setCashingOut] = useState<ReadonlySet<string>>(() => new Set())
+  const [closing, setClosing] = useState<ReadonlySet<string>>(() => new Set())
 
   useEffect(() => {
     if (!positionsCap) return
@@ -44,35 +43,39 @@ export function useLiveBets(): {
     return map
   }, [markets])
 
-  const onCashOut = useCallback(
+  const onClose = useCallback(
     (symbol: string) => {
       const position = positions.find((entry) => entry.symbol === symbol)
       if (!position) return
-      if (cashingOut.has(symbol)) return
-      setCashingOut((previous) => new Set(previous).add(symbol))
+      if (closing.has(symbol)) return
+      setClosing((previous) => new Set(previous).add(symbol))
       trader.placeOrder(buildFullCloseRequest(position)).match(
         () => {
-          setCashingOut((previous) => removeFrom(previous, symbol))
-          toast.show({ variant: 'success', title: 'Cashed out', description: position.symbol })
+          setClosing((previous) => removeFrom(previous, symbol))
+          toast.show({ variant: 'success', title: 'Position closed', description: position.symbol })
         },
         (error) => {
-          setCashingOut((previous) => removeFrom(previous, symbol))
-          toast.show({ variant: 'error', title: 'Cash out failed', description: error.message })
+          setClosing((previous) => removeFrom(previous, symbol))
+          toast.show({ variant: 'error', title: 'Close failed', description: error.message })
         },
       )
     },
-    [positions, cashingOut, trader],
+    [positions, closing, trader],
   )
 
-  const liveBets = useMemo(
+  const openPositions = useMemo(
     () =>
       positions.map((position) =>
-        projectLiveBet(position, marketsBySymbol.get(position.symbol), cashingOut.has(position.symbol)),
+        projectOpenPosition(
+          position,
+          marketsBySymbol.get(position.symbol),
+          closing.has(position.symbol),
+        ),
       ),
-    [positions, marketsBySymbol, cashingOut],
+    [positions, marketsBySymbol, closing],
   )
 
-  return { liveBets, onCashOut }
+  return { openPositions, onClose }
 }
 
 function removeFrom(set: ReadonlySet<string>, symbol: string): ReadonlySet<string> {

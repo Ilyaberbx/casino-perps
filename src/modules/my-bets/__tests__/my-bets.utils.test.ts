@@ -1,31 +1,22 @@
 import { describe, it, expect } from 'vitest'
 import {
   buildFullCloseRequest,
-  directionLabel,
-  formatLiquidationSentence,
-  isSettlementFill,
+  isCloseFill,
   liquidationPriceText,
-  mergeSettledBet,
-  positionSideToDirection,
-  projectLiveBet,
-  projectSettledBet,
+  mergeClosedTrade,
+  projectClosedTrade,
+  projectOpenPosition,
+  sideLabel,
   tickerFromSymbol,
 } from '../my-bets.utils'
-import { SETTLED_BETS_LIMIT } from '../my-bets.constants'
+import { CLOSED_TRADES_LIMIT } from '../my-bets.constants'
 import { makeFill, makeMarket, makePosition } from '../__fixtures__/venue'
-import type { SettledBet } from '../my-bets.types'
+import type { ClosedTradeRow } from '../my-bets.types'
 
-describe('positionSideToDirection', () => {
-  it('maps long to up and short to down', () => {
-    expect(positionSideToDirection('long')).toBe('up')
-    expect(positionSideToDirection('short')).toBe('down')
-  })
-})
-
-describe('directionLabel', () => {
-  it('uppercases the direction', () => {
-    expect(directionLabel('up')).toBe('UP')
-    expect(directionLabel('down')).toBe('DOWN')
+describe('sideLabel', () => {
+  it('uppercases the position side', () => {
+    expect(sideLabel('long')).toBe('LONG')
+    expect(sideLabel('short')).toBe('SHORT')
   })
 })
 
@@ -49,47 +40,39 @@ describe('liquidationPriceText', () => {
   })
 })
 
-describe('formatLiquidationSentence', () => {
-  it('says "drops below" for an UP bet and "rises above" for a DOWN bet (D16)', () => {
-    expect(formatLiquidationSentence('up', 'BTC', '94,102')).toBe(
-      'You lose this bet if BTC drops below $94,102',
-    )
-    expect(formatLiquidationSentence('down', 'SOL', '212.40')).toBe(
-      'You lose this bet if SOL rises above $212.40',
-    )
-  })
-
-  it('degrades to an honest fallback when the price is unknown', () => {
-    expect(formatLiquidationSentence('up', 'BTC', null)).toBe(
-      'You lose this bet if BTC moves too far against you',
-    )
-  })
-})
-
-describe('projectLiveBet', () => {
-  it('projects a winning long into an UP bet with the liquidation prose', () => {
-    const bet = projectLiveBet(makePosition(), makeMarket(), false)
-    expect(bet).toMatchObject({
+describe('projectOpenPosition', () => {
+  it('projects a profitable long, exposing the liquidation price as a number', () => {
+    const position = projectOpenPosition(makePosition(), makeMarket(), false)
+    expect(position).toMatchObject({
       symbol: 'BTC-PERP',
       ticker: 'BTC',
-      direction: 'up',
+      side: 'long',
       leverage: 10,
-      profitUsd: 124,
-      isWinning: true,
-      isCashingOut: false,
-      liquidationSentence: 'You lose this bet if BTC drops below $94,102',
+      pnlUsd: 124,
+      isUp: true,
+      isClosing: false,
+      liquidationPriceText: '94,102',
     })
   })
 
-  it('marks a negative-profit position as losing', () => {
-    const bet = projectLiveBet(makePosition({ unrealizedPnlUsd: -12 }), makeMarket(), true)
-    expect(bet.isWinning).toBe(false)
-    expect(bet.isCashingOut).toBe(true)
+  it('marks a negative-PnL position as down', () => {
+    const position = projectOpenPosition(makePosition({ unrealizedPnlUsd: -12 }), makeMarket(), true)
+    expect(position.isUp).toBe(false)
+    expect(position.isClosing).toBe(true)
+  })
+
+  it('carries a null liquidation through rather than inventing one', () => {
+    const position = projectOpenPosition(
+      makePosition({ liquidationPrice: null }),
+      makeMarket(),
+      false,
+    )
+    expect(position.liquidationPriceText).toBeNull()
   })
 
   it('falls back to the symbol ticker when the market is unknown', () => {
-    const bet = projectLiveBet(makePosition({ symbol: 'SOL-PERP' }), undefined, false)
-    expect(bet.ticker).toBe('SOL')
+    const position = projectOpenPosition(makePosition({ symbol: 'SOL-PERP' }), undefined, false)
+    expect(position.ticker).toBe('SOL')
   })
 })
 
@@ -112,55 +95,55 @@ describe('buildFullCloseRequest', () => {
   })
 })
 
-describe('isSettlementFill', () => {
+describe('isCloseFill', () => {
   it('accepts a close fill that booked realised pnl', () => {
-    expect(isSettlementFill(makeFill())).toBe(true)
+    expect(isCloseFill(makeFill())).toBe(true)
   })
 
   it('rejects an open fill and a fill with no closedPnl', () => {
-    expect(isSettlementFill(makeFill({ direction: 'Open Long' }))).toBe(false)
-    expect(isSettlementFill(makeFill({ closedPnl: undefined }))).toBe(false)
+    expect(isCloseFill(makeFill({ direction: 'Open Long' }))).toBe(false)
+    expect(isCloseFill(makeFill({ closedPnl: undefined }))).toBe(false)
   })
 })
 
-describe('projectSettledBet', () => {
-  it('reads the original direction from a close-long fill', () => {
-    const bet = projectSettledBet(makeFill({ direction: 'Close Long', closedPnl: 124 }))
-    expect(bet).toMatchObject({ ticker: 'BTC', direction: 'up', profitUsd: 124, isWin: true })
+describe('projectClosedTrade', () => {
+  it('reads the closed side from a close-long fill', () => {
+    const trade = projectClosedTrade(makeFill({ direction: 'Close Long', closedPnl: 124 }))
+    expect(trade).toMatchObject({ ticker: 'BTC', side: 'long', pnlUsd: 124, isUp: true })
   })
 
-  it('reads a close-short fill as a DOWN bet and marks a loss', () => {
-    const bet = projectSettledBet(makeFill({ direction: 'Close Short', closedPnl: -30 }))
-    expect(bet).toMatchObject({ direction: 'down', profitUsd: -30, isWin: false })
+  it('reads a close-short fill as a short and marks a loss', () => {
+    const trade = projectClosedTrade(makeFill({ direction: 'Close Short', closedPnl: -30 }))
+    expect(trade).toMatchObject({ side: 'short', pnlUsd: -30, isUp: false })
   })
 })
 
-describe('mergeSettledBet', () => {
-  it('prepends a settlement, newest first', () => {
+describe('mergeClosedTrade', () => {
+  it('prepends a close, newest first', () => {
     const older = makeFill({ identifier: 'a', timestamp: 1 })
     const newer = makeFill({ identifier: 'b', timestamp: 2 })
-    const afterOlder = mergeSettledBet([], older)
-    const merged = mergeSettledBet(afterOlder, newer)
-    expect(merged.map((bet) => bet.id)).toEqual(['b', 'a'])
+    const afterOlder = mergeClosedTrade([], older)
+    const merged = mergeClosedTrade(afterOlder, newer)
+    expect(merged.map((trade) => trade.id)).toEqual(['b', 'a'])
   })
 
-  it('ignores non-settlement fills', () => {
-    expect(mergeSettledBet([], makeFill({ direction: 'Open Long' }))).toEqual([])
+  it('ignores fills that did not close anything', () => {
+    expect(mergeClosedTrade([], makeFill({ direction: 'Open Long' }))).toEqual([])
   })
 
   it('dedups by fill id', () => {
-    const first = mergeSettledBet([], makeFill({ identifier: 'x', closedPnl: 10 }))
-    const second = mergeSettledBet(first, makeFill({ identifier: 'x', closedPnl: 20 }))
+    const first = mergeClosedTrade([], makeFill({ identifier: 'x', closedPnl: 10 }))
+    const second = mergeClosedTrade(first, makeFill({ identifier: 'x', closedPnl: 20 }))
     expect(second).toHaveLength(1)
-    expect(second[0].profitUsd).toBe(20)
+    expect(second[0].pnlUsd).toBe(20)
   })
 
-  it('caps the list at the settled limit', () => {
-    let list: ReadonlyArray<SettledBet> = []
-    for (let index = 0; index < SETTLED_BETS_LIMIT + 5; index += 1) {
-      list = mergeSettledBet(list, makeFill({ identifier: `f${index}`, timestamp: index }))
+  it('caps the list at the history limit', () => {
+    let list: ReadonlyArray<ClosedTradeRow> = []
+    for (let index = 0; index < CLOSED_TRADES_LIMIT + 5; index += 1) {
+      list = mergeClosedTrade(list, makeFill({ identifier: `f${index}`, timestamp: index }))
     }
-    expect(list).toHaveLength(SETTLED_BETS_LIMIT)
-    expect(list[0].id).toBe(`f${SETTLED_BETS_LIMIT + 4}`)
+    expect(list).toHaveLength(CLOSED_TRADES_LIMIT)
+    expect(list[0].id).toBe(`f${CLOSED_TRADES_LIMIT + 4}`)
   })
 })

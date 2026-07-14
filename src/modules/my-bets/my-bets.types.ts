@@ -1,69 +1,68 @@
-/** A casino bet direction. `up` = long (buy), `down` = short (sell). */
-export type BetDirection = 'up' | 'down'
+/** The side of an open perps position. Mirrors `PerpPositionSnapshot['side']`. */
+export type PositionSide = 'long' | 'short'
 
 /**
- * One open bet, projected from a `PerpPositionSnapshot` for the LIVE BETS list.
- * `profitUsd` is the unrealised profit/loss in quote currency (D16 vocabulary:
- * "profit" / "loss", never "PnL"); `liquidationSentence` is the always-shown
- * plain-prose liquidation warning (D16). `symbol` is the venue market symbol
- * (the Cash Out target); `ticker` is the display coin (`BTC`).
+ * One open position, projected from a `PerpPositionSnapshot`. `pnlUsd` is the
+ * unrealised PnL in quote currency and `liquidationPriceText` the formatted
+ * liquidation price (`null` when the venue has not reported one) — a labelled
+ * number, not the prose warning the casino build used. `symbol` is the venue
+ * market symbol (the close target); `ticker` is the display coin (`BTC`).
  */
-export interface LiveBet {
+export interface OpenPositionRow {
   readonly symbol: string
   readonly ticker: string
-  readonly direction: BetDirection
+  readonly side: PositionSide
   readonly leverage: number
-  readonly profitUsd: number
-  readonly isWinning: boolean
-  readonly liquidationSentence: string
-  readonly isCashingOut: boolean
+  readonly pnlUsd: number
+  readonly isUp: boolean
+  readonly liquidationPriceText: string | null
+  readonly isClosing: boolean
 }
 
 /**
- * One settled bet, projected from a close `Fill` for the SETTLED history list.
- * `profitUsd` is the realised profit/loss the close booked; `isWin` drives the
- * win/loss tone.
+ * One closed trade, projected from a close `Fill`. `pnlUsd` is the realised PnL
+ * the close booked; `isUp` drives the profit/loss tone.
  */
-export interface SettledBet {
+export interface ClosedTradeRow {
   readonly id: string
   readonly ticker: string
-  readonly direction: BetDirection
-  readonly profitUsd: number
-  readonly isWin: boolean
+  readonly side: PositionSide
+  readonly pnlUsd: number
+  readonly isUp: boolean
   readonly timestamp: number
 }
 
-export interface MyBetsPageView {
-  readonly cashLabel: string
+export interface PositionsPageView {
+  readonly equityLabel: string
   readonly isConnected: boolean
-  onAddCash(): void
+  onDeposit(): void
   onWithdraw(): void
-  readonly liveBets: ReadonlyArray<LiveBet>
-  onCashOut(symbol: string): void
-  readonly settledBets: ReadonlyArray<SettledBet>
+  readonly openPositions: ReadonlyArray<OpenPositionRow>
+  onClose(symbol: string): void
+  readonly closedTrades: ReadonlyArray<ClosedTradeRow>
 }
 
-export interface CashHeaderProps {
-  readonly cashLabel: string
+export interface AccountHeaderProps {
+  readonly equityLabel: string
   readonly isConnected: boolean
-  onAddCash(): void
+  onDeposit(): void
   onWithdraw(): void
 }
 
-export interface LiveBetsSectionProps {
-  readonly bets: ReadonlyArray<LiveBet>
-  onCashOut(symbol: string): void
+export interface OpenPositionsSectionProps {
+  readonly positions: ReadonlyArray<OpenPositionRow>
+  onClose(symbol: string): void
 }
 
-export interface LiveBetRowProps {
-  readonly bet: LiveBet
-  onCashOut(symbol: string): void
+export interface OpenPositionRowProps {
+  readonly position: OpenPositionRow
+  onClose(symbol: string): void
 }
 
-export interface SettledBetsSectionProps {
-  readonly bets: ReadonlyArray<SettledBet>
+export interface ClosedTradesSectionProps {
+  readonly trades: ReadonlyArray<ClosedTradeRow>
 }
 
-export interface SettledBetRowProps {
-  readonly bet: SettledBet
+export interface ClosedTradeRowProps {
+  readonly trade: ClosedTradeRow
 }

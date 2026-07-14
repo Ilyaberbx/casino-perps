@@ -4,7 +4,7 @@ import { okAsync, ResultAsync } from 'neverthrow'
 import type { PlaceOrderOutcome, PlaceOrderRequest, Trader } from '@/modules/shared/domain'
 import { makeVenueWrapper } from '@/modules/shared/providers/venue-provider/__fixtures__/venue'
 import { makeMyBetsVenue, makeMarket, makePosition } from '../../__fixtures__/venue'
-import { useLiveBets } from '../use-live-bets'
+import { useOpenPositions } from '../use-open-positions'
 
 const filledOutcome: PlaceOrderOutcome = {
   kind: 'filled',
@@ -15,28 +15,28 @@ const filledOutcome: PlaceOrderOutcome = {
   filledSize: 0.5,
 }
 
-function renderLiveBets(placeOrder: Trader['placeOrder'], positions = [makePosition()]) {
+function renderOpenPositions(placeOrder: Trader['placeOrder'], positions = [makePosition()]) {
   const venue = makeMyBetsVenue({ placeOrder, positions, markets: [makeMarket()] })
-  return renderHook(() => useLiveBets(), { wrapper: makeVenueWrapper(venue) })
+  return renderHook(() => useOpenPositions(), { wrapper: makeVenueWrapper(venue) })
 }
 
-describe('useLiveBets', () => {
-  it('projects each open position into a live bet with liquidation prose', () => {
+describe('useOpenPositions', () => {
+  it('projects each open position, exposing the liquidation price as a number', () => {
     const placeOrder = vi.fn<Trader['placeOrder']>(() => okAsync(filledOutcome))
-    const { result } = renderLiveBets(placeOrder)
-    expect(result.current.liveBets).toHaveLength(1)
-    expect(result.current.liveBets[0]).toMatchObject({
+    const { result } = renderOpenPositions(placeOrder)
+    expect(result.current.openPositions).toHaveLength(1)
+    expect(result.current.openPositions[0]).toMatchObject({
       ticker: 'BTC',
-      direction: 'up',
-      liquidationSentence: 'You lose this bet if BTC drops below $94,102',
+      side: 'long',
+      liquidationPriceText: '94,102',
     })
   })
 
-  it('cashes out via a reduce-only full-size market close on the opposite side', () => {
+  it('closes via a reduce-only full-size market order on the opposite side', () => {
     const placeOrder = vi.fn<Trader['placeOrder']>(() => okAsync(filledOutcome))
-    const { result } = renderLiveBets(placeOrder)
+    const { result } = renderOpenPositions(placeOrder)
 
-    act(() => result.current.onCashOut('BTC-PERP'))
+    act(() => result.current.onClose('BTC-PERP'))
 
     expect(placeOrder).toHaveBeenCalledTimes(1)
     const request = placeOrder.mock.calls[0][0] as PlaceOrderRequest
@@ -49,28 +49,28 @@ describe('useLiveBets', () => {
     })
   })
 
-  it('ignores a cash-out for a symbol with no open bet', () => {
+  it('ignores a close for a symbol with no open position', () => {
     const placeOrder = vi.fn<Trader['placeOrder']>(() => okAsync(filledOutcome))
-    const { result } = renderLiveBets(placeOrder)
-    act(() => result.current.onCashOut('DOGE-PERP'))
+    const { result } = renderOpenPositions(placeOrder)
+    act(() => result.current.onClose('DOGE-PERP'))
     expect(placeOrder).not.toHaveBeenCalled()
   })
 
-  it('marks the bet as cashing out while the close is in flight, then clears it', async () => {
+  it('marks the position as closing while the close is in flight, then clears it', async () => {
     let resolveClose: (outcome: PlaceOrderOutcome) => void = () => {}
     const pending = new Promise<PlaceOrderOutcome>((resolve) => {
       resolveClose = resolve
     })
     const placeOrder = vi.fn<Trader['placeOrder']>(() => ResultAsync.fromSafePromise(pending))
-    const { result } = renderLiveBets(placeOrder)
+    const { result } = renderOpenPositions(placeOrder)
 
-    act(() => result.current.onCashOut('BTC-PERP'))
-    expect(result.current.liveBets[0].isCashingOut).toBe(true)
+    act(() => result.current.onClose('BTC-PERP'))
+    expect(result.current.openPositions[0].isClosing).toBe(true)
 
     await act(async () => {
       resolveClose(filledOutcome)
       await pending
     })
-    expect(result.current.liveBets[0].isCashingOut).toBe(false)
+    expect(result.current.openPositions[0].isClosing).toBe(false)
   })
 })

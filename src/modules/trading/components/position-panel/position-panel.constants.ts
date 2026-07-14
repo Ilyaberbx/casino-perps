@@ -14,3 +14,5 @@ export const ORDER_KIND_CLASS: Readonly<Record<PositionOrderKind, string>> = {
   'stop-loss': 'kindStopLoss',
   limit: 'kindLimit',
 }
+
+export const EXIT_TARGETS_TITLE = 'Set exit targets'

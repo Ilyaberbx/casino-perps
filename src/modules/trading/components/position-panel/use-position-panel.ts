@@ -29,12 +29,14 @@ export function usePositionPanel(): UsePositionPanelReturn {
   const trader = useCapability('trader')
   const positionsCap = useOwnCapability('perpsPositionsSnapshot')
   const openOrdersCap = useCapabilityOptional('openOrdersSnapshot')
+  const protectionCap = useCapabilityOptional('positionProtection')
   const isSpectating = useIsSpectating()
   const { selectedMarket, market } = useSelectedMarketContext()
 
   const [positions, setPositions] = useState<ReadonlyArray<PerpPositionSnapshot>>([])
   const [allOrders, setAllOrders] = useState<ReadonlyArray<Order>>([])
   const [isClosing, setIsClosing] = useState(false)
+  const [isExitTargetsOpen, setExitTargetsOpen] = useState(false)
   const [cancellingOrderIds, setCancellingOrderIds] = useState<ReadonlySet<string>>(
     () => new Set(),
   )
@@ -117,10 +119,19 @@ export function usePositionPanel(): UsePositionPanelReturn {
     [cancellingOrderIds, trader],
   )
 
+  const openExitTargets = useCallback(() => setExitTargetsOpen(true), [])
+  const closeExitTargets = useCallback(() => setExitTargetsOpen(false), [])
+
   return {
     position,
     orders,
     showsOrders: openOrdersCap !== undefined && !isSpectating,
+    // Protection is optional on the port; hide the affordance when the venue
+    // cannot honour it rather than offering a button that always fails.
+    supportsExitTargets: protectionCap !== undefined && !isSpectating,
+    isExitTargetsOpen,
+    openExitTargets,
+    closeExitTargets,
     liquidationPriceText: position
       ? liquidationPriceText(position.liquidationPrice, market)
       : null,

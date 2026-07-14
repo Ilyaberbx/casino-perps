@@ -1,6 +1,7 @@
 import { usePositionPanel } from './use-position-panel'
 import { PositionCard } from './PositionCard'
 import { PositionOrdersList } from './PositionOrdersList'
+import { SetExitTargetsSheet } from './SetExitTargetsSheet'
 import styles from './position-panel.module.css'
 
 /**
@@ -24,6 +25,7 @@ export function PositionPanel() {
         baseAsset={panel.baseAsset}
         isClosing={panel.isClosing}
         onClose={panel.closePosition}
+        onSetExitTargets={panel.supportsExitTargets ? panel.openExitTargets : undefined}
       />
       {panel.showsOrders ? (
         <PositionOrdersList
@@ -31,6 +33,14 @@ export function PositionPanel() {
           baseAsset={panel.baseAsset}
           cancellingOrderIds={panel.cancellingOrderIds}
           onCancel={panel.cancelOrder}
+        />
+      ) : null}
+      {panel.supportsExitTargets ? (
+        <SetExitTargetsSheet
+          isOpen={panel.isExitTargetsOpen}
+          onClose={panel.closeExitTargets}
+          position={panel.position}
+          liquidationPriceText={panel.liquidationPriceText}
         />
       ) : null}
     </div>

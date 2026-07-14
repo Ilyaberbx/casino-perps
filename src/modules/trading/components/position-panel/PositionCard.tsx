@@ -15,6 +15,7 @@ export function PositionCard({
   baseAsset,
   isClosing,
   onClose,
+  onSetExitTargets,
 }: PositionCardProps) {
   const isLong = position.side === 'long'
   const isUp = position.unrealizedPnlUsd >= 0
@@ -64,17 +65,29 @@ export function PositionCard({
         </div>
       </dl>
 
-      <PixelButton
-        variant={isLong ? 'directionDown' : 'directionUp'}
-        size="md"
-        fullWidth
-        elevated
-        disabled={isClosing}
-        onClick={onClose}
-        data-testid="close-position"
-      >
-        {isClosing ? 'Closing…' : `Close ${formatUsd(position.positionValueUsd)}`}
-      </PixelButton>
+      <div className={styles.actions}>
+        {onSetExitTargets ? (
+          <button
+            type="button"
+            className={styles.secondaryAction}
+            onClick={onSetExitTargets}
+            data-testid="open-exit-targets"
+          >
+            Set exit targets
+          </button>
+        ) : null}
+        <PixelButton
+          variant={isLong ? 'directionDown' : 'directionUp'}
+          size="md"
+          fullWidth
+          elevated
+          disabled={isClosing}
+          onClick={onClose}
+          data-testid="close-position"
+        >
+          {isClosing ? 'Closing…' : `Close ${formatUsd(position.positionValueUsd)}`}
+        </PixelButton>
+      </div>
     </div>
   )
 }

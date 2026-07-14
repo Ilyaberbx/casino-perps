@@ -3,25 +3,37 @@ import { describe, it, expect } from 'vitest'
 import type { ReactNode } from 'react'
 import { ThemeProvider } from '../../../providers/theme-provider'
 import { SettingsProvider } from '../../../providers/settings-provider'
+import { TradingModeProvider } from '../../../providers/trading-mode-provider'
 import { useSettingsModal } from '../use-settings-modal'
 
 function wrapper({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
-      <SettingsProvider>{children}</SettingsProvider>
+      <SettingsProvider>
+        <TradingModeProvider>{children}</TradingModeProvider>
+      </SettingsProvider>
     </ThemeProvider>
   )
 }
 
 describe('useSettingsModal', () => {
-  // Pro mode is gone (PRD-0008 D7): the Trading section was removed, leaving
-  // only Appearance.
-  it('exposes the appearance section and the ten colors with cyan selected', () => {
+  it('exposes the appearance and trading sections, with the ten colors and cyan selected', () => {
     const { result } = renderHook(() => useSettingsModal(), { wrapper })
-    expect(result.current.sections.map((section) => section.id)).toEqual(['appearance'])
+    expect(result.current.sections.map((section) => section.id)).toEqual([
+      'appearance',
+      'trading',
+    ])
     expect(result.current.activeSection).toBe('appearance')
     expect(result.current.colors).toHaveLength(10)
     expect(result.current.selectedColorId).toBe('cyan')
+  })
+
+  it('defaults the trade layout to simple and onSelectTradingMode switches it', () => {
+    localStorage.clear()
+    const { result } = renderHook(() => useSettingsModal(), { wrapper })
+    expect(result.current.tradingMode).toBe('simple')
+    act(() => result.current.onSelectTradingMode('pro'))
+    expect(result.current.tradingMode).toBe('pro')
   })
 
   it('onSelectColor changes the selected accent color', () => {

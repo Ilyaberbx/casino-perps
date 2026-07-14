@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { VenueOnboardingSheetActions } from '@/modules/shared/components/VenueOnboardingSheet'
+import type { RailAction } from './left-rail'
 
 /** Passed to route pages via `<Outlet context>`. The casino shell owns the
  * mobile chrome globally, so app-level header controls are no longer injected
@@ -34,6 +35,10 @@ export interface UseAppShellReturn {
 
   /** Opens Add Cash (deposit) and dismisses any open mobile drawer. */
   handleAddCash: () => void
+  /** Opens the Settings modal (rail item + mobile drawer cell). */
+  handleOpenSettings: () => void
+  /** Runs an action-kind rail item. */
+  handleRailAction: (action: RailAction) => void
   handleLogIn: () => void
   handleCreateAccount: () => void
   /** Desktop rail collapse — icon-only 76px rail when true. */

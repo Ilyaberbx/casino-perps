@@ -19,6 +19,7 @@ export function MobileMenuDrawer({
   onClose,
   authenticated,
   onAddCash,
+  onRailAction,
   onLogIn,
   onCreateAccount,
 }: MobileMenuDrawerProps) {
@@ -41,7 +42,12 @@ export function MobileMenuDrawer({
             )}
           </div>
           <div className={styles.railSlot}>
-            <LeftRail collapsed={false} onAddCash={onAddCash} onCollapse={onClose} />
+            <LeftRail
+              collapsed={false}
+              onAddCash={onAddCash}
+              onCollapse={onClose}
+              onRailAction={onRailAction}
+            />
           </div>
         </div>
       )}

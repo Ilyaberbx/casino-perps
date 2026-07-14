@@ -2,8 +2,10 @@ import { useCallback, useMemo, useState } from 'react'
 import { useAuth, useIsWalletConnected, useOwnEquity } from '@/modules/account'
 import { formatUsd } from '@/modules/shared/utils/format-number'
 import { useDepositSheet } from '@/modules/shared/providers/deposit-sheet-provider'
+import { useSettings } from '@/modules/shared/providers/settings-provider'
 import { useVenueOnboardingSheet } from '@/modules/shared/providers/venue-onboarding-sheet-provider'
 import type { VenueOnboardingSheetActions } from '@/modules/shared/components/VenueOnboardingSheet'
+import type { RailAction } from './left-rail'
 import type { UseAppShellReturn } from './app-shell.types'
 
 /**
@@ -17,6 +19,7 @@ export function useAppShell(): UseAppShellReturn {
   const isWalletConnected = useIsWalletConnected()
   const depositSheet = useDepositSheet()
   const onboardingSheet = useVenueOnboardingSheet()
+  const settings = useSettings()
 
   // Read-only header balance (perp equity). Label only when there is a live
   // number to show; the loading flag drives the chip's shimmer.
@@ -41,6 +44,20 @@ export function useAppShell(): UseAppShellReturn {
     setMenuOpen(false)
     depositSheet.open()
   }, [depositSheet])
+
+  const handleOpenSettings = useCallback(() => {
+    setMenuOpen(false)
+    settings.open()
+  }, [settings])
+
+  // The rail's action-kind items open in-app surfaces rather than navigating.
+  // Settings is the only one today; the switch keeps the union exhaustive.
+  const handleRailAction = useCallback(
+    (action: RailAction) => {
+      if (action === 'settings') handleOpenSettings()
+    },
+    [handleOpenSettings],
+  )
 
   const handleLogIn = useCallback(() => {
     openConnectModal?.()
@@ -93,6 +110,8 @@ export function useAppShell(): UseAppShellReturn {
     openChat,
     closeChat,
     handleAddCash,
+    handleOpenSettings,
+    handleRailAction,
     handleLogIn,
     handleCreateAccount,
     isRailCollapsed,

@@ -13,7 +13,9 @@ const VIEW_PARAM = 'view'
 const DEFAULT_LOBBY_VIEW = 'all'
 
 function isItemActive(item: RailItem, pathname: string, currentView: string): boolean {
-  if (item.kind === 'mailto') return false
+  // Neither leaves the current location: mailto hands off to a mail client, and
+  // an action opens a modal. There is nothing for them to match against.
+  if (item.kind === 'mailto' || item.kind === 'action') return false
 
   if (item.kind === 'route') {
     return pathname === item.to || pathname.startsWith(`${item.to}/`)

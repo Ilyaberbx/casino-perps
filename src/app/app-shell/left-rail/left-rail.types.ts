@@ -29,7 +29,21 @@ export interface RailMailtoItem {
   href: string
 }
 
-export type RailItem = RailLobbyItem | RailRouteItem | RailMailtoItem
+/** A rail item that runs an in-app action instead of navigating (Settings).
+ * Renders as a button, never highlights as "active" — it opens a modal, so
+ * there is no location for it to match. */
+export interface RailActionItem {
+  kind: 'action'
+  key: string
+  label: string
+  icon: LucideIcon
+  action: RailAction
+}
+
+/** The in-app actions a rail item may trigger. */
+export type RailAction = 'settings'
+
+export type RailItem = RailLobbyItem | RailRouteItem | RailMailtoItem | RailActionItem
 
 /** A labelled (or unlabelled) group of rail items. */
 export interface RailGroup {
@@ -58,6 +72,8 @@ export interface LeftRailProps {
   onAddCash: () => void
   /** Toggles the shell's collapsed rail state. */
   onCollapse: () => void
+  /** Runs an action-kind rail item (today: opens the Settings modal). */
+  onRailAction: (action: RailAction) => void
 }
 
 export interface UseLeftRailReturn {

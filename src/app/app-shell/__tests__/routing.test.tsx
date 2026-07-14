@@ -50,7 +50,16 @@ vi.mock('@/modules/shared/components/VenueOnboardingSheet', () => ({
 vi.mock('@/modules/shared/components/deposit-sheet', () => ({ DepositSheet: () => null }))
 vi.mock('@/modules/shared/components/transfer-sheet', () => ({ TransferSheet: () => null }))
 vi.mock('@/modules/shared/components/manage-funds-modal', () => ({ ManageFundsModal: () => null }))
-vi.mock('@/modules/shared/components/settings-modal', () => ({ SettingsModal: () => null }))
+// Stands in for the real modal (which would drag in the theme + trading-mode
+// providers) but stays honest about the one thing this suite asserts: that the
+// rail's Settings item actually flips the shared open state.
+vi.mock('@/modules/shared/components/settings-modal', async () => {
+  const { useSettings } = await import('@/modules/shared/providers/settings-provider')
+  return {
+    SettingsModal: () =>
+      useSettings().isOpen ? <div data-testid="settings-modal-open" /> : null,
+  }
+})
 
 const openDepositSpy = vi.fn()
 vi.mock('@/modules/shared/providers/deposit-sheet-provider', () => ({
@@ -60,21 +69,26 @@ vi.mock('@/modules/shared/providers/venue-onboarding-sheet-provider', () => ({
   useVenueOnboardingSheet: () => ({ isOpen: false, open: () => {}, close: () => {} }),
 }))
 
+import { SettingsProvider } from '@/modules/shared/providers/settings-provider'
 import { AppShell } from '../AppShell'
 
+// `SettingsProvider` is real (not stubbed): the shell hook reads `useSettings()`
+// so the rail's Settings item has something to open.
 function harness(initialPath: string) {
   return (
-    <MemoryRouter initialEntries={[initialPath]}>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route index element={<div>LOBBY_PAGE</div>} />
-          <Route path="trade" element={<Navigate to="/trade/BTC-PERP" replace />} />
-          <Route path="trade/:symbol" element={<div>TRADE_PAGE</div>} />
-          <Route path="my-bets" element={<div>MY_BETS_PAGE</div>} />
-        </Route>
-        <Route path="*" element={<div>NO_MATCH</div>} />
-      </Routes>
-    </MemoryRouter>
+    <SettingsProvider>
+      <MemoryRouter initialEntries={[initialPath]}>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route index element={<div>LOBBY_PAGE</div>} />
+            <Route path="trade" element={<Navigate to="/trade/BTC-PERP" replace />} />
+            <Route path="trade/:symbol" element={<div>TRADE_PAGE</div>} />
+            <Route path="my-bets" element={<div>MY_BETS_PAGE</div>} />
+          </Route>
+          <Route path="*" element={<div>NO_MATCH</div>} />
+        </Routes>
+      </MemoryRouter>
+    </SettingsProvider>
   )
 }
 
@@ -148,5 +162,12 @@ describe('AppShell casino routing', () => {
     render(harness('/'))
     await userEvent.click(screen.getByTestId('rail-add-cash'))
     expect(openDepositSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('the rail Settings item opens the settings modal', async () => {
+    render(harness('/'))
+    expect(screen.queryByTestId('settings-modal-open')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByTestId('rail-item-settings'))
+    expect(screen.getByTestId('settings-modal-open')).toBeInTheDocument()
   })
 })

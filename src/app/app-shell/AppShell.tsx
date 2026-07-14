@@ -47,6 +47,7 @@ export function AppShell() {
             collapsed={shell.isRailCollapsed}
             onAddCash={shell.handleAddCash}
             onCollapse={shell.handleCollapse}
+            onRailAction={shell.handleRailAction}
           />
         </aside>
 
@@ -81,6 +82,7 @@ export function AppShell() {
           onClose={shell.closeMenu}
           authenticated={shell.authenticated}
           onAddCash={shell.handleAddCash}
+          onRailAction={shell.handleRailAction}
           onLogIn={shell.handleLogIn}
           onCreateAccount={shell.handleCreateAccount}
         />

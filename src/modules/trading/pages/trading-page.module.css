@@ -1,19 +1,34 @@
-/* Casino-Mode trade screen container (PRD §8). The 3-column app shell,
-   LIVE WINS ticker, and chat are owned by `app/AppShell`; this is the center
-   trade column only. */
+/* The trade screen's center column. The 3-column app shell and chat are owned by
+   `app/AppShell`; this is the trade column only. */
 .shell {
   display: flex;
   flex-direction: column;
+  gap: 12px;
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
   padding: 16px;
 }
 
+.marketStrip {
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  overflow: hidden;
+}
+
 .chartCard {
   position: relative;
   height: clamp(220px, 34vh, 360px);
-  border-radius: 8px;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  background: var(--bg-elevated);
+  background-color: var(--surface);
+}
+
+.ticketCard {
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--surface);
 }

@@ -11,4 +11,14 @@ export { LeverageMarginProvider } from './providers/leverage-margin'
 export { OrderIntentProvider } from './providers/order-intent-provider'
 export { type MarketSymbol } from './providers/selected-market-provider'
 export { DEFAULT_SELECTED_MARKET } from './providers/selected-market-provider/selected-market-provider.constants'
-export { FavoritesProvider } from './providers/favorites-provider'
+// Favorites + Recent are app-wide (the left rail exposes both as lobby views, and
+// the lobby reads them through these hooks). The `*Optional` variants are what
+// the lobby actually uses — see the hook docs.
+export { FavoritesProvider, useFavorites, useFavoritesOptional } from './providers/favorites-provider'
+export type { FavoritesContextValue } from './providers/favorites-provider'
+export {
+  RecentMarketsProvider,
+  useRecentMarkets,
+  useRecentMarketsOptional,
+} from './providers/recent-markets-provider'
+export type { RecentMarketsContextValue } from './providers/recent-markets-provider'

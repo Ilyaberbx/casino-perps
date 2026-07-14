@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { MarketCard, MarketCardSkeleton } from '../market-card'
 import { tradeHref } from '../../utils/trade-href'
+import { toChangePct } from '../../utils/to-change-pct'
 import { useCarousel } from './use-carousel'
-import { toChangePct } from './market-carousel.utils'
 import styles from './market-carousel.module.css'
 import type { MarketCarouselProps } from './market-carousel.types'
 
@@ -12,18 +12,24 @@ import type { MarketCarouselProps } from './market-carousel.types'
 const SKELETON_COUNT = 8
 const SKELETON_KEYS = Array.from({ length: SKELETON_COUNT }, (_, i) => i)
 
-// The trade screen hosts the full, searchable market list — the closest "see
-// all" surface, since the lobby has no per-category route.
-const SEE_ALL_HREF = '/trade'
-
 /**
  * One lobby carousel row (PRD 0008, lobby phase): an icon + title, a "SEE ALL"
  * link, and prev/next arrows top-right, over a horizontal scroll-snap strip of
  * poster cards. Dumb w.r.t. data — markets and loading come from `useLobby`;
  * only the local scroll/paging state lives in `useCarousel`. Cards navigate to
  * `/trade/:symbol` via `<Link>`.
+ *
+ * "See all" points at this section's focused grid (`/?view=hot`), supplied by the
+ * page. It used to hardcode `/trade` — the closest thing to a see-all surface
+ * back when the lobby had no per-section route. It does now.
  */
-export function MarketCarousel({ title, icon: Icon, markets, isLoading }: MarketCarouselProps) {
+export function MarketCarousel({
+  title,
+  icon: Icon,
+  markets,
+  isLoading,
+  seeAllHref,
+}: MarketCarouselProps) {
   const { scrollRef, canPrev, canNext, page } = useCarousel()
 
   const isEmpty = !isLoading && markets.length === 0
@@ -34,9 +40,11 @@ export function MarketCarousel({ title, icon: Icon, markets, isLoading }: Market
         <div className={styles.heading}>
           <Icon className={styles.icon} size={18} aria-hidden="true" />
           <h2 className={styles.title}>{title}</h2>
-          <Link className={styles.seeAll} to={SEE_ALL_HREF}>
-            See all
-          </Link>
+          {seeAllHref !== null && (
+            <Link className={styles.seeAll} to={seeAllHref}>
+              See all
+            </Link>
+          )}
         </div>
         <div className={styles.arrows}>
           <button

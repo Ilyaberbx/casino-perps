@@ -91,3 +91,24 @@ export function reconcileFavorites(
   const liveSet = new Set(liveMarkets.map((m) => m.symbol))
   return new Set([...storedSymbols].filter((sym) => liveSet.has(sym)))
 }
+
+/**
+ * Records a market visit into the recent list: prepend → dedup → cap at `limit`.
+ * Re-visiting a market already in the list moves it back to the front rather
+ * than duplicating it. The input array is never mutated.
+ *
+ * Unknown or delisted symbols are NOT filtered here — the write path has no
+ * venue universe to check against. The Recent view intersects with the live
+ * markets at read time instead, so a delisting self-heals (the same shape as
+ * `reconcileFavorites`, just deferred to the reader).
+ *
+ * Pure function — no React, no I/O, no module state.
+ */
+export function recordRecentMarket(
+  symbols: ReadonlyArray<string>,
+  symbol: string,
+  limit: number,
+): string[] {
+  const withoutSymbol = symbols.filter((entry) => entry !== symbol)
+  return [symbol, ...withoutSymbol].slice(0, limit)
+}

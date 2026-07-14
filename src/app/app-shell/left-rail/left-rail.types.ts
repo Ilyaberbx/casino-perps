@@ -1,14 +1,16 @@
 import type { LucideIcon } from 'lucide-react'
+import type { LobbyView } from '@/modules/lobby'
 
-/** A rail item that returns to the lobby, optionally pre-selecting a view. The
- * lobby phase reads `?view=` to filter; today every lobby item lands on `/`. */
+/** A rail item that returns to the lobby, selecting a view. The lobby reads
+ * `?view=` and renders a focused grid for it; `all` is the bare lobby. */
 export interface RailLobbyItem {
   kind: 'lobby'
   key: string
   label: string
   icon: LucideIcon
-  /** Lobby view key. `all` is the bare lobby (no query). */
-  view: 'favorites' | 'recent' | 'hot' | 'new' | 'all'
+  /** Lobby view key. `all` is the bare lobby (no query). Owned by `@/modules/lobby`
+   *  — the rail writes these URLs, the lobby renders them, so the union has one home. */
+  view: LobbyView
 }
 
 /** A rail item that navigates to a first-class route (My Bets). */

@@ -1,33 +1,32 @@
 import { useCallback } from 'react'
 import { useManageFunds } from '@/modules/shared/providers/manage-funds-provider'
 import { formatUsd } from '@/modules/shared/utils/format-number'
-import { useCashBalance } from './use-cash-balance'
-import { useLiveBets } from './use-live-bets'
-import { useSettledBets } from './use-settled-bets'
-import type { MyBetsPageView } from '../my-bets.types'
+import { useAccountEquity } from './use-account-equity'
+import { useOpenPositions } from './use-open-positions'
+import { useClosedTrades } from './use-closed-trades'
+import type { PositionsPageView } from '../my-bets.types'
 
 /**
- * Page orchestrator for My Bets (PRD 0008 D11). Composes the cash-balance,
- * live-bets, and settled-bets hooks and wires ADD CASH / WITHDRAW to the shared
- * Manage Funds surface ("Add Cash" = Deposit, "Withdraw" = the withdraw tab —
- * the D7 vocabulary is applied at the button labels, not here).
+ * Page orchestrator for the positions page. Composes the equity, open-positions,
+ * and closed-trades hooks and wires Deposit / Withdraw to the shared Manage
+ * Funds surface.
  */
-export function useMyBetsPage(): MyBetsPageView {
-  const { cashUsd, isConnected } = useCashBalance()
-  const { liveBets, onCashOut } = useLiveBets()
-  const settledBets = useSettledBets()
+export function useMyBetsPage(): PositionsPageView {
+  const { equityUsd, isConnected } = useAccountEquity()
+  const { openPositions, onClose } = useOpenPositions()
+  const closedTrades = useClosedTrades()
   const { open } = useManageFunds()
 
-  const onAddCash = useCallback(() => open('deposit'), [open])
+  const onDeposit = useCallback(() => open('deposit'), [open])
   const onWithdraw = useCallback(() => open('withdraw'), [open])
 
   return {
-    cashLabel: formatUsd(cashUsd),
+    equityLabel: formatUsd(equityUsd),
     isConnected,
-    onAddCash,
+    onDeposit,
     onWithdraw,
-    liveBets,
-    onCashOut,
-    settledBets,
+    openPositions,
+    onClose,
+    closedTrades,
   }
 }

@@ -1,6 +1,6 @@
-// Public and internal types for the `social` module: the fake chat reel and the
-// LIVE WINS ticker. All of this is fixture-driven, non-networked social proof —
-// see social.fixtures.ts for the standing disclosure.
+// Public and internal types for the `social` module: the fake chat reel. This is
+// fixture-driven, non-networked social proof — see social.fixtures.ts for the
+// standing disclosure.
 
 export type ChatMessageKind = 'text' | 'win-brag' | 'tip'
 
@@ -54,10 +54,3 @@ export interface ChatTextToken {
   readonly isMention: boolean
 }
 
-export interface LiveWin {
-  readonly id: string
-  /** The market the (simulated) win landed on, e.g. `BTC`. */
-  readonly market: string
-  readonly username: string
-  readonly amountUsd: number
-}

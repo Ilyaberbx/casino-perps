@@ -29,9 +29,8 @@ vi.mock('@/modules/account', () => ({
 }))
 
 vi.mock('@/modules/social', () => ({
-  LiveWinsTicker: () => <div data-testid="live-wins" />,
   ChatPanel: () => <div data-testid="chat-panel" />,
-  DISCLOSURE_TEXT: 'Chat and Live Wins are simulated.',
+  DISCLOSURE_TEXT: 'Chat is simulated.',
 }))
 
 vi.mock('@/modules/trading', () => ({
@@ -123,10 +122,9 @@ describe('AppShell casino routing', () => {
     expect(screen.getByText('NO_MATCH')).toBeInTheDocument()
   })
 
-  it('mounts the shell chrome (rail, live wins, chat, mobile nav)', () => {
+  it('mounts the shell chrome (rail, chat, mobile nav)', () => {
     render(harness('/'))
     expect(screen.getByTestId('left-rail')).toBeInTheDocument()
-    expect(screen.getByTestId('live-wins')).toBeInTheDocument()
     expect(screen.getByTestId('chat-column')).toBeInTheDocument()
     expect(screen.getByTestId('mobile-bottom-nav')).toBeInTheDocument()
   })

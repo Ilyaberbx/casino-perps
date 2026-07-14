@@ -2,6 +2,19 @@ import type { RefCallback } from 'react'
 import type { Candle, Interval } from '../../../shared/domain/domain.types'
 import type { CandleError } from '../../../shared/domain'
 
+/**
+ * A horizontal reference line drawn on the price scale. `id` is the reconcile
+ * key — the effect creates/updates/removes by it, so it must be stable across
+ * renders for the same conceptual line.
+ */
+export interface ChartPriceLine {
+  id: string
+  price: number
+  color: string
+  title: string
+  style: 'solid' | 'dashed'
+}
+
 export interface UseChartParams {
   symbol: string
   interval: Interval
@@ -17,6 +30,11 @@ export interface UseChartParams {
    * (axis + crosshair label) and re-applies on market switch.
    */
   priceDecimals: number
+  /**
+   * Horizontal reference lines (entry / liquidation). Reconciled by `id` against
+   * the live series, and torn down on market switch. Empty/absent ⇒ no lines.
+   */
+  priceLines?: ReadonlyArray<ChartPriceLine>
 }
 
 export interface CrosshairOhlc {

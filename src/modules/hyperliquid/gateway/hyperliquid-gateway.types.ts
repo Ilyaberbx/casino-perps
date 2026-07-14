@@ -88,8 +88,13 @@ export interface HyperliquidGateway {
   ): ResultAsync<WebData2Response, HyperliquidGatewayError>
 
   /**
-   * Subscribe to live `webData2` updates. Returns the SDK's subscription handle
-   * directly; consumers observe `failureSignal` to react to terminal failure.
+   * Subscribe to live `webData2` updates. Same `ReconnectableSubscription`
+   * contract as every other channel, but the transport is a REST
+   * `/info webData2` poller (`WEB_DATA2_POLL_MS`) — Hyperliquid removed the
+   * `webData2` websocket subscription in the 2026-07 network upgrade and its
+   * `webData3` replacement lacks the clearinghouse/spot/orders/twap payload.
+   * Consumers observe `failureSignal` to react to terminal failure (the
+   * consecutive poll-failure limit).
    */
   subscribeWebData2(
     address: WalletAddress,

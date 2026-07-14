@@ -129,6 +129,23 @@ export const HYPERLIQUID_HTTP_TIMEOUT_MS = 10_000
  */
 export const PORTFOLIO_POLL_MS = 30_000
 
+/**
+ * Polling cadence for the REST `webData2` feed. Hyperliquid REMOVED the
+ * `webData2` websocket subscription in the 2026-07 network upgrade (replaced by
+ * the much thinner `webData3`); the REST `/info` variant still serves the
+ * identical payload. The old websocket feed only pushed every ~5s, so a 5s poll
+ * is behaviour parity, and at ~12 req/min it is far inside HL's 1200 weight/min
+ * per-IP REST budget.
+ */
+export const WEB_DATA2_POLL_MS = 5_000
+
+/**
+ * Consecutive REST `webData2` poll failures tolerated before the poller aborts
+ * its `failureSignal` and hands recovery to `withReconnect`'s backoff. Single
+ * blips keep serving the cached tick without surfacing a reconnect.
+ */
+export const WEB_DATA2_POLL_FAILURE_LIMIT = 3
+
 /** USDC token symbol on the Hyperliquid spot universe. Always priced at $1. */
 export const USDC_SYMBOL = 'USDC'
 

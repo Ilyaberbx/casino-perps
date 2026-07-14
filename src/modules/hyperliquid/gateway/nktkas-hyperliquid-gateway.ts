@@ -18,7 +18,11 @@ import type {
   MultiplexEntry,
 } from './hyperliquid-gateway.types'
 import { HyperliquidGatewayError } from './hyperliquid-gateway.types'
-import { HYPERLIQUID_HTTP_TIMEOUT_MS } from '../hyperliquid.constants'
+import {
+  HYPERLIQUID_HTTP_TIMEOUT_MS,
+  WEB_DATA2_POLL_FAILURE_LIMIT,
+  WEB_DATA2_POLL_MS,
+} from '../hyperliquid.constants'
 import type {
   ActiveAssetCtxWsEvent,
   ActiveSpotAssetCtxWsEvent,
@@ -68,6 +72,10 @@ export interface NktkasHyperliquidGatewayOptions {
    * See ADR-0041.
    */
   readonly notifyActivity?: () => void
+  /** Override timer in tests (drives the `webData2` REST poller). */
+  readonly setTimeout?: (handler: () => void, ms: number) => unknown
+  /** Override timer cancellation in tests (drives the `webData2` REST poller). */
+  readonly clearTimeout?: (handle: unknown) => void
 }
 
 export function createNktkasHyperliquidGateway(
@@ -85,6 +93,8 @@ export function createNktkasHyperliquidGateway(
   const infoClient = new InfoClient({ transport: httpTransport })
   const subscriptionClient = new SubscriptionClient({ transport: wsTransport })
   const log = options.logger.child({ module: 'hyperliquid-gateway' })
+  const schedule = options.setTimeout ?? ((handler: () => void, ms: number) => setTimeout(handler, ms))
+  const cancel = options.clearTimeout ?? ((handle: unknown) => clearTimeout(handle as ReturnType<typeof setTimeout>))
 
   function instrument<T>(method: string, run: () => Promise<T>): ResultAsync<T, HyperliquidGatewayError> {
     log.debug({ method }, 'sdk call')
@@ -211,26 +221,90 @@ export function createNktkasHyperliquidGateway(
     })
   }
 
+  // Hyperliquid REMOVED the `webData2` websocket subscription in the 2026-07
+  // network upgrade (the ws server now rejects the frame; its replacement
+  // `webData3` carries none of the clearinghouse/spot/orders/twap data the
+  // readers consume). The REST `/info` variant still serves the identical
+  // payload — same SDK type — and the old ws feed only pushed every ~5s, so a
+  // `WEB_DATA2_POLL_MS` poller behind the same `ReconnectableSubscription`
+  // contract is behaviour parity. First fetch resolves the handle (or rejects
+  // into `withReconnect`'s backoff); after that, single poll failures keep the
+  // cached tick, and `WEB_DATA2_POLL_FAILURE_LIMIT` consecutive failures abort
+  // `failureSignal` so `withReconnect` rebuilds the poller with backoff.
+  function openWebData2Poller(
+    address: WalletAddress,
+    fanout: (event: WebData2Response) => void,
+  ): Promise<HyperliquidSubscription> {
+    return infoClient.webData2({ user: address }).then((first) => {
+      const failure = new AbortController()
+      let stopped = false
+      let pendingTimer: unknown = null
+      let consecutiveFailures = 0
+
+      function schedulePoll(): void {
+        pendingTimer = schedule(() => {
+          pendingTimer = null
+          void infoClient
+            .webData2({ user: address })
+            .then((data) => {
+              if (stopped) return
+              consecutiveFailures = 0
+              fanout(data)
+              schedulePoll()
+            })
+            .catch((cause: unknown) => {
+              if (stopped) return
+              const mapped = mapSdkError(cause)
+              consecutiveFailures += 1
+              log.warn(
+                {
+                  method: 'webData2Poll',
+                  kind: mapped.kind,
+                  errorMessage: mapped.message,
+                  consecutiveFailures,
+                },
+                'sdk call failed',
+              )
+              const isFailureLimitReached = consecutiveFailures >= WEB_DATA2_POLL_FAILURE_LIMIT
+              if (isFailureLimitReached) {
+                failure.abort(mapped)
+                return
+              }
+              schedulePoll()
+            })
+        }, WEB_DATA2_POLL_MS)
+      }
+
+      fanout(first)
+      schedulePoll()
+
+      return {
+        failureSignal: failure.signal,
+        unsubscribe: () => {
+          stopped = true
+          if (pendingTimer !== null) {
+            cancel(pendingTimer)
+            pendingTimer = null
+          }
+          return Promise.resolve()
+        },
+      }
+    })
+  }
+
   return {
     fetchWebData2(address: WalletAddress) {
       return instrument<WebData2Response>('webData2', () => infoClient.webData2({ user: address }))
     },
 
     subscribeWebData2(address: WalletAddress, listener: (data: WebData2Response) => void) {
-      // Multiplexed for the same reason as the channel subscriptions above:
-      // a duplicate SDK subscribe against an in-flight WS handshake (e.g. a
-      // teardown-then-resubscribe race when the wallet address rotates, or
-      // any second consumer that beats `WebData2Stream`'s `activeAddress`
-      // guard) makes the SDK terminate the handshake with "WebSocket
-      // connection closed". With multiplexing, the first subscribe per
-      // (address) opens one SDK sub; later subscribes share the underlying
-      // handle via refcount.
+      // Multiplexed for the same reason as the channel subscriptions below:
+      // concurrent identical subscribes (StrictMode double-mount, a
+      // teardown-then-resubscribe race on wallet rotation) share one underlying
+      // poller per (address) via refcount instead of double-polling.
       return multiplex<WebData2Response>(`webData2|${address}`, listener, (fanout) =>
         instrument<HyperliquidSubscription>('subscribeWebData2', () =>
-          subscriptionClient.webData2({ user: address }, fanout).then((sub) => ({
-            unsubscribe: () => sub.unsubscribe(),
-            failureSignal: sub.failureSignal,
-          })),
+          openWebData2Poller(address, fanout),
         ),
       )
     },

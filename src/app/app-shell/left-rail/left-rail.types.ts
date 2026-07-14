@@ -1,14 +1,16 @@
 import type { LucideIcon } from 'lucide-react'
+import type { LobbyView } from '@/modules/lobby'
 
-/** A rail item that returns to the lobby, optionally pre-selecting a view. The
- * lobby phase reads `?view=` to filter; today every lobby item lands on `/`. */
+/** A rail item that returns to the lobby, selecting a view. The lobby reads
+ * `?view=` and renders a focused grid for it; `all` is the bare lobby. */
 export interface RailLobbyItem {
   kind: 'lobby'
   key: string
   label: string
   icon: LucideIcon
-  /** Lobby view key. `all` is the bare lobby (no query). */
-  view: 'favorites' | 'recent' | 'hot' | 'new' | 'all'
+  /** Lobby view key. `all` is the bare lobby (no query). Owned by `@/modules/lobby`
+   *  — the rail writes these URLs, the lobby renders them, so the union has one home. */
+  view: LobbyView
 }
 
 /** A rail item that navigates to a first-class route (My Bets). */
@@ -29,7 +31,21 @@ export interface RailMailtoItem {
   href: string
 }
 
-export type RailItem = RailLobbyItem | RailRouteItem | RailMailtoItem
+/** A rail item that runs an in-app action instead of navigating (Settings).
+ * Renders as a button, never highlights as "active" — it opens a modal, so
+ * there is no location for it to match. */
+export interface RailActionItem {
+  kind: 'action'
+  key: string
+  label: string
+  icon: LucideIcon
+  action: RailAction
+}
+
+/** The in-app actions a rail item may trigger. */
+export type RailAction = 'settings'
+
+export type RailItem = RailLobbyItem | RailRouteItem | RailMailtoItem | RailActionItem
 
 /** A labelled (or unlabelled) group of rail items. */
 export interface RailGroup {
@@ -58,6 +74,8 @@ export interface LeftRailProps {
   onAddCash: () => void
   /** Toggles the shell's collapsed rail state. */
   onCollapse: () => void
+  /** Runs an action-kind rail item (today: opens the Settings modal). */
+  onRailAction: (action: RailAction) => void
 }
 
 export interface UseLeftRailReturn {

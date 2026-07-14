@@ -1,0 +1,63 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.icon {
+  flex: none;
+  color: var(--accent-primary-bright);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 110%;
+  font-size: clamp(16px, 2vw, 20px);
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Same 150px/168px card track as the carousel's `grid-auto-columns`, so the
+   poster aspect ratio and gradient read identically across both surfaces —
+   only the flow direction differs (wrap here, horizontal scroll there). */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.cell {
+  display: block;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--accent-primary-bright);
+  outline-offset: 2px;
+}
+
+.empty {
+  margin: 0;
+  padding: 28px 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  }
+}

@@ -79,3 +79,7 @@ export const INITIAL_ENTRY_PROTECTION: EntryProtectionDraft = {
   takeProfit: { priceInput: '', amountInput: '' },
   stopLoss: { priceInput: '', amountInput: '' },
 }
+
+/** Simple ticket — the price-target (limit) toggle label and the review sheet's title. */
+export const PRICE_TARGET_LABEL = 'Price target'
+export const REVIEW_SHEET_TITLE = 'Review order'

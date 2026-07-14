@@ -6,17 +6,12 @@ import type {
 } from '@/modules/shared/domain'
 import { formatPrice, specFromMarket } from '@/modules/shared/utils/format-price'
 import { generateCloid } from '@/modules/shared/utils/generate-cloid'
-import { CASH_OUT_CLOID_PREFIX, SETTLED_BETS_LIMIT } from './my-bets.constants'
-import type { BetDirection, LiveBet, SettledBet } from './my-bets.types'
+import { CLOSE_CLOID_PREFIX, CLOSED_TRADES_LIMIT } from './my-bets.constants'
+import type { ClosedTradeRow, OpenPositionRow, PositionSide } from './my-bets.types'
 
-/** A long position is an UP bet; a short is a DOWN bet. */
-export function positionSideToDirection(side: 'long' | 'short'): BetDirection {
-  return side === 'long' ? 'up' : 'down'
-}
-
-/** `up` → `UP`, `down` → `DOWN` — the row label. */
-export function directionLabel(direction: BetDirection): 'UP' | 'DOWN' {
-  return direction === 'up' ? 'UP' : 'DOWN'
+/** `long` → `LONG`, `short` → `SHORT` — the row label. */
+export function sideLabel(side: PositionSide): 'LONG' | 'SHORT' {
+  return side === 'long' ? 'LONG' : 'SHORT'
 }
 
 /**
@@ -30,23 +25,6 @@ export function tickerFromSymbol(symbol: string): string {
   const beforeQuote = afterDexPrefix.split('/')[0]
   const withoutTypeSuffix = beforeQuote.replace(/-(PERP|SPOT)$/i, '')
   return withoutTypeSuffix.toUpperCase()
-}
-
-/**
- * D16 — the liquidation price as a plain sentence, never a labelled number. An
- * UP (long) bet loses when the price *drops below* the liquidation; a DOWN
- * (short) bet loses when it *rises above*. `priceText` is the already-formatted
- * price (the hook formats it with the market's own precision) — `null` when the
- * liquidation is unknown, which degrades to a still-honest fallback sentence.
- */
-export function formatLiquidationSentence(
-  direction: BetDirection,
-  ticker: string,
-  priceText: string | null,
-): string {
-  if (priceText === null) return `You lose this bet if ${ticker} moves too far against you`
-  const verb = direction === 'up' ? 'drops below' : 'rises above'
-  return `You lose this bet if ${ticker} ${verb} $${priceText}`
 }
 
 /**
@@ -65,31 +43,28 @@ export function liquidationPriceText(
   return formatPrice(liquidationPrice, spec)
 }
 
-/** Project an open perps position into a LIVE BETS row view. */
-export function projectLiveBet(
+/** Project an open perps position into a positions-list row view. */
+export function projectOpenPosition(
   position: PerpPositionSnapshot,
   market: Market | undefined,
-  isCashingOut: boolean,
-): LiveBet {
-  const direction = positionSideToDirection(position.side)
+  isClosing: boolean,
+): OpenPositionRow {
   const ticker = market?.baseAsset ?? tickerFromSymbol(position.symbol)
-  const priceText = liquidationPriceText(position.liquidationPrice, market)
   return {
     symbol: position.symbol,
     ticker,
-    direction,
+    side: position.side,
     leverage: position.leverage,
-    profitUsd: position.unrealizedPnlUsd,
-    isWinning: position.unrealizedPnlUsd >= 0,
-    liquidationSentence: formatLiquidationSentence(direction, ticker, priceText),
-    isCashingOut,
+    pnlUsd: position.unrealizedPnlUsd,
+    isUp: position.unrealizedPnlUsd >= 0,
+    liquidationPriceText: liquidationPriceText(position.liquidationPrice, market),
+    isClosing,
   }
 }
 
 /**
- * Reduce-only market close of the full position — the opposite side, full size
- * (D17: market only). Mirrors the trade screen's Cash Out path so both close a
- * bet identically.
+ * Reduce-only market close of the full position — the opposite side, full size.
+ * Mirrors the trade screen's close path so both flatten a position identically.
  */
 export function buildFullCloseRequest(position: PerpPositionSnapshot): PlaceOrderRequest {
   return {
@@ -98,60 +73,60 @@ export function buildFullCloseRequest(position: PerpPositionSnapshot): PlaceOrde
     side: position.side === 'long' ? 'sell' : 'buy',
     size: position.size,
     reduceOnly: true,
-    clientOrderId: generateCloid(CASH_OUT_CLOID_PREFIX),
+    clientOrderId: generateCloid(CLOSE_CLOID_PREFIX),
   }
 }
 
 /**
- * Whether a fill settles a bet: a close that booked realised profit/loss. Open
- * fills (and any fill with no `closedPnl`) are not settlements.
+ * Whether a fill closed a trade: a close that booked realised PnL. Opening fills
+ * (and any fill with no `closedPnl`) are not closes.
  */
-export function isSettlementFill(fill: Fill): boolean {
+export function isCloseFill(fill: Fill): boolean {
   const hasClosedPnl = fill.closedPnl !== undefined
   const isClose = fill.direction !== undefined && fill.direction.includes('Close')
   return hasClosedPnl && isClose
 }
 
 /**
- * The original bet direction of a close fill: closing a `Long` was an UP bet,
- * closing a `Short` was a DOWN bet. Falls back to the fill side when the venue
- * direction label is absent (a `sell` closes a long ⇒ UP).
+ * The side of the position a close fill flattened: closing a `Long` was a long,
+ * closing a `Short` was a short. Falls back to the fill side when the venue
+ * direction label is absent (a `sell` closes a long).
  */
-function settledBetDirection(fill: Fill): BetDirection {
+function closedPositionSide(fill: Fill): PositionSide {
   const isCloseLong = fill.direction?.includes('Long') === true
   const isCloseShort = fill.direction?.includes('Short') === true
-  if (isCloseLong) return 'up'
-  if (isCloseShort) return 'down'
-  return fill.side === 'sell' ? 'up' : 'down'
+  if (isCloseLong) return 'long'
+  if (isCloseShort) return 'short'
+  return fill.side === 'sell' ? 'long' : 'short'
 }
 
-/** Project a settlement `Fill` into a SETTLED history row view. */
-export function projectSettledBet(fill: Fill): SettledBet {
-  const profitUsd = fill.closedPnl ?? 0
+/** Project a close `Fill` into a trade-history row view. */
+export function projectClosedTrade(fill: Fill): ClosedTradeRow {
+  const pnlUsd = fill.closedPnl ?? 0
   return {
     id: fill.identifier,
     ticker: tickerFromSymbol(fill.symbol),
-    direction: settledBetDirection(fill),
-    profitUsd,
-    isWin: profitUsd >= 0,
+    side: closedPositionSide(fill),
+    pnlUsd,
+    isUp: pnlUsd >= 0,
     timestamp: fill.timestamp,
   }
 }
 
 /**
- * Merge a newly-arrived fill into the accumulated settled-bet list: keep only
- * settlements, dedup by fill id, sort newest-first, and cap at
- * `SETTLED_BETS_LIMIT`. Pure — the hook holds the list in state and feeds it
+ * Merge a newly-arrived fill into the accumulated trade history: keep only
+ * closes, dedup by fill id, sort newest-first, and cap at
+ * `CLOSED_TRADES_LIMIT`. Pure — the hook holds the list in state and feeds it
  * back through here on every fill.
  */
-export function mergeSettledBet(
-  existing: ReadonlyArray<SettledBet>,
+export function mergeClosedTrade(
+  existing: ReadonlyArray<ClosedTradeRow>,
   fill: Fill,
-): ReadonlyArray<SettledBet> {
-  if (!isSettlementFill(fill)) return existing
-  const projected = projectSettledBet(fill)
-  const withoutDuplicate = existing.filter((bet) => bet.id !== projected.id)
+): ReadonlyArray<ClosedTradeRow> {
+  if (!isCloseFill(fill)) return existing
+  const projected = projectClosedTrade(fill)
+  const withoutDuplicate = existing.filter((trade) => trade.id !== projected.id)
   const merged = [projected, ...withoutDuplicate]
   merged.sort((a, b) => b.timestamp - a.timestamp)
-  return merged.slice(0, SETTLED_BETS_LIMIT)
+  return merged.slice(0, CLOSED_TRADES_LIMIT)
 }

@@ -6,12 +6,7 @@ import {
   CHAT_APPEND_MIN_DELAY_MS,
   CHAT_MAX_MESSAGES,
 } from './social.constants'
-import type {
-  ChatMessage,
-  ChatTextToken,
-  LiveWin,
-  ScriptedChatMessage,
-} from './social.types'
+import type { ChatMessage, ChatTextToken, ScriptedChatMessage } from './social.types'
 
 const MENTION_PATTERN = /(@\w+)/g
 
@@ -20,19 +15,9 @@ export function createMessageId(sequence: number): string {
   return `chat-${sequence}`
 }
 
-/** Stable id for a live-win card, keyed by its origin index in the reel. */
-export function createLiveWinId(sequence: number): string {
-  return `win-${sequence}`
-}
-
 /** Attach a runtime id to a scripted reel entry, preserving its discriminant. */
 export function withMessageId(scripted: ScriptedChatMessage, id: string): ChatMessage {
   return { ...scripted, id }
-}
-
-/** Attach a runtime id to a seed live-win entry. */
-export function withLiveWinId(seed: Omit<LiveWin, 'id'>, id: string): LiveWin {
-  return { ...seed, id }
 }
 
 /** Drop the oldest messages so the reel never exceeds the retention cap. */

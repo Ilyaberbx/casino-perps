@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom'
 import { AccountModal, AccountModalProvider } from '@/modules/account'
-import { LiveWinsTicker } from '@/modules/social'
 import { MobileBottomNav } from '@/modules/trading'
 import { ConnectionBanner } from '@/modules/shared/components/connection-banner'
 import { VenueOnboardingBanner } from '@/modules/shared/components/VenueOnboardingBanner'
@@ -21,10 +20,9 @@ import styles from './app-shell.module.css'
 import type { AppShellOutletContext } from './app-shell.types'
 
 /**
- * The casino app shell (PRD 0008 §6, D8): a fixed left rail, a fluid scrolling
- * center column topped by a LIVE WINS ticker, and a fixed right chat column,
- * degrading to a mobile top bar + 4-tab bottom nav under 900px. Dumb — all
- * state and actions come from {@link useAppShell}.
+ * The app shell: a fixed left rail, a fluid scrolling center column, and a fixed
+ * right chat column, degrading to a mobile top bar + 4-tab bottom nav under
+ * 900px. Dumb — all state and actions come from {@link useAppShell}.
  */
 export function AppShell() {
   const shell = useAppShell()
@@ -47,6 +45,7 @@ export function AppShell() {
             collapsed={shell.isRailCollapsed}
             onAddCash={shell.handleAddCash}
             onCollapse={shell.handleCollapse}
+            onRailAction={shell.handleRailAction}
           />
         </aside>
 
@@ -60,7 +59,6 @@ export function AppShell() {
             onCreateAccount={shell.handleCreateAccount}
           />
           <div className={styles.centerScroll}>
-            <LiveWinsTicker />
             <VenueOnboardingBanner isWalletConnected={shell.isWalletConnected} />
             <ConnectionBanner />
             <main className={styles.outletWrap}>
@@ -81,6 +79,7 @@ export function AppShell() {
           onClose={shell.closeMenu}
           authenticated={shell.authenticated}
           onAddCash={shell.handleAddCash}
+          onRailAction={shell.handleRailAction}
           onLogIn={shell.handleLogIn}
           onCreateAccount={shell.handleCreateAccount}
         />

@@ -18,15 +18,31 @@ function market(symbol: string, change24hPct?: number): Market {
   }
 }
 
-function renderCarousel(markets: Market[], isLoading = false) {
+function renderCarousel(
+  markets: Market[],
+  isLoading = false,
+  seeAllHref: string | null = '/?view=hot',
+) {
   return render(
     <MemoryRouter>
-      <MarketCarousel title="Hot Markets" icon={Flame} markets={markets} isLoading={isLoading} />
+      <MarketCarousel
+        title="Hot Markets"
+        icon={Flame}
+        markets={markets}
+        isLoading={isLoading}
+        seeAllHref={seeAllHref}
+      />
     </MemoryRouter>,
   )
 }
 
 describe('MarketCarousel', () => {
+  // The "All Markets" row is already the full remainder — it has nowhere to go.
+  it('renders no "See all" link when the section has no focused view', () => {
+    renderCarousel([market('BTC-PERP')], false, null)
+    expect(screen.queryByRole('link', { name: /see all/i })).not.toBeInTheDocument()
+  })
+
   it('links each card to its /trade/:symbol screen', () => {
     renderCarousel([market('BTC-PERP'), market('xyz:AAPL')])
     expect(screen.getByRole('link', { name: 'BTC-PERP' })).toHaveAttribute(
@@ -48,7 +64,7 @@ describe('MarketCarousel', () => {
   it('renders the section title and a See all link', () => {
     renderCarousel([market('BTC-PERP')])
     expect(screen.getByRole('heading', { name: 'Hot Markets' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /see all/i })).toHaveAttribute('href', '/trade')
+    expect(screen.getByRole('link', { name: /see all/i })).toHaveAttribute('href', '/?view=hot')
   })
 
   it('shows a plain empty line when loaded with no markets', () => {

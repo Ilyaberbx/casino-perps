@@ -1,6 +1,6 @@
-import type { Candle } from '../../../shared/domain'
+import type { Candle, PerpPositionSnapshot } from '../../../shared/domain'
 import type { ThemeVariant } from '../../../shared/providers/theme-provider'
-import type { ChartColors, CandleReconciliation } from './chart.types'
+import type { ChartColors, CandleReconciliation, ChartPriceLine } from './chart.types'
 
 /**
  * Folds a live candle update into the loaded history. Pure reducer extracted
@@ -80,4 +80,47 @@ export function resolveChartColors(themeName: ThemeVariant): ChartColors {
 
 export function formatVolume(value: number): string {
   return value.toFixed(2)
+}
+
+/**
+ * The reference lines for an open position: where you got in, and where you get
+ * taken out. Drawing the liquidation on the same axis as the price is the whole
+ * point — a number in a panel tells you where liquidation is, a line tells you
+ * how close you are to it.
+ *
+ * Flat (or no position) ⇒ no lines. A null/non-positive liquidation (the venue
+ * reports none for an unlevered position) is skipped rather than drawn at 0.
+ * Colours come from the resolved theme, never hardcoded.
+ */
+export function buildPositionPriceLines(
+  position: PerpPositionSnapshot | null,
+  colors: ChartColors,
+): ChartPriceLine[] {
+  if (position === null || position.size === 0) return []
+
+  const lines: ChartPriceLine[] = []
+
+  if (position.entryPrice > 0) {
+    lines.push({
+      id: 'entry',
+      price: position.entryPrice,
+      color: colors.textMuted,
+      title: 'Entry',
+      style: 'dashed',
+    })
+  }
+
+  const liquidation = position.liquidationPrice
+  const hasLiquidation = liquidation !== null && Number.isFinite(liquidation) && liquidation > 0
+  if (hasLiquidation) {
+    lines.push({
+      id: 'liquidation',
+      price: liquidation,
+      color: colors.directionDown,
+      title: 'Liq.',
+      style: 'solid',
+    })
+  }
+
+  return lines
 }

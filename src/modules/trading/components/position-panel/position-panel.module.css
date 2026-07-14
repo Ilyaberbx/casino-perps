@@ -1,0 +1,387 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--surface);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.leverage,
+.marginMode {
+  color: var(--text-muted);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.size {
+  margin-left: auto;
+  color: var(--text);
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pnlRow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.pnl {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.roe {
+  font-family: var(--font-trading);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.up {
+  color: var(--directionUp);
+}
+
+.down {
+  color: var(--directionDown);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.stat dt {
+  color: var(--text-muted);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat dd {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.liq {
+  color: var(--directionDown);
+}
+
+/* Resting orders */
+
+.orders {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px 14px;
+  border-top: var(--border-pixel) solid var(--border-strong);
+}
+
+.ordersHeading {
+  color: var(--text-muted);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orderRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.orderKind {
+  flex-shrink: 0;
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kindTakeProfit {
+  color: var(--directionUp);
+}
+
+.kindStopLoss {
+  color: var(--directionDown);
+}
+
+.kindLimit {
+  color: var(--text-muted);
+}
+
+.orderSize {
+  color: var(--text);
+  font-family: var(--font-trading);
+  font-size: 11px;
+}
+
+.orderPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-left: auto;
+  color: var(--text);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.orderPriceLabel {
+  color: var(--text-muted);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cancelButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: var(--text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  transition: color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.cancelButton:hover:not(:disabled) {
+  color: var(--directionDown);
+  border-color: var(--directionDown);
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Card actions */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.secondaryAction {
+  padding: 8px 10px;
+  color: var(--text-muted);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  transition: color var(--dur-fast) var(--ease-out-quart),
+    border-color var(--dur-fast) var(--ease-out-quart);
+}
+
+.secondaryAction:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Exit-targets sheet */
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+
+.sheetContext {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.sheetContext .stat {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.legRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.legLabel {
+  color: var(--text-muted);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.roiChip {
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.legInput {
+  width: 100%;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: var(--font-trading);
+  font-size: 14px;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.legInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.legInputError {
+  border-color: var(--directionDown);
+}
+
+.legIssue {
+  margin: 0;
+  color: var(--directionDown);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.clearButton {
+  padding: 8px;
+  color: var(--text-muted);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-decoration: underline;
+}
+
+.clearButton:hover:not(:disabled) {
+  color: var(--directionDown);
+}
+
+.secondaryRow {
+  display: flex;
+  gap: 8px;
+}
+
+.secondaryRow > * {
+  flex: 1;
+}
+
+.presets {
+  display: flex;
+  gap: 6px;
+}
+
+.presetButton {
+  flex: 1;
+  padding: 7px 0;
+  color: var(--text-muted);
+  font-family: var(--font-trading);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: var(--surface-elevated);
+  border: var(--border-pixel) solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.presetButton:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.reduceSize {
+  color: var(--text);
+  font-family: var(--font-trading);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.midChip {
+  padding: 2px 8px;
+  color: var(--accent);
+  font-family: var(--font-trading);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: transparent;
+  border: var(--border-pixel) solid var(--accent);
+  border-radius: var(--radius-pill);
+}

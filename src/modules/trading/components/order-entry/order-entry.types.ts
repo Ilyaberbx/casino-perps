@@ -147,6 +147,45 @@ export interface TwapPreTradeEstimates {
   hasBuilderFee: boolean
 }
 
+/**
+ * Starting-state overrides for {@link useOrderEntry}. Both default to the Pro
+ * ticket's behaviour, so passing nothing preserves it exactly. This is a hook
+ * argument rather than a component prop — the ticket components stay dumb.
+ */
+export interface UseOrderEntryOptions {
+  /** Sizing unit the ticket opens in. Simple opens in `usd`; Pro in `coin`. */
+  initialSizeUnit?: SizeUnit
+  /** Side the ticket opens on. Used by "Add to position" to pin the side. */
+  initialSide?: Side
+}
+
+/**
+ * The Simple ticket's own state, on top of everything `useOrderEntry` returns.
+ * Simple is market-by-default; turning on the price target flips the order type
+ * to `limit` (miracle's only limit affordance). The review sheet is the confirm
+ * step — the ticket's primary button opens it, and the sheet submits.
+ */
+export interface UseSimpleOrderTicketReturn extends UseOrderEntryReturn {
+  /** True when the price target is on, i.e. the order is a limit. */
+  isPriceTargetOn: boolean
+  togglePriceTarget: () => void
+  isReviewOpen: boolean
+  openReview: () => void
+  closeReview: () => void
+}
+
+export interface SimpleReviewSheetProps {
+  isOpen: boolean
+  onClose: () => void
+  ticket: UseSimpleOrderTicketReturn
+  baseAsset: string
+}
+
+export interface PriceTargetToggleProps {
+  isOn: boolean
+  onToggle: () => void
+}
+
 export interface UseOrderEntryReturn {
   form: OrderEntryFormState
   validation: OrderEntryValidation

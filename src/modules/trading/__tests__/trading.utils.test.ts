@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { Market } from '@/modules/shared/domain'
-import { filterByMinVolume, reconcileFavorites } from '../trading.utils'
+import { filterByMinVolume, reconcileFavorites, recordRecentMarket } from '../trading.utils'
 
 function buildMarket(overrides: Partial<Market> = {}): Market {
   return {
@@ -77,5 +77,34 @@ describe('filterByMinVolume', () => {
     expect(
       filterByMinVolume([buildMarket({ marketType: 'spot', volume24h: 600_000 })], 500_000),
     ).toHaveLength(1)
+  })
+})
+
+describe('recordRecentMarket', () => {
+  it('prepends a new visit', () => {
+    expect(recordRecentMarket(['ETH'], 'BTC', 12)).toEqual(['BTC', 'ETH'])
+  })
+
+  it('starts the list from empty', () => {
+    expect(recordRecentMarket([], 'BTC', 12)).toEqual(['BTC'])
+  })
+
+  // Re-visiting must not duplicate — it promotes.
+  it('moves an already-visited market back to the front instead of duplicating it', () => {
+    expect(recordRecentMarket(['ETH', 'BTC', 'SOL'], 'BTC', 12)).toEqual(['BTC', 'ETH', 'SOL'])
+  })
+
+  it('re-recording the head is a no-op in content', () => {
+    expect(recordRecentMarket(['BTC', 'ETH'], 'BTC', 12)).toEqual(['BTC', 'ETH'])
+  })
+
+  it('caps the list at the limit, dropping the oldest', () => {
+    expect(recordRecentMarket(['B', 'C', 'D'], 'A', 3)).toEqual(['A', 'B', 'C'])
+  })
+
+  it('does not mutate the input', () => {
+    const input = ['ETH']
+    recordRecentMarket(input, 'BTC', 12)
+    expect(input).toEqual(['ETH'])
   })
 })

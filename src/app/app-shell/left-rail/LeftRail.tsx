@@ -14,7 +14,7 @@ import type { LeftRailProps } from './left-rail.types'
  * Dumb component — `useLeftRail` resolves active state; actions come in as
  * props.
  */
-export function LeftRail({ collapsed, onAddCash, onCollapse }: LeftRailProps) {
+export function LeftRail({ collapsed, onAddCash, onCollapse, onRailAction }: LeftRailProps) {
   const { groups } = useLeftRail()
 
   const railClass = collapsed ? `${styles.rail} ${styles.railCollapsed}` : styles.rail
@@ -56,7 +56,11 @@ export function LeftRail({ collapsed, onAddCash, onCollapse }: LeftRailProps) {
               <span className={styles.groupLabel}>{group.label}</span>
             ) : null}
             {group.items.map((resolved) => (
-              <RailItemLink key={resolved.item.key} resolved={resolved} />
+              <RailItemLink
+                key={resolved.item.key}
+                resolved={resolved}
+                onAction={onRailAction}
+              />
             ))}
           </div>
         ))}

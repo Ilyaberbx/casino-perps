@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router-dom'
 import { VenueProvider } from '@/modules/shared/providers/venue-provider'
 import { ThemeProvider } from '@/modules/shared/providers/theme-provider'
 import { SettingsProvider } from '@/modules/shared/providers/settings-provider'
+import { TradingModeProvider } from '@/modules/shared/providers/trading-mode-provider'
 import { ToastProvider } from '@/modules/shared/providers/toast-provider'
 import { ConnectionRecoveryProvider } from '@/modules/shared/providers/connection-recovery'
 import { useVenueSession } from '@/modules/shared/hooks/use-venue-session'
@@ -25,7 +26,9 @@ function App() {
       <AuthProvider appId={PRIVY_APP_ID} apiBaseUrl={API_BASE_URL}>
         <ThemeProvider>
           <SettingsProvider>
-            <AppShell />
+            <TradingModeProvider>
+              <AppShell />
+            </TradingModeProvider>
           </SettingsProvider>
         </ThemeProvider>
       </AuthProvider>

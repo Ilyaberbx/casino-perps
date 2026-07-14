@@ -1,4 +1,4 @@
-import { Star, History, Flame, Sparkles, LayoutGrid, Ticket, Headset } from 'lucide-react'
+import { Star, History, Flame, Sparkles, LayoutGrid, Ticket, Headset, Settings } from 'lucide-react'
 import type { RailGroup } from './left-rail.types'
 
 /** Where "Live Support" points. A plain `mailto:` per PRD 0008 §6 — no ticketing
@@ -40,6 +40,7 @@ export const RAIL_GROUPS: readonly RailGroup[] = [
     label: 'GENERAL',
     items: [
       { kind: 'route', key: 'my-bets', label: 'My Bets', icon: Ticket, to: '/my-bets' },
+      { kind: 'action', key: 'settings', label: 'Settings', icon: Settings, action: 'settings' },
       { kind: 'mailto', key: 'support', label: 'Live Support', icon: Headset, href: SUPPORT_MAILTO },
     ],
   },

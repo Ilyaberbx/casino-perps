@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Result } from 'neverthrow'
 import { useVenueOptional } from '../../../shared/providers/venue-provider'
 import type { Market } from '../../../shared/domain/domain.types'
+import { useRecentMarketsOptional } from '../recent-markets-provider'
 import {
   SELECTED_MARKET_STORAGE_KEY,
   DEFAULT_SELECTED_MARKET,
@@ -144,6 +145,28 @@ export function useSelectedMarketProvider(
     () => resolveSelectedMarket(selectedMarket, markets),
     [selectedMarket, markets],
   )
+
+  // Record the visit for the left rail's Recent lobby view (`/?view=recent`).
+  //
+  // This provider — not `TradeRoute` — is the recording site, because it is the
+  // only place that sees EVERY visit: deep links, lobby card clicks, the
+  // hot-markets ticker's `?market=` navigation, the search overlay's in-page
+  // `setSelectedMarket`, and browser back/forward. `TradeRoute` only has the raw
+  // `:symbol` param and would miss every in-page switch.
+  //
+  // Gated on the symbol resolving against the LIVE universe, so an unknown or
+  // delisted `/trade/FOO` never pollutes the list. `markets` churns identity on
+  // every venue snapshot, so this effect re-runs constantly — the head-guard
+  // inside `recordMarketVisit` is what makes those re-runs free.
+  const recentMarkets = useRecentMarketsOptional()
+  const recordMarketVisit = recentMarkets?.recordMarketVisit ?? null
+
+  useEffect(() => {
+    if (recordMarketVisit === null) return
+    const isLiveMarket = markets.some((m) => m.symbol === selectedMarket)
+    if (!isLiveMarket) return
+    recordMarketVisit(selectedMarket)
+  }, [selectedMarket, markets, recordMarketVisit])
 
   return { selectedMarket, setSelectedMarket, market }
 }

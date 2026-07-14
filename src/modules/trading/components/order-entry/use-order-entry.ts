@@ -45,6 +45,7 @@ import type {
   ProtectionLegDraft,
   ProtectionLegKind,
   SizeUnit,
+  UseOrderEntryOptions,
   UseOrderEntryReturn,
 } from './order-entry.types'
 import type {
@@ -78,6 +79,21 @@ const INITIAL_TOUCHED: OrderEntryTouched = {
   stopPrice: false,
   slippage: false,
   twapDuration: false,
+}
+
+/**
+ * The ticket's starting state. `options` only shifts the two defaults that
+ * differ between the ticket flavours: the Simple ticket sizes in USD (miracle
+ * parity — you think in dollars, not coins), and "Add to position" opens pinned
+ * to the position's side. Everything else is identical, which is what lets the
+ * Simple and Pro tickets share this one hook.
+ */
+function initialForm(options: UseOrderEntryOptions | undefined): OrderEntryFormState {
+  return {
+    ...INITIAL_FORM,
+    sizeUnit: options?.initialSizeUnit ?? INITIAL_FORM.sizeUnit,
+    side: options?.initialSide ?? INITIAL_FORM.side,
+  }
 }
 
 const ALL_TOUCHED: OrderEntryTouched = {
@@ -318,7 +334,7 @@ function projectValidation(
   }
 }
 
-export function useOrderEntry(): UseOrderEntryReturn {
+export function useOrderEntry(options?: UseOrderEntryOptions): UseOrderEntryReturn {
   const traderCap = useCapability('trader')
   // Available-to-Trade / spot sizing / Current-Position read the ACTING account
   // group so they reflect the User's own account while Spectating, matching the
@@ -331,7 +347,7 @@ export function useOrderEntry(): UseOrderEntryReturn {
   const { leverage } = useLeverageMargin()
   const { pending: pendingIntent } = useOrderIntent()
   const { isSpectating, stopSpectating } = useSpectate()
-  const [form, setForm] = useState<OrderEntryFormState>(INITIAL_FORM)
+  const [form, setForm] = useState<OrderEntryFormState>(() => initialForm(options))
   const [touched, setTouched] = useState<OrderEntryTouched>(INITIAL_TOUCHED)
   const [protection, setProtection] = useState<EntryProtectionDraft>(INITIAL_ENTRY_PROTECTION)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -519,7 +535,7 @@ export function useOrderEntry(): UseOrderEntryReturn {
   const [activeMarketSymbol, setActiveMarketSymbol] = useState(selectedMarket)
   if (activeMarketSymbol !== selectedMarket) {
     setActiveMarketSymbol(selectedMarket)
-    setForm(INITIAL_FORM)
+    setForm(initialForm(options))
     setTouched(INITIAL_TOUCHED)
     setProtection(INITIAL_ENTRY_PROTECTION)
   }

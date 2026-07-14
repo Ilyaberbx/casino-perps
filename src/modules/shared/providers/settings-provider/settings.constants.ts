@@ -10,6 +10,7 @@ export const SETTINGS_SECTIONS: ReadonlyArray<{
   readonly label: string
 }> = [
   { id: 'appearance', label: 'Appearance' },
+  { id: 'trading', label: 'Trading' },
 ] as const
 
 export const DEFAULT_SETTINGS_SECTION: SettingsSection = 'appearance'

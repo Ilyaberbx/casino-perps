@@ -8,6 +8,7 @@ import {
   type CandlestickData,
   type HistogramData,
   type IChartApi,
+  type IPriceLine,
   type ISeriesApi,
   type LogicalRange,
   type MouseEventParams,
@@ -135,6 +136,7 @@ export function useChart({
   interval,
   hasCandles,
   priceDecimals,
+  priceLines,
 }: UseChartParams): UseChartReturn {
   const { theme } = useThemeContext()
   const candlesCap = useCapability('candles')
@@ -252,6 +254,47 @@ export function useChart({
     if (candleSeries === null) return
     candleSeries.applyOptions({ priceFormat: buildPriceFormat(priceDecimals) })
   }, [priceDecimals, chartReadyTick])
+
+  // Reconcile the horizontal reference lines (entry / liquidation) against the
+  // live series: create what is new, update what moved, remove what is gone.
+  // Keyed by `id` and held in a ref (the `IPriceLine` handles are imperative
+  // chart objects, never React state). Reruns on `chartReadyTick` so a series
+  // rebuild — which happens on market switch and drops its own price lines —
+  // re-draws them, and the stale handles are dropped rather than reused.
+  const priceLineHandlesRef = useRef<Map<string, IPriceLine>>(new Map())
+  useEffect(() => {
+    const candleSeries = candlesSeriesRef.current
+    const handles = priceLineHandlesRef.current
+    if (candleSeries === null) {
+      handles.clear()
+      return
+    }
+    const next = priceLines ?? []
+    const wanted = new Set(next.map((line) => line.id))
+
+    for (const [id, handle] of handles) {
+      if (wanted.has(id)) continue
+      candleSeries.removePriceLine(handle)
+      handles.delete(id)
+    }
+
+    for (const line of next) {
+      const options = {
+        price: line.price,
+        color: line.color,
+        title: line.title,
+        lineWidth: 1 as const,
+        lineStyle: line.style === 'dashed' ? LineStyle.Dashed : LineStyle.Solid,
+        axisLabelVisible: true,
+      }
+      const existing = handles.get(line.id)
+      if (existing) {
+        existing.applyOptions(options)
+        continue
+      }
+      handles.set(line.id, candleSeries.createPriceLine(options))
+    }
+  }, [priceLines, chartReadyTick])
 
   // Keep a ref so the subscription callback can read the current theme without
   // being in the subscribe effect's deps (which would re-subscribe on every toggle).

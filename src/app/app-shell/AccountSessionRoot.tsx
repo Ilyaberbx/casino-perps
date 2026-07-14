@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Outlet } from 'react-router-dom'
 import { OnboardingFlowProvider, OnboardingStepper, useAuth, useIsWalletConnected } from '@/modules/account'
-import { FavoritesProvider } from '@/modules/trading'
+import { FavoritesProvider, RecentMarketsProvider } from '@/modules/trading'
 import { AgentWalletProvider, BuilderFeeProvider, DepositProvider } from '@/modules/hyperliquid'
 import { SpectateProvider } from '@/modules/spectate'
 import { useVenue } from '@/modules/shared/providers/venue-provider'
@@ -56,13 +56,17 @@ export function AccountSessionRoot() {
                     <SpectateProvider isWalletConnected={isWalletConnected}>
                       <SpectateBridge />
                       {/*
-                        Favorites are app-wide, not trade-route state: the left rail has a
-                        Favorites item and the shell's SearchOverlay renders the market
-                        picker above the `/trade/:symbol` route. Mounted here so every
-                        consumer shares one store.
+                        Favorites and Recent are app-wide, not trade-route state: the left
+                        rail exposes both as lobby views (`/?view=favorites`, `/?view=recent`)
+                        and the shell's SearchOverlay renders the market picker above the
+                        `/trade/:symbol` route. Mounted here so every consumer shares one
+                        store — the lobby reads them, `SelectedMarketProvider` (mounted far
+                        below, under `/trade/*`) writes Recent.
                       */}
                       <FavoritesProvider>
-                        <Outlet />
+                        <RecentMarketsProvider>
+                          <Outlet />
+                        </RecentMarketsProvider>
                       </FavoritesProvider>
                     </SpectateProvider>
                   </VenueHip3AbstractionSession>

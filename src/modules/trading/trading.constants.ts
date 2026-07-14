@@ -15,6 +15,21 @@ export const SUBSCRIPTION_KEY_NONE = ''
 export const FAVORITES_STORAGE_KEY = 'perps-dex-favorites'
 
 /**
+ * localStorage key for the markets the user has most recently opened, newest
+ * first. Payload shape: { version: 1, symbols: string[] }. Feeds the left rail's
+ * "Recent" lobby view (`/?view=recent`).
+ *
+ * Global, not per-user (no `:<privyId>` suffix) — matching FAVORITES_STORAGE_KEY.
+ * Recent markets are a browsing convenience on a device, not account data, and
+ * the rail shows them before a wallet is ever connected.
+ */
+export const RECENT_MARKETS_STORAGE_KEY = 'perps-dex-recent-markets'
+
+/** How many recently-opened markets are retained. Matches HOT_MARKET_LIMIT so the
+ *  Recent grid fills the same shape as the other focused views. */
+export const RECENT_MARKETS_LIMIT = 12
+
+/**
  * Asset-class symbol sets — Minara's market-browser categorisation, scraped 1:1
  * (the partition is exact: every market falls in exactly one category; see
  * `docs/adr/0062-minara-market-catalog.md` and the verification artifact

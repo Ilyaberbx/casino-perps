@@ -1,67 +1,46 @@
 import { LazyChart } from '../components/chart'
-import {
-  BetAmountChips,
-  ConfirmBetSheet,
-  DirectionButtons,
-  LiveBetRow,
-  MarketHeader,
-  MultiplierControl,
-} from '../components/casino-trade'
-import { useCasinoTrade } from '../hooks/use-casino-trade'
+import { TopBar } from '../components/top-bar'
+import { SimpleOrderTicket } from '../components/order-entry'
+import { PositionPanel } from '../components/position-panel'
 import styles from './trading-page.module.css'
-import casino from '../components/casino-trade/casino-trade.module.css'
 
 /**
- * The Casino-Mode trade screen (PRD §8). Market header + lightweight-charts
- * price chart, then the bet ticket: amount (margin) chips, multiplier, and the
- * UP/DOWN commit. Tapping a direction opens the confirm sheet (liquidation
- * prose + magenta PLACE BET). An open bet on this market renders a live row with
- * Cash Out. No orderbook / depth / trades / funding (D7).
+ * The trade screen. Market strip, price chart, your open position in this market
+ * (when there is one), and a real order ticket: market by default, limit via the
+ * price-target toggle, with leverage, margin mode, USD⇄coin sizing off buying
+ * power, and the venue's own liquidation + fee estimates before you commit.
+ *
+ * This replaced the casino bet ticket (bet-amount chips, a "multiplier" slider,
+ * UP/DOWN). The order ticket is the long-standing `order-entry` tree, which was
+ * always here — it had simply been left unmounted.
+ *
+ * The position panel sits ABOVE the ticket rather than replacing it: on a screen
+ * you can both open and manage a position from, hiding the ticket behind an
+ * extra tap the moment you are in a trade is the wrong trade-off — adding to or
+ * hedging a position is a normal thing to want.
+ *
+ * `TopBar`'s favourite star reads `FavoritesProvider`, which is mounted app-wide
+ * in `AccountSessionRoot` — mounting a second one here would give the star its
+ * own store, so the trade page and the rail would disagree about what is starred.
  */
 export function TradingPage() {
-  const trade = useCasinoTrade()
-
   return (
-    <div className={`${styles.shell} ambient-cyan`} data-testid="casino-trade-shell">
-      <MarketHeader
-        ticker={trade.ticker}
-        markPrice={trade.markPrice}
-        change24hPct={trade.change24hPct}
-      />
+    <div className={`${styles.shell} ambient-cyan`} data-testid="trading-shell">
+      <div className={styles.marketStrip}>
+        <TopBar />
+      </div>
 
       <div className={styles.chartCard}>
         <LazyChart />
       </div>
 
-      {trade.liveBet ? (
-        <LiveBetRow
-          liveBet={trade.liveBet}
-          isCashingOut={trade.isCashingOut}
-          onCashOut={trade.cashOut}
-        />
-      ) : null}
+      {/* Renders nothing when flat — it carries its own card chrome so no
+          empty bordered box is left behind. */}
+      <PositionPanel />
 
-      <span className={casino.sectionLabel}>Your bet</span>
-      <BetAmountChips
-        presets={trade.betPresets}
-        betAmount={trade.betAmount}
-        onSelect={trade.selectAmount}
-        onMax={trade.selectMax}
-      />
-
-      <MultiplierControl
-        leverage={trade.leverage}
-        maxLeverage={trade.maxLeverage}
-        onChange={trade.setMultiplier}
-      />
-
-      <DirectionButtons canBet={trade.canBet} onPick={trade.openConfirm} />
-
-      <ConfirmBetSheet
-        pendingBet={trade.pendingBet}
-        onClose={trade.closeConfirm}
-        onPrimary={trade.confirmPrimary}
-      />
+      <div className={styles.ticketCard}>
+        <SimpleOrderTicket />
+      </div>
     </div>
   )
 }
